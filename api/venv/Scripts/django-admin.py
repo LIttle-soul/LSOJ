@@ -1,4 +1,4 @@
-#!F:\毕业项目\副本\api\venv\Scripts\python.exe
+#!H:\LSOJ\api\venv\Scripts\python.exe
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

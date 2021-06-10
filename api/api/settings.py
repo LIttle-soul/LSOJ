@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['*']
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://192.168.123.20:6379/0',
+        'LOCATION': 'redis://192.168.123.3:6379/0',
         'OPTIONS': {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PARSER_CLASS": "redis.connection.HiredisParser",    #解析器
@@ -62,8 +62,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.common.CommonMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -94,6 +94,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'app': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'lsoj',
+        'USER': 'LSOJ',
+        'PASSWORD': 'renchenghui',
+        'HOST': '192.168.123.3',
+        'PORT': '3306'
     }
 }
 
@@ -143,3 +151,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = '/files/'
 
 # MEDIA_URL = BASE_DIR / 'images'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+# EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '3488508834@qq.com'
+EMAIL_HOST_PASSWORD = 'lvsfyuviiaqtdacj'
+DEFAULT_FROM_EMAIL = '3488508834@qq.com'

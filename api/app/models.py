@@ -264,8 +264,3 @@ class Reply(models.Model):
     class Meta:
         managed = True
         db_table = 'reply'
-
-
-if __name__ == '__main__':
-    for i in range(11):
-        print(i)
