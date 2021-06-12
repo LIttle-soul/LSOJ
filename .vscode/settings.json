@@ -1,4 +1,4 @@
 {
     "git.ignoreLimitWarning": true,
-    "python.pythonPath": "C:\\Users\\LiSoul\\AppData\\Local\\Programs\\Python\\Python39\\python.exe"
+    "python.pythonPath": "api\\venv\\Scripts\\python.exe"
 }
