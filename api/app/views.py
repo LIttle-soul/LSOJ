@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.generic import View
 from django.utils import timezone
+from django.db.models import Q
 from app.utils.PublicMethods import PublicMethod
 from app.models import *
 
@@ -8,6 +9,7 @@ publicMethod = PublicMethod()
 
 
 # --------------------------用户功能----------------------------
+# 普通用户
 class Login(View):
     """
     模块: 用户登录
@@ -28,10 +30,14 @@ class Login(View):
         password = request.POST.get('password')
         code = request.POST.get('code')
         if publicMethod.check_capture(requester=request, code=code):
-            if Password.objects.using('app').filter(user_id=username):
-                obj = Password.objects.using('app').get(user_id=username)
+            obj = Password.objects.using('app').filter(user_id=username)
+            if obj.exists():
+                obj = obj.first()
                 if publicMethod.check_password(password_new=password, password_old=obj.password):
-                    token = publicMethod.create_token({'username': obj.user_id}, 30)
+                    user_obj = User.objects.using('app').filter(user_id=obj)
+                    capacity = user_obj.first().role_pri if user_obj.exists() else 4
+                    print(capacity)
+                    token = publicMethod.create_token({'username': obj.user_id, 'capacity': capacity}, 120)
                     LoginLog.objects.using('app').create(
                         user_id=username,
                         ip=publicMethod.get_ip(request),
@@ -51,11 +57,7 @@ class Login(View):
 class Logout(View):
     def get(self, request):
         token = request.GET.get('token')
-        if token:
-            data = publicMethod.parse_payload(token)
-        else:
-            data = "error"
-        print(data)
+        data = publicMethod.parse_payload(token)
         message = {'err': data}
         return JsonResponse(message)
 
@@ -86,7 +88,8 @@ class Register(View):
         check_pass = request.POST.get('check_pass')
         code = request.POST.get('code')
         if publicMethod.check_capture(request, code):
-            if Password.objects.using('app').filter(user_id=username):
+            obj = Password.objects.using('app').filter(user_id=username)
+            if obj.exists():
                 state = {'status': False, 'err': '此用户已注册'}
             else:
                 if password == check_pass:
@@ -117,11 +120,9 @@ class PerfectInfo(View):
         user_id = publicMethod.check_user_login(token)
         if not user_id:
             return JsonResponse({'status': False, 'err': '用户未登录'})
-        else:
-            user_id = Password.objects.using('app').get(user_id=user_id)
-        if User.objects.using('app').filter(user_id=user_id):
-            obj = User.objects.using('app').filter(user_id=user_id).values().first()
-            messages = {'status': True, 'err': '个人用户信息', 'data': obj}
+        obj = User.objects.using('app').filter(user_id__user_id=user_id)
+        if obj.exists():
+            messages = {'status': True, 'err': '个人用户信息', 'data': obj.values().first()}
         else:
             messages = {'status': False, 'err': '请先完善用户信息'}
         return JsonResponse(messages)
@@ -136,9 +137,10 @@ class PerfectInfo(View):
         school = request.POST.get('school')
         sex = request.POST.get('sex')
         sex = (0 if sex == '男' else 1)
-        user_id = Password.objects.using('app').get(user_id=user_id)
-        if User.objects.using('app').filter(user_id=user_id):
-            obj = User.objects.using('app').get(user_id=user_id)
+        user = Password.objects.using('app').get(user_id=user_id)
+        obj = User.objects.using('app').filter(user_id=user)
+        if obj.exists():
+            obj = obj.first()
             if nick_name:
                 obj.nick = nick_name
             if school:
@@ -149,7 +151,7 @@ class PerfectInfo(View):
             message = {'status': True, 'err': '信息修改成功'}
         else:
             User.objects.using('app').create(
-                user_id=user_id,
+                user_id=user,
                 real_name=real_name,
                 nick=nick_name,
                 ip=publicMethod.get_ip(request),
@@ -247,7 +249,7 @@ class SendEmail(View):
         email = request.POST.get('email')
         code = request.POST.get('code')
         if not token or not publicMethod.parse_payload(token).get('status'):
-            email = User.objects.using('app').get(user_id__user_id=user_id).email
+            email = User.objects.using('app').get(user_id_id=user_id).email
             if publicMethod.check_email_code(email=email, code=code):
                 message = {'status': True, 'err': '邮箱验证通过'}
                 publicMethod.set_user_email(user_id + email)
@@ -257,7 +259,7 @@ class SendEmail(View):
             user_id = publicMethod.check_user_login(token)
             if publicMethod.check_email_code(email=email, code=code):
                 message = {'status': True, 'err': '邮箱绑定成功'}
-                obj = User.objects.using('app').get(user_id__user_id=user_id)
+                obj = User.objects.using('app').get(user_id_id=user_id)
                 obj.email = email
                 obj.save()
             else:
@@ -306,6 +308,23 @@ class ForgetPassword(View):
         return JsonResponse(message)
 
 
+class GetUserStatus(View):
+    """
+    模块: 获取用户状态
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+# 教师管理员功能
 class GetUserList(View):
     """
     模块: 获取用户信息列表
@@ -313,14 +332,56 @@ class GetUserList(View):
         GET:
             None
         POST:
-            None
-        """
+            search: 查询字段
+    """
     def get(self, request):
         message = []
         obj = User.objects.using('app').all()
         for user in obj.values():
             message.append(user)
         return JsonResponse({"data": message})
+
+    def post(self, request):
+        message = []
+        search = request.POST.get('search')
+        obj = User.objects.using('app').filter(
+            Q(user_id__user_id__contains=search) |
+            Q(real_name__contains=search) |
+            Q(nick__contains=search) |
+            Q(school__contains=search)
+        )
+        for user in obj.values():
+            message.append(user)
+        return JsonResponse({'data': message})
+
+
+class ChangeUserCapacity(View):
+    """
+    模块: 修改用户权限
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class ResettingUserPassword(View):
+    """
+    模块: 重置用户密码
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
 
     def post(self, request):
         pass

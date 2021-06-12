@@ -2,6 +2,8 @@ import base64
 import hashlib
 import string
 from django.utils import timezone
+import datetime
+import time
 import random
 import jwt
 from django_redis import get_redis_connection
@@ -139,6 +141,7 @@ class PublicMethod:
     def parse_payload(self, token):
         result = {
             'status': False,
+            'remind': False,
             'time': timezone.now(),
             'data': None,
             'error': None
@@ -147,6 +150,8 @@ class PublicMethod:
             verified_payload = jwt.decode(token, key=self.JWT_SALT, algorithms="HS256")
             result['status'] = True
             result['data'] = verified_payload
+            if verified_payload['exp'] - int(time.time()) < 1800:
+                result['remind'] = True
         except jwt.ExpiredSignatureError:
             result['error'] = 'token已失效'
         except jwt.DecodeError:
