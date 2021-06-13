@@ -1,11 +1,9 @@
 <template>
-  <div id="App">
+  <div id="app">
     <router-view></router-view>
   </div>
 </template>
 
 <style>
-#App {
-  margin: 0;
-}
+  
 </style>
