@@ -23,6 +23,11 @@ const routes = [
     path: '/:catchAll(.*)',
     name: '404',
     component: () => import('../views/404.vue')
+  },
+  {
+    path: '/ceshi',
+    name: 'Ceshi',
+    component: () => import('../components/Login.vue')
   }
 ]
 
