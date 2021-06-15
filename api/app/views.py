@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.generic import View
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, F, Avg, Max, Min, Count, Sum
 from app.utils.PublicMethods import PublicMethod
 from app.models import *
 
@@ -317,8 +317,67 @@ class GetUserStatus(View):
         POST:
             None
     """
+    def __init__(self):
+        super(GetUserStatus, self).__init__()
+        self.year_now = timezone.now().year
+        self.month_now = timezone.now().month
+        self.day_now = timezone.now().day
+
     def get(self, request):
-        pass
+        user_id = request.GET.get('user_id')
+        year = self.year_now - 1
+        month = self.month_now
+        day = 1 if self.day_now <= 15 else 15
+        solved = 0
+        submit = 0
+        rank = 1
+        school = None
+        solution_list = None
+        solved_list = None
+        submit_data = []
+        solved_data = []
+        date_data = []
+        user = User.objects.using('app').filter(user_id__user_id=user_id)
+        solution = Solution.objects.using('app').filter(user_id=user_id)
+        if user.exists():
+            user = user.first()
+            solved = user.solved
+            submit = user.submit
+            school = user.school
+            rank = User.objects.filter(solved__gt=solved).count() + 1
+            if solution.exists():
+                stop = False
+                while True:
+                    begin_time = timezone.now().replace(year, month, day)
+                    day += 15
+                    if day == 31:
+                        month += 1
+                        day = 1
+                        if month == 13:
+                            month = 1
+                            year += 1
+                    end_time = timezone.now().replace(year, month, day)
+                    if end_time >= timezone.now():
+                        stop = True
+                        end_time = timezone.now()
+                    submit_data.append(solution.filter(in_date__range=[begin_time, end_time]).count())
+                    solved_data.append(solution.filter(Q(result=4) & Q(in_date__range=[begin_time, end_time])).count())
+                    date_data.append(end_time)
+                    if stop:
+                        break
+                solution_list = solution.values("result").annotate(number=Count("user_id"))
+                solved_list = solution.filter(result=4).values("problem_id").annotate(number=Count('user_id'))
+        return JsonResponse({'user_id': user_id,
+                             'solved': solved,
+                             'submit': submit,
+                             'rank': rank,
+                             'solution': list(solution_list),
+                             'school': school,
+                             'solved_list': list(solved_list),
+                             'submit_data': list(submit_data),
+                             'solved_data': list(solved_data),
+                             'date_data': list(date_data)
+                             })
 
     def post(self, request):
         pass
@@ -362,7 +421,9 @@ class ChangeUserCapacity(View):
         GET:
             None
         POST:
-            None
+            token: 当前登录用户的token
+            user: 要修改的用户id
+            role_pri: 要修改的用户权限
     """
     def get(self, request):
         pass
@@ -370,6 +431,20 @@ class ChangeUserCapacity(View):
     def post(self, request):
         token = request.POST.get('token')
         user_id = request.POST.get('user')
+        role_pri = request.POST.get('role_pri')
+        capacity = publicMethod.get_user_capacity(token)
+        if capacity in [0, 1]:
+            obj = User.objects.using('app').filter(user_id__user_id=user_id)
+            if obj.exists():
+                obj = obj.first()
+                obj.role_pri = role_pri
+                obj.save()
+                message = {'status': True, 'err': '权限修改成功'}
+            else:
+                message = {'status': False, 'err': '未找到此用户'}
+        else:
+            message = {'status': False, 'err': '你未拥有此权限'}
+        return JsonResponse(message)
 
 
 class ResettingUserPassword(View):
@@ -385,7 +460,22 @@ class ResettingUserPassword(View):
         pass
 
     def post(self, request):
-        pass
+        token = request.POST.get('token')
+        user_id = request.POST.get('user')
+        password = request.POST.get('password')
+        capacity = publicMethod.get_user_capacity(token)
+        if capacity in [0, 1]:
+            obj = Password.objects.using('app').filter(user_id=user_id)
+            if obj.exists():
+                obj = obj.first()
+                obj.password = password
+                obj.save()
+                message = {'status': True, 'err': '密码修改成功'}
+            else:
+                message = {'status': False, 'err': '未找到此用户'}
+        else:
+            message = {'status': False, 'err': '你未拥有此权限'}
+        return JsonResponse(message)
 
 
 # ---------------------------问题功能---------------------------

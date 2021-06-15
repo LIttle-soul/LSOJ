@@ -24,11 +24,11 @@ const routes = [
     name: '404',
     component: () => import('../views/404.vue')
   },
-  {
-    path: '/ceshi',
-    name: 'Ceshi',
-    component: () => import('../components/Login.vue')
-  }
+  // {
+  //   path: '/ceshi',
+  //   name: 'Ceshi',
+  //   component: () => import('../components/Login.vue')
+  // }
 ]
 
 const router = createRouter({

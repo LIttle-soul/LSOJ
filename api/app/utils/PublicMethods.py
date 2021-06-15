@@ -172,6 +172,7 @@ class PublicMethod:
                 user_id = None
         return user_id
 
+    # 通过token获取用户身份
     def get_user_capacity(self, token):
         capacity = 4
         if token:
