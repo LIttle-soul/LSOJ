@@ -26,13 +26,26 @@
       ></el-input>
     </el-form-item>
     <el-form-item label="" prop="code">
-      <el-input
+      <el-col
+        :xs="14"
+        :sm="16"
+        >
+        <el-input
         prefix-icon="el-icon-box"
         placeholder="验证码"
-        style="width: 150px"
         v-model="ruleForm.code"
         ></el-input>
+      </el-col>
+      <el-col 
+        :xs="9"
+        :sm="7"
+        :offset="1">
+        <div class="login-code" @click="refreshCode">
+          <Identify :identifyCode="ruleForm.true_code" style="margin-top: 1px;"></Identify>
+        </div>
+      </el-col>
     </el-form-item>
+    <!-- 按钮实现 -->
     <el-form-item>
       <el-button 
         type="primary" 
@@ -46,7 +59,12 @@
 </template>
 
 <script>
+import Identify from './identify.vue';
+
 export default {
+  components: {
+    Identify
+  },
   data() {
     var checkUser = (rule, value, callback) => {
       if (!value) {
@@ -91,6 +109,8 @@ export default {
         pass: [{ validator: validatePass, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
+      identifyCode: '',
+      identifyCodes: '1234567890'
     };
   },
   methods: {
@@ -107,6 +127,18 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
+    refreshCode () {
+      this.ruleForm.true_code = '';
+      this.makeCode(this.identifyCodes, 4);
+    },
+    randomNum (min, max) {
+      return Math.floor(Math.random() * (max - min) + min);
+    },
+    makeCode (o, l) {
+      for (let i = 0; i < l; i++) {
+        this.ruleForm.true_code += this.identifyCodes[this.randomNum(0, this.identifyCodes.length)]
+      }
+    }
   },
 };
 </script>
