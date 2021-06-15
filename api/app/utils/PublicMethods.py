@@ -171,3 +171,11 @@ class PublicMethod:
             else:
                 user_id = None
         return user_id
+
+    def get_user_capacity(self, token):
+        capacity = 4
+        if token:
+            data = self.parse_payload(token)
+            if data['status']:
+                capacity = data.get('data').get('data').get('capacity')
+        return capacity

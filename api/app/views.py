@@ -77,7 +77,7 @@ class Register(View):
             password: 用户密码
             check_pass: 重复密码
             code: 图片验证码
-        """
+    """
     def get(self, request):
         res = publicMethod.capture(requester=request)
         return JsonResponse(res)
@@ -114,7 +114,7 @@ class PerfectInfo(View):
             nickname: 用户昵称
             school: 用户所在学校
             sex: 用户性别{‘男’，‘女’}
-        """
+    """
     def get(self, request):
         token = request.GET.get('token')
         user_id = publicMethod.check_user_login(token)
@@ -178,7 +178,7 @@ class PasswordModification(View):
             new_password: 新用户密码
             check_password: 重复密码
             code: 图片验证码
-        """
+    """
     def get(self, request):
         res = publicMethod.capture(requester=request)
         return JsonResponse(res)
@@ -218,7 +218,7 @@ class SendEmail(View):
         POST:
             token: token认证
             code: 邮箱验证码
-        """
+    """
     def get(self, request):
         token = request.GET.get('token')
         user_id = request.GET.get('user_id')
@@ -278,7 +278,7 @@ class ForgetPassword(View):
             new_password: 新用户密码
             check_password: 重复密码
             code: 图片验证码
-        """
+    """
     def get(self, request):
         res = publicMethod.capture(requester=request)
         return JsonResponse(res)
@@ -368,7 +368,8 @@ class ChangeUserCapacity(View):
         pass
 
     def post(self, request):
-        pass
+        token = request.POST.get('token')
+        user_id = request.POST.get('user')
 
 
 class ResettingUserPassword(View):
