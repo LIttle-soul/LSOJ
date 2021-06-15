@@ -3,80 +3,11 @@
     <div class="container" :class="{ 'right-panel-active': signUpMode }">
       <!-- Sign Up -->
       <div class="container__form container__signup">
-        <el-form class="form" id="form1">
-          <h2 class="form__title">注册</h2>
-          <el-form-item label="" class="input">
-            <el-input
-              prefix-icon="el-icon-user-solid"
-              type="text"
-              maxlength="20"
-              minlength="5"
-              placeholder="User"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="" class="input">
-            <el-input
-              prefix-icon="el-icon-lock"
-              type="password"
-              show-password="true"
-              minlength="8"
-              maxlength="16"
-              placeholder="Password"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="" class="input">
-            <el-input
-              prefix-icon="el-icon-circle-check"
-              type="password"
-              placeholder="Reply"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="" class="input">
-            <el-input
-              v-model="loginForm.captcha_code"
-              prefix-icon="el-icon-circle-check"
-              maxlength="6"
-              type="text"
-              placeholder="Code"
-              style="float: left; width: 140px"
-            ></el-input>
-            <div class="captcha_code">
-              <img src="" ref="code" @click="changeCode" alt="" />
-            </div>
-          </el-form-item>
-
-          <el-form-item label="">
-            <el-button class="btn">注册</el-button>
-          </el-form-item>
-        </el-form>
+        <Register/>
       </div>
       <!-- Sign In -->
       <div class="container__form container__signin">
-        <el-form class="form" id="form2">
-          <h2 class="form__title">登录</h2>
-          <el-form-item label="" class="input">
-            <el-input type="text" placeholder="User"></el-input>
-          </el-form-item>
-          <el-form-item label="" class="input">
-            <el-input type="password" placeholder="Password"></el-input>
-          </el-form-item>
-          <el-form-item label="" class="input">
-            <el-input
-              v-model="loginForm.captcha_code"
-              prefix-icon="el-icon-circle-check"
-              maxlength="6"
-              type="text"
-              placeholder="Code"
-              style="float: left; width: 140px"
-            ></el-input>
-            <div class="captcha_code">
-              <img src="" ref="code" @click="changeCode" alt="" />
-            </div>
-          </el-form-item>
-          <el-form-item label="">
-            <el-button class="btn">登录</el-button>
-          </el-form-item>
-        </el-form>
+        <Login/>
       </div>
       <!-- Overlay -->
       <div class="container__overlay">
@@ -108,38 +39,24 @@
 </template>
 
 <script>
-// import { ref } from '@vue/runtime-core'
+import Login from '../../components/Login.vue';
+import Register from '../../components/Register.vue';
+
 export default {
   name: "LoginRegister",
+  components: {
+    Login,
+    Register
+  },
   setup() {},
   data() {
     return {
-      signUpMode: false,
-      loginForm: {
-        username: "",
-        password: "",
-        captcha_key: "",
-        captcha_code: "",
-      },
+      signUpMode: false
     };
   },
   mounted() {
-    this.changeCode();
   },
   methods: {
-    getCaptchaKey() {
-      let captchaKey = Math.random().toString(36).substring(2);
-      return captchaKey;
-    },
-    changeCode() {
-      let captcha_key = this.getCaptchaKey();
-      this.$refs.code.setAttribute(
-        "src",
-        process.env.VUE_APP_API_URL +
-          "auth/get_captcha?captcha_key=" +
-          captcha_key
-      );
-    },
   },
 };
 </script>
@@ -178,21 +95,6 @@ div {
   z-index: 1;
 }
 
-.form__title {
-  font-size: 18pt;
-  font-weight: 800;
-  color: #07539be8;
-  margin: 0;
-  margin-bottom: 1.25rem;
-}
-
-.link {
-  color: var(--gray);
-  font-size: 0.9rem;
-  margin: 1.5rem 0;
-  text-decoration: none;
-}
-
 .container {
   /* background-color: var(--white); */
   border-radius: var(--button-radius);
@@ -219,6 +121,7 @@ div {
 }
 
 .container.right-panel-active .container__signin {
+  opacity: 0;
   transform: translateX(100%);
 }
 
@@ -315,34 +218,12 @@ div {
   transition: transform 80ms ease-in;
 }
 
-.form > .btn {
-  margin-top: 1.5rem;
-}
-
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.85);
 }
 
 .btn:focus {
   outline: none;
-}
-
-.form {
-  background-color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 0 3rem;
-  height: 100%;
-  text-align: center;
-}
-
-.input {
-  border: none;
-  padding: 0.7rem 0.9rem;
-  margin: 0.2rem 0;
-  width: 100%;
 }
 
 @-webkit-keyframes show {
