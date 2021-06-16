@@ -39,14 +39,13 @@
 </template>
 
 <script>
-import Login from '../../components/Login.vue';
-import Register from '../../components/Register.vue';
+import { defineAsyncComponent } from 'vue'
 
 export default {
   name: "LoginRegister",
   components: {
-    Login,
-    Register
+    Login: defineAsyncComponent(() => import('../../components/Login.vue')),
+    Register: defineAsyncComponent(() => import('../../components/Register.vue')),
   },
   setup() {},
   data() {

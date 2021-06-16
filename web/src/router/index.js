@@ -1,10 +1,23 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+
 
 const routes = [
   {
-    path: '/',
+    path: '',
     name: 'User',
-    component: () => import('../views/user/index.vue')
+    component: () => import('@/views/user/index.vue'),
+    children: [
+      {
+        path: '',
+        name: 'Index',
+        component: () => import('@/views/user/Home/Home.vue')
+      },
+      {
+        path: '/ceshi',
+        name: 'Ceshi',
+        component: () => import('@/components/HelloWorld.vue')
+      },
+    ]
   },
   {
     path: '/admin',
@@ -20,19 +33,14 @@ const routes = [
     component: () => import('../views/user/LoginRegister.vue')
   },
   {
-    path: '/:catchAll(.*)',
+    path: '/:pathMatch(.*)',
     name: '404',
     component: () => import('../views/404.vue')
-  },
-  // {
-  //   path: '/ceshi',
-  //   name: 'Ceshi',
-  //   component: () => import('../components/Login.vue')
-  // }
+  }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 

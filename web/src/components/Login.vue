@@ -1,7 +1,7 @@
 <template>
   <el-form
     :model="ruleForm"
-    status-icon=true
+    status-icon="true"
     :rules="rules"
     ref="ruleForm"
     label-position="left"
@@ -30,39 +30,34 @@
         prefix-icon="el-icon-box"
         placeholder="验证码"
         v-model="ruleForm.code"
-        >
-          <template #append>
-            <div class="login-code" @click="refreshCode">
-              <Identify :identifyCode="ruleForm.true_code" key="one" v-if="isShow"></Identify>
-            </div>
-          </template>
+      >
+        <template #append>
+          <div class="login-code" @click="refreshCode" key="one" v-if="isShow">
+            <Identify :identifyCode="ruleForm.true_code"></Identify>
+          </div>
+        </template>
       </el-input>
     </el-form-item>
     <!-- 按钮实现 -->
     <el-form-item>
-      <el-button 
-        type="primary" 
-        @click="submitForm('ruleForm')"
-        >提交</el-button>
-      <el-button 
-        @click="resetForm('ruleForm')"
-        >重置</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+      <el-button @click="resetForm('ruleForm')">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
-import Identify from './identify'
+import Identify from "./identify.vue";
 
 export default {
   components: {
-    Identify
-  }, 
+    Identify,
+  },
   props: {
     isShow: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     var checkUser = (rule, value, callback) => {
@@ -101,13 +96,14 @@ export default {
         user: "",
         pass: "",
         code: "",
-        true_code: "4321"
+        true_code: "4321",
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
         pass: [{ validator: validatePass, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
+      identifyCodes: "1234567890",
     };
   },
   methods: {
@@ -124,18 +120,19 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    refreshCode () {
-      this.ruleForm.true_code = '';
+    refreshCode() {
+      this.ruleForm.true_code = "";
       this.makeCode(this.identifyCodes, 4);
     },
-    randomNum (min, max) {
+    randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
     },
-    makeCode (o, l) {
+    makeCode(o, l) {
       for (let i = 0; i < l; i++) {
-        this.ruleForm.true_code += this.identifyCodes[this.randomNum(0, this.identifyCodes.length)]
+        this.ruleForm.true_code +=
+          this.identifyCodes[this.randomNum(0, this.identifyCodes.length)];
       }
-    }
+    },
   },
 };
 </script>

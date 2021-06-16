@@ -1,33 +1,25 @@
 <template>
 <div>
     <el-header>
-        <Header></Header>
+        <NavTop />
     </el-header>
     <el-main>
-        <ul 
-        class="infinite-list" 
-        v-infinite-scroll="load" 
-        style="overflow:auto">
-            <li 
-            v-for="i in count" 
-            :key="i" 
-            class="infinite-list-item">
-                {{ i }}
-            </li>
-        </ul>
+        <router-view />
     </el-main>
     <el-footer>
-        Footer
+        <Footer />
     </el-footer>
 </div>
 </template>
 
 <script>
-import Header from './Header/Header.vue'
+import NavTop from '@/components/NavTop.vue'
+import Footer from '@/components/Footer.vue'
 
 export default {
     components: {
-        Header
+        NavTop,
+        Footer
     },
     data() {
         return {
@@ -44,3 +36,13 @@ export default {
     }
 }
 </script>
+
+<style>
+a {
+  text-decoration: none;
+}
+ 
+.router-link-active {
+  text-decoration: none;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <el-form
     :model="ruleForm"
-    status-icon=true
+    status-icon="true"
     :rules="rules"
     ref="ruleForm"
     label-position="left"
@@ -39,37 +39,39 @@
         prefix-icon="el-icon-box"
         placeholder="验证码"
         v-model="ruleForm.code"
-        >
-          <template #append>
-            <div class="login-code" @click="refreshCode" style="width: 90">
-              <Identify :identifyCode="ruleForm.true_code" key="two" v-if="isShow"/>
-            </div>
-          </template>
+      >
+        <template #append>
+          <div
+            class="login-code"
+            @click="refreshCode"
+            style="width: 90"
+            key="two"
+            v-if="isShow"
+          >
+            <Identify :identifyCode="ruleForm.true_code" />
+          </div>
+        </template>
       </el-input>
     </el-form-item>
     <el-form-item>
-      <el-button 
-        type="primary" 
-        @click="submitForm('ruleForm')"
-        >提交</el-button>
-      <el-button 
-        @click="resetForm('ruleForm')"
-        >重置</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+      <el-button @click="resetForm('ruleForm')">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
-import Identify from './identify.vue';
+import Identify from "./identify.vue";
+
 export default {
   components: {
-    Identify
+    Identify,
   },
   props: {
     isShow: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     var checkUser = (rule, value, callback) => {
@@ -98,7 +100,7 @@ export default {
       if (value === "") {
         callback(new Error("请输入密码"));
       } else if (value !== this.ruleForm.pass) {
-        callback(new Error("两次输入密码不一致"))
+        callback(new Error("两次输入密码不一致"));
       } else {
         callback();
       }
@@ -118,16 +120,15 @@ export default {
         pass: "",
         checkPass: "",
         code: "",
-        true_code: "123456"
+        true_code: "1234",
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
         pass: [{ validator: validatePass, trigger: "blur" }],
-        checkPass: [{ validator: validatePass2, trigger: "blur"}],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
-      identifyCode: '',
-      identifyCodes: '1234567890'
+      identifyCodes: "1234567890",
     };
   },
   methods: {
@@ -144,18 +145,19 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    refreshCode () {
-      this.ruleForm.true_code = '';
-      this.makeCode(this.identifyCodes, 6);
+    refreshCode() {
+      this.ruleForm.true_code = "";
+      this.makeCode(this.identifyCodes, 4);
     },
-    randomNum (min, max) {
+    randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
     },
-    makeCode (o, l) {
+    makeCode(o, l) {
       for (let i = 0; i < l; i++) {
-        this.ruleForm.true_code += this.identifyCodes[this.randomNum(0, this.identifyCodes.length)]
+        this.ruleForm.true_code +=
+          this.identifyCodes[this.randomNum(0, this.identifyCodes.length)];
       }
-    }
+    },
   },
 };
 </script>
