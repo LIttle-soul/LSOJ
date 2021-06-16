@@ -26,24 +26,17 @@
       ></el-input>
     </el-form-item>
     <el-form-item label="" prop="code">
-      <el-col
-        :xs="14"
-        :sm="16"
-        >
-        <el-input
+      <el-input
         prefix-icon="el-icon-box"
         placeholder="验证码"
         v-model="ruleForm.code"
-        ></el-input>
-      </el-col>
-      <el-col 
-        :xs="9"
-        :sm="7"
-        :offset="1">
-        <div class="login-code" @click="refreshCode">
-          <Identify :identifyCode="ruleForm.true_code" style="margin-top: 1px;"></Identify>
-        </div>
-      </el-col>
+        >
+          <template #append>
+            <div class="login-code" @click="refreshCode">
+              <Identify :identifyCode="ruleForm.true_code" key="one" v-if="isShow"></Identify>
+            </div>
+          </template>
+      </el-input>
     </el-form-item>
     <!-- 按钮实现 -->
     <el-form-item>
@@ -59,11 +52,17 @@
 </template>
 
 <script>
-import Identify from './identify.vue';
+import Identify from './identify'
 
 export default {
   components: {
     Identify
+  }, 
+  props: {
+    isShow: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     var checkUser = (rule, value, callback) => {
@@ -102,15 +101,13 @@ export default {
         user: "",
         pass: "",
         code: "",
-        true_code: "abcd"
+        true_code: "4321"
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
         pass: [{ validator: validatePass, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
-      identifyCode: '',
-      identifyCodes: '1234567890'
     };
   },
   methods: {

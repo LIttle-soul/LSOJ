@@ -35,24 +35,17 @@
       ></el-input>
     </el-form-item>
     <el-form-item label="" prop="code">
-      <el-col
-        :xs="14"
-        :sm="16"
-        >
-        <el-input
+      <el-input
         prefix-icon="el-icon-box"
         placeholder="验证码"
         v-model="ruleForm.code"
-        ></el-input>
-      </el-col>
-      <el-col 
-        :xs="9"
-        :sm="7"
-        :offset="1">
-        <div class="login-code" @click="refreshCode">
-          <Identify :identifyCode="identifyCode" style="margin-top: 1px;"></Identify>
-        </div>
-      </el-col>
+        >
+          <template #append>
+            <div class="login-code" @click="refreshCode" style="width: 90">
+              <Identify :identifyCode="ruleForm.true_code" key="two" v-if="isShow"/>
+            </div>
+          </template>
+      </el-input>
     </el-form-item>
     <el-form-item>
       <el-button 
@@ -68,15 +61,15 @@
 
 <script>
 import Identify from './identify.vue';
-
 export default {
   components: {
     Identify
   },
-  mounted () {
-    // 初始化验证码
-    this.ruleForm.true_code = '';
-    this.makeCode(this.identifyCodes, 4);
+  props: {
+    isShow: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     var checkUser = (rule, value, callback) => {
@@ -125,7 +118,7 @@ export default {
         pass: "",
         checkPass: "",
         code: "",
-        true_code: ""
+        true_code: "123456"
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
@@ -153,7 +146,7 @@ export default {
     },
     refreshCode () {
       this.ruleForm.true_code = '';
-      this.makeCode(this.identifyCodes, 4);
+      this.makeCode(this.identifyCodes, 6);
     },
     randomNum (min, max) {
       return Math.floor(Math.random() * (max - min) + min);

@@ -3,11 +3,11 @@
     <div class="container" :class="{ 'right-panel-active': signUpMode }">
       <!-- Sign Up -->
       <div class="container__form container__signup">
-        <Register/>
+        <Register :isShow="signUpMode"/>
       </div>
       <!-- Sign In -->
       <div class="container__form container__signin">
-        <Login/>
+        <Login :isShow="!signUpMode"/>
       </div>
       <!-- Overlay -->
       <div class="container__overlay">
@@ -51,7 +51,7 @@ export default {
   setup() {},
   data() {
     return {
-      signUpMode: false
+      signUpMode: false,
     };
   },
   mounted() {
