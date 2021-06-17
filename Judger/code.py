@@ -24,6 +24,8 @@ def runner(problem, language):
                     print(run.run_python3())
                 elif language == 'java':
                     print(run.run_java())
+                elif language == 'bash':
+                    print(run.run_bash())
                 else:
                     return False
 
@@ -56,6 +58,8 @@ def write_to_file(coder, language):
         path = f'{path}/code/main.go'
     elif language == 'js':
         path = f'{path}/code/main.js'
+    elif language == 'bash':
+        path = f'{path}/code/main.sh'
     else:
         return False
     fd = open(path, 'w+')
@@ -63,6 +67,9 @@ def write_to_file(coder, language):
     fd.close()
     return True
 
+
+def replace_word(s):
+    return s.replace('<br\>', '\\n')
 
 if __name__ == '__main__':
     language_list = [
@@ -74,7 +81,7 @@ if __name__ == '__main__':
 using namespace std;
 
 int main(){
-    cout << "Hello, World!\\n";
+    cout << "Hello, World!<br\>";
     return 0;
 }"""
     problem = '2'

@@ -115,3 +115,21 @@ class Run:
         f_in.close()
         f_temp.close()
         return self.check(rst)
+
+    def run_bash(self):
+        f_in = open(self.in_path)
+        f_temp = open(self.temp_path, 'w')
+        run_cfg = {
+            'args': ['sh', f'{self.code_path}/main.sh'],
+            'fd_in': f_in.fileno(),
+            'fd_out': f_temp.fileno(),
+            'timelimit': 1000,  # ms
+            'memorylimit': 102400,  # kb
+        }
+        try:
+            rst = lorun.run(run_cfg)
+        except SyntaxError:
+            return {'result': self.RESULT_STR[7]}
+        f_in.close()
+        f_temp.close()
+        return self.check(rst)

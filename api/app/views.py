@@ -214,9 +214,12 @@ class SendEmail(View):
     接口信息:
         GET:
             token: token认证
+            user_id: 用户id
             email: 邮箱（绑定邮箱时使用）
         POST:
             token: token认证
+            user_id: 用户id
+            email: 邮箱
             code: 邮箱验证码
     """
     def get(self, request):
@@ -249,7 +252,7 @@ class SendEmail(View):
         email = request.POST.get('email')
         code = request.POST.get('code')
         if not token or not publicMethod.parse_payload(token).get('status'):
-            email = User.objects.using('app').get(user_id_id=user_id).email
+            email = User.objects.using('app').get(user_id__user_id=user_id).email
             if publicMethod.check_email_code(email=email, code=code):
                 message = {'status': True, 'err': '邮箱验证通过'}
                 publicMethod.set_user_email(user_id + email)
@@ -259,7 +262,7 @@ class SendEmail(View):
             user_id = publicMethod.check_user_login(token)
             if publicMethod.check_email_code(email=email, code=code):
                 message = {'status': True, 'err': '邮箱绑定成功'}
-                obj = User.objects.using('app').get(user_id_id=user_id)
+                obj = User.objects.using('app').get(user_id__user_id=user_id)
                 obj.email = email
                 obj.save()
             else:
@@ -313,7 +316,7 @@ class GetUserStatus(View):
     模块: 获取用户状态
     接口信息:
         GET:
-            None
+            user_id: 用户账号
         POST:
             None
     """
@@ -454,7 +457,9 @@ class ResettingUserPassword(View):
         GET:
             None
         POST:
-            None
+            token: 当前登录用户token
+            user: 要修改的用户账号
+            password: 修改后的密码
     """
     def get(self, request):
         pass
@@ -468,7 +473,7 @@ class ResettingUserPassword(View):
             obj = Password.objects.using('app').filter(user_id=user_id)
             if obj.exists():
                 obj = obj.first()
-                obj.password = password
+                obj.password = publicMethod.reg_pass(password)
                 obj.save()
                 message = {'status': True, 'err': '密码修改成功'}
             else:
