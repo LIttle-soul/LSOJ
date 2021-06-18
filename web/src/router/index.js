@@ -9,13 +9,17 @@ const routes = [
     children: [
       {
         path: '',
+        redirect: '/home'
+      },
+      {
+        path: '/home',
         name: 'Index',
         component: () => import('@/views/user/Home/Home.vue')
       },
       {
-        path: '/ceshi',
-        name: 'Ceshi',
-        component: () => import('@/components/HelloWorld.vue')
+        path: '/problems',
+        name: 'Problems',
+        component: () => import('@/views/user/Problems/Problems.vue')
       },
     ]
   },

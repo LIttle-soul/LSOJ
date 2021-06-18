@@ -3,11 +3,11 @@
     <div class="container" :class="{ 'right-panel-active': signUpMode }">
       <!-- Sign Up -->
       <div class="container__form container__signup">
-        <Register :isShow="signUpMode"/>
+        <Register :isShow="signUpMode" class="input"/>
       </div>
       <!-- Sign In -->
       <div class="container__form container__signin">
-        <Login :isShow="!signUpMode"/>
+        <Login :isShow="!signUpMode" class="input"/>
       </div>
       <!-- Overlay -->
       <div class="container__overlay">
@@ -82,7 +82,6 @@ div {
 
 .login-register {
   align-items: center;
-  background-color: var(--white);
   background: url("~@/assets/img/640.jpg");
   background-attachment: fixed;
   background-position: center;
@@ -107,10 +106,17 @@ div {
 }
 
 .container__form {
+  background-color: rgba(255, 255, 255, 0.9);
   height: 100%;
   position: absolute;
   top: 0;
   transition: all 0.6s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0;
+  text-align: center;
 }
 
 .container__signin {
@@ -224,6 +230,7 @@ div {
 .btn:focus {
   outline: none;
 }
+
 
 @-webkit-keyframes show {
   0%,

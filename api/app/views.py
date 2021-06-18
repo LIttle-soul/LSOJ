@@ -331,12 +331,8 @@ class GetUserStatus(View):
         year = self.year_now - 1
         month = self.month_now
         day = 1 if self.day_now <= 15 else 15
-        solved = 0
-        submit = 0
-        rank = 1
-        school = None
-        solution_list = None
-        solved_list = None
+        solution_list = []
+        solved_list = []
         submit_data = []
         solved_data = []
         date_data = []
@@ -353,10 +349,10 @@ class GetUserStatus(View):
                 while True:
                     begin_time = timezone.now().replace(year, month, day)
                     day += 15
-                    if day == 31:
+                    if day >= 30:
                         month += 1
                         day = 1
-                        if month == 13:
+                        if month >= 13:
                             month = 1
                             year += 1
                     end_time = timezone.now().replace(year, month, day)
@@ -370,6 +366,8 @@ class GetUserStatus(View):
                         break
                 solution_list = solution.values("result").annotate(number=Count("user_id"))
                 solved_list = solution.filter(result=4).values("problem_id").annotate(number=Count('user_id'))
+        else:
+            return JsonResponse({'status': False, 'err': '输入用户不存在'})
         return JsonResponse({'user_id': user_id,
                              'solved': solved,
                              'submit': submit,

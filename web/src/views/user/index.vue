@@ -1,7 +1,7 @@
 <template>
 <div>
     <el-header>
-        <NavTop />
+        <Header />
     </el-header>
     <el-main>
         <router-view />
@@ -13,13 +13,12 @@
 </template>
 
 <script>
-import NavTop from '@/components/NavTop.vue'
-import Footer from '@/components/Footer.vue'
+import { defineAsyncComponent } from '@vue/runtime-core'
 
 export default {
     components: {
-        NavTop,
-        Footer
+        Header: defineAsyncComponent(() => import('./Header/Header.vue')),
+        Footer: defineAsyncComponent(() => import('./Footer/Footer.vue')),
     },
     data() {
         return {
