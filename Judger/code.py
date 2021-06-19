@@ -85,7 +85,8 @@ int main(){
     return 0;
 }"""
     problem = '2'
-    language = 'python3'
+    language = 'cpp'
+    code = replace_word(code)
     if write_to_file(code, language):
         if language in language_list:
             if compiler(language):

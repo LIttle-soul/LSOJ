@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ac46385-6647-47c1-9664-b4cd282bcde8" name="默认变更列表" comment="">
+      <change beforePath="$PROJECT_DIR$/../Judger/build/main.o" beforeDir="false" afterPath="$PROJECT_DIR$/../Judger/build/main.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Judger/code.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Judger/code.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Judger/code/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Judger/code/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +85,8 @@
       <workItem from="1623854485614" duration="211000" />
       <workItem from="1623855753228" duration="2537000" />
       <workItem from="1623901307573" duration="3108000" />
+      <workItem from="1624014814651" duration="344000" />
+      <workItem from="1624015171837" duration="3324000" />
     </task>
     <servers />
   </component>

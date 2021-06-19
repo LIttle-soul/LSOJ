@@ -1,24 +1,51 @@
 
 <template>
-<el-table
+  <el-card style="margin-top: 60px;">
+    <template #header>
+      <div>
+        <span>问题列表</span>
+        <el-button class="button" style="float: right; transform: translatey(-12px);">
+          操作按钮
+        </el-button>
+      </div>
+    </template>
+    <div>
+      <el-table
     :data="tableData"
+    stripe="true"
     border
+    height=80vh
     style="width: 100%">
     <el-table-column
-      prop="date"
-      label="日期"
-      width="180">
+      prop="problem_id"
+      label="编号"
+      width="80">
     </el-table-column>
     <el-table-column
-      prop="name"
-      label="姓名"
-      width="180">
+      prop="tittle"
+      label="题目"
+      width="350">
     </el-table-column>
     <el-table-column
-      prop="address"
-      label="地址">
+      prop="tag"
+      label="标签"
+      width="200">
+    </el-table-column>
+    <el-table-column
+      prop="degree"
+      label="难度">
+    </el-table-column>
+    <el-table-column
+      prop="solved"
+      label="正确">
+    </el-table-column>
+    <el-table-column
+      prop="submit"
+      label="提交">
     </el-table-column>
   </el-table>
+    </div>
+  </el-card>
 </template>
 
 <script>
@@ -26,105 +53,20 @@
     data() {
       return {
         tableData: [{
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          problem_id: 1000,
+          tittle: 'A+B',
+          degree: 1,
+          tag: '基础题',
+          solved: 10,
+          submit: 100
+        },
+        {
+          problem_id: 1001,
+          tittle: 'Hello,World',
+          degree: 1,
+          tag: '基础题',
+          solved: 8,
+          submit: 50
         }]
       }
     }

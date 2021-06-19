@@ -40,7 +40,15 @@ export default {
 a {
   text-decoration: none;
 }
- 
+.el-header {
+    width: 100%;
+    position: fixed;
+    top: 10px;
+    z-index: 5;
+}
+.el-main {
+    margin-top: 50px;
+}
 .router-link-active {
   text-decoration: none;
 }
