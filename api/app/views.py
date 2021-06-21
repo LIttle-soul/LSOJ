@@ -485,7 +485,13 @@ class ResettingUserPassword(View):
 # ---------------------------问题功能---------------------------
 class GetProblemList(View):
     def get(self, request):
-        pass
+        token = request.GET.get('token')
+        print(token)
+        user_id = publicMethod.check_user_login(token)
+        print(user_id)
+        obj = Problems.objects.using('app').all().values('problem_id', 'title', 'difficulty', 'type', 'accepted', 'submit')
+        data = {'status': True, 'data': list(obj)}
+        return JsonResponse(data)
 
     def post(self, request):
         pass

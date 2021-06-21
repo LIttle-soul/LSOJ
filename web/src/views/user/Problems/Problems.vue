@@ -62,6 +62,17 @@
 <script>
   export default {
     name: "Problems",
+    mounted() {
+      this.$http({
+        url: '/api/getproblemlist/',
+        methods: 'get',
+        params: {
+          'token': this.$cookies.get('token')
+        }
+      }).then( res => {
+        console.log(res.data)
+      })
+    },
     methods: {
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
@@ -76,7 +87,7 @@
         tableData: [{
           problem_id: 1000,
           tittle: 'A+B',
-          degree: '星星',
+          degree: 1,
           tag: '基础题',
           solved: 10,
           submit: 100

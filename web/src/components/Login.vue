@@ -110,14 +110,26 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$http.post(
-            '/api/login/',
-            this.$qs.stringify({
+          this.$http({
+            url: '/api/login/',
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            transformRequest: [function(data) {
+              let ret = ''
+              for (let it in data) {
+                ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+              }
+              return ret
+            }],
+            params: {},
+            data: {
               'user_id': this.ruleForm.user,
               'password': this.ruleForm.pass,
               'code': this.ruleForm.code,
             }
-          )).then( res => {
+          }).then( res => {
             console.log('res=>', res);
             alert(res.data.err);
             if(res.data.status){

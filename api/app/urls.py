@@ -15,4 +15,5 @@ urlpatterns = [
     path('changeusercapacity/', views.ChangeUserCapacity.as_view(), name='change_user_capacity'),
     path('resettinguserpassword/', views.ResettingUserPassword.as_view(), name='resetting_user_password'),
     path('addnews/', views.AddNews.as_view(), name='add_news'),
+    path('getproblemlist/', views.GetProblemList.as_view(), name='get_problem_list'),
 ]
