@@ -259,4 +259,92 @@ div {
     z-index: 5;
   }
 }
+
+@media screen and (max-width: 750px) {
+.container__signin {
+  left: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+.container.right-panel-active .container__signin {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.container__signup {
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  transform: translateX(-100%);
+  z-index: 1;
+}
+
+.container.right-panel-active .container__signup {
+  -webkit-animation: show 0.6s;
+  animation: show 0.6s;
+  opacity: 1;
+  transform: translateX(0);
+  z-index: 5;
+}
+
+.container__overlay {
+  height: 18%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  transition: transform 0.6s ease-in-out;
+  width: 100%;
+  /* z-index: 100; */
+}
+
+.container.right-panel-active .container__overlay {
+  transform: translateY(0);
+}
+
+.overlay {
+  height: 100%;
+  left: -100%;
+  position: relative;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+  width: 200%;
+}
+
+.container.right-panel-active .overlay {
+  transform: translateX(50%);
+}
+
+.overlay__panel {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+  width: 50%;
+}
+
+.overlay__left {
+  transform: translateX(-20%);
+}
+
+.container.right-panel-active .overlay__left {
+  transform: translateX(0);
+}
+
+.overlay__right {
+  right: 0;
+  transform: translateX(0%);
+}
+
+.container.right-panel-active .overlay__right {
+  transform: translateX(20%);
+}
+}
 </style>

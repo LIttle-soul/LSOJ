@@ -32,7 +32,7 @@
         v-model="ruleForm.code"
       >
         <template #append>
-          <div class="login-code" @click="refreshCode" key="one" v-if="isShow">
+          <div class="login-code" @click="getCode" key="one" v-if="isShow">
             <Identify :identifyCode="ruleForm.true_code"></Identify>
           </div>
         </template>
@@ -50,6 +50,7 @@
 import Identify from "./identify.vue";
 
 export default {
+  name: 'Login',
   components: {
     Identify,
   },
@@ -85,7 +86,7 @@ export default {
     var checkCode = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入验证码"));
-      } else if (value !== this.ruleForm.true_code) {
+      } else if (value.toLowerCase() !== this.ruleForm.true_code.toLowerCase()) {
         callback(new Error("验证码输入错误"));
       } else {
         callback();
@@ -96,21 +97,34 @@ export default {
         user: "",
         pass: "",
         code: "",
-        true_code: "4321",
+        true_code: "",
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
         pass: [{ validator: validatePass, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
-      identifyCodes: "1234567890",
     };
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
+          this.$http.post(
+            '/api/login/',
+            this.$qs.stringify({
+              'user_id': this.ruleForm.user,
+              'password': this.ruleForm.pass,
+              'code': this.ruleForm.code,
+            }
+          )).then( res => {
+            console.log('res=>', res);
+            alert(res.data.err);
+            if(res.data.status){
+              this.$cookies.set('token', res.data.token)
+              this.$router.push('/home');
+            }
+          })
         } else {
           console.log("error submit!!");
           return false;
@@ -120,19 +134,12 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    refreshCode() {
-      this.ruleForm.true_code = "";
-      this.makeCode(this.identifyCodes, 4);
-    },
-    randomNum(min, max) {
-      return Math.floor(Math.random() * (max - min) + min);
-    },
-    makeCode(o, l) {
-      for (let i = 0; i < l; i++) {
-        this.ruleForm.true_code +=
-          this.identifyCodes[this.randomNum(0, this.identifyCodes.length)];
-      }
-    },
+    getCode() {
+      this.$http.get('/api/login/').then(response => (
+          this.ruleForm.true_code = response.data.capture,
+          console.log(response.data.capture)
+      ));
+    }
   },
 };
 </script>

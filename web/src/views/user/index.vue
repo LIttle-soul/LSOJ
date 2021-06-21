@@ -1,12 +1,12 @@
 <template>
 <div>
-    <el-header>
+    <el-header class="home-header">
         <Header />
     </el-header>
-    <el-main>
+    <el-main class="home-main">
         <router-view />
     </el-main>
-    <el-footer>
+    <el-footer class="home-footer">
         <Footer />
     </el-footer>
 </div>
@@ -16,6 +16,7 @@
 import { defineAsyncComponent } from '@vue/runtime-core'
 
 export default {
+    name: "User",
     components: {
         Header: defineAsyncComponent(() => import('./Header/Header.vue')),
         Footer: defineAsyncComponent(() => import('./Footer/Footer.vue')),
@@ -40,14 +41,17 @@ export default {
 a {
   text-decoration: none;
 }
-.el-header {
+.home-header {
     width: 100%;
     position: fixed;
     top: 10px;
     z-index: 5;
 }
-.el-main {
-    margin-top: 50px;
+.home-main {
+    margin: 50px auto;
+    max-width: 1800px;
+    min-width: 400px;
+    position: relative;
 }
 .router-link-active {
   text-decoration: none;

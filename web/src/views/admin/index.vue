@@ -16,3 +16,12 @@
         </el-container>
     </el-container>
 </template>
+
+<script>
+export default {
+    name: "Admin",
+    setup() {
+        
+    },
+}
+</script>

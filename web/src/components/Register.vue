@@ -43,7 +43,7 @@
         <template #append>
           <div
             class="login-code"
-            @click="refreshCode"
+            @click="getCode"
             style="width: 90"
             key="two"
             v-if="isShow"
@@ -108,7 +108,7 @@ export default {
     var checkCode = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入验证码"));
-      } else if (value !== this.ruleForm.true_code) {
+      } else if (value.toLowerCase() !== this.ruleForm.true_code.toLowerCase()) {
         callback(new Error("验证码输入错误"));
       } else {
         callback();
@@ -120,7 +120,7 @@ export default {
         pass: "",
         checkPass: "",
         code: "",
-        true_code: "1234",
+        true_code: "",
       },
       rules: {
         user: [{ validator: checkUser, trigger: "blur" }],
@@ -128,14 +128,28 @@ export default {
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
         code: [{ validator: checkCode, trigger: "blur" }],
       },
-      identifyCodes: "1234567890",
     };
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
+          this.$http.post(
+            '/api/register/',
+            this.$qs.stringify({
+              'user_id': this.ruleForm.user,
+              'password': this.ruleForm.pass,
+              'check_pass': this.ruleForm.checkPass,
+              'code': this.ruleForm.code,
+            }
+          )).then( res => {
+            console.log('res=>', res);
+            if(res.data.status){
+              alert(res.data.err + '请登录')
+            } else {
+              alert(res.data.err)
+            }
+          })
         } else {
           console.log("error submit!!");
           return false;
@@ -145,19 +159,12 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    refreshCode() {
-      this.ruleForm.true_code = "";
-      this.makeCode(this.identifyCodes, 4);
-    },
-    randomNum(min, max) {
-      return Math.floor(Math.random() * (max - min) + min);
-    },
-    makeCode(o, l) {
-      for (let i = 0; i < l; i++) {
-        this.ruleForm.true_code +=
-          this.identifyCodes[this.randomNum(0, this.identifyCodes.length)];
-      }
-    },
+    getCode() {
+      this.$http.get('/api/register/').then(response => (
+          this.ruleForm.true_code = response.data.capture,
+          console.log(response.data.capture)
+      ));
+    }
   },
 };
 </script>

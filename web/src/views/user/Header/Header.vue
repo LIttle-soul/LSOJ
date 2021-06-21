@@ -1,6 +1,7 @@
 <template>
     <div class="nav">
       <el-button
+        class="nav-button"
         icon="el-icon-menu"
         circle
         @click="drawer = !drawer"
@@ -70,6 +71,7 @@
 
 <script>
 export default {
+  name: "Header",
   components: {},
   updated() {},
   data() {
@@ -82,6 +84,7 @@ export default {
       headerNav: [
         { index: "home", tittle: "首页" },
         { index: "problems", tittle: "问题" },
+        { index: "ranking", tittle: "排名" },
         { index: "contest", tittle: "竞赛" },
         { index: "collage", tittle: "闯关" },
       ],
@@ -104,7 +107,7 @@ export default {
   border-radius: 28px;
   position: relative;
 }
-.el-button {
+.nav-button {
   position: absolute;
   top: 10px;
   left: 20px;
@@ -146,7 +149,7 @@ export default {
 }
 
 @media screen and (max-width: 750px) {
-  .el-button {
+  .nav-button {
     display: block;
   }
   .header-menu {

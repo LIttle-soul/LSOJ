@@ -29,6 +29,7 @@ class Login(View):
         username = request.POST.get('user_id')
         password = request.POST.get('password')
         code = request.POST.get('code')
+        print(username, password, code)
         if publicMethod.check_capture(requester=request, code=code):
             obj = Password.objects.using('app').filter(user_id=username)
             if obj.exists():

@@ -12,27 +12,28 @@
       <el-card
       >
         <div
-        v-for="o in 4"
-        :key="o"
-        style="width: 100%; height: 40px;"
+        v-for="item in 4"
+        :key="item"
         >
-          {{'列表内容' + o}}
+          {{'列表内容' + item}}
         </div>
       </el-card>
-      <el-card>
+      <el-card
+      >
         <div
-        v-for="o in 4"
-        :key="o"
+        v-for="item in 4"
+        :key="item"
         >
-          {{'列表内容' + o}}
+          {{'列表内容' + item}}
         </div>
       </el-card>
-      <el-card>
+      <el-card
+      >
         <div
-        v-for="o in 4"
-        :key="o"
+        v-for="item in 4"
+        :key="item"
         >
-          {{'列表内容' + o}}
+          {{'列表内容' + item}}
         </div>
       </el-card>
     </el-aside>
@@ -43,7 +44,12 @@
 </template>
 
 <script>
-  
+export default {
+  name: "Home",
+  setup() {
+    
+  }
+}
 </script>
 
 <style scoped>
