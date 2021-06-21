@@ -70,15 +70,29 @@
           'token': this.$cookies.get('token')
         }
       }).then( res => {
-        console.log(res.data)
+        this.tableData = []
+        for(let i in res.data.data){
+          // console.log(res.data.data[i])
+          let item = res.data.data[i]
+          this.tableData.push({
+              problem_id: item.problem_id,
+              tittle: item.title,
+              degree: item.difficulty,
+              tag: item.type,
+              solved: item.accepted,
+              submit: item.submit
+            })
+        }
       })
     },
     methods: {
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
           return 'success-row';
-        } else {
+        } else if (rowIndex === 2) {
           return 'warning-row';
+        } else {
+          return '';
         }
       }
     },

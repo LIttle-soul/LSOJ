@@ -16,13 +16,14 @@
           class="nav-menu"
           text-color="#1af"
           active-text-color="#fa1"
-          default-active="home"
+          :default-active="activeIndex"
           router
         >
           <el-menu-item
             v-for="item in headerNav"
             :key="item.index"
             :index="item.index"
+            @click="activeIndex=item.index"
             >{{ item.tittle }}</el-menu-item
           >
         </el-menu>
@@ -33,7 +34,7 @@
         mode="horizontal"
         text-color="#1af"
         active-text-color="#fa1"
-        default-active="home"
+        :default-active="activeIndex"
         router
         style="border: none;"
       >
@@ -41,6 +42,7 @@
           v-for="item in headerNav"
           :key="item.index"
           :index="item.index"
+          @click="activeIndex=item.index"
           >{{ item.tittle }}</el-menu-item
         >
       </el-menu>
@@ -76,10 +78,8 @@ export default {
   updated() {},
   data() {
     return {
-      activeIndex: "1",
-      activeIndex2: "1",
-      circleUrl:
-        "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+      activeIndex: "home",
+      circleUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       drawer: false,
       headerNav: [
         { index: "home", tittle: "首页" },
