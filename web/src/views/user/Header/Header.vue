@@ -16,14 +16,13 @@
           class="nav-menu"
           text-color="#1af"
           active-text-color="#fa1"
-          :default-active="activeIndex"
+          :default-active="$route.path"
           router
         >
           <el-menu-item
             v-for="item in headerNav"
             :key="item.index"
             :index="item.index"
-            @click="activeIndex=item.index"
             >{{ item.tittle }}</el-menu-item
           >
         </el-menu>
@@ -34,7 +33,7 @@
         mode="horizontal"
         text-color="#1af"
         active-text-color="#fa1"
-        :default-active="activeIndex"
+        :default-active="$route.path"
         router
         style="border: none;"
       >
@@ -42,7 +41,6 @@
           v-for="item in headerNav"
           :key="item.index"
           :index="item.index"
-          @click="activeIndex=item.index"
           >{{ item.tittle }}</el-menu-item
         >
       </el-menu>
@@ -78,19 +76,18 @@ export default {
   updated() {},
   data() {
     return {
-      activeIndex: "home",
       circleUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       drawer: false,
       headerNav: [
-        { index: "home", tittle: "首页" },
-        { index: "problems", tittle: "问题" },
-        { index: "ranking", tittle: "排名" },
-        { index: "contest", tittle: "竞赛" },
-        { index: "collage", tittle: "闯关" },
+        { index: "/home", tittle: "首页" },
+        { index: "/problems", tittle: "问题" },
+        { index: "/ranking", tittle: "排名" },
+        { index: "/contest", tittle: "竞赛" },
+        { index: "/collage", tittle: "闯关" },
       ],
       userNav: [
-        { index: "login", tittle: "登录" },
-        { index: "logout", tittle: "注销" },
+        { index: "/login", tittle: "登录" },
+        { index: "/logout", tittle: "注销" },
       ],
     };
   },

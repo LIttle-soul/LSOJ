@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3ac46385-6647-47c1-9664-b4cd282bcde8" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web/src/views/user/Header/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/user/Header/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web/src/views/user/Problems/Problems.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/user/Problems/Problems.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +87,7 @@
       <workItem from="1624014814651" duration="344000" />
       <workItem from="1624015171837" duration="3324000" />
       <workItem from="1624175535441" duration="4701000" />
-      <workItem from="1624239760039" duration="4538000" />
+      <workItem from="1624239760039" duration="5363000" />
     </task>
     <servers />
   </component>
