@@ -88,8 +88,8 @@ class User(models.Model):
     real_name = models.CharField(max_length=20, null=True, blank=True, verbose_name='真实姓名')
     nick = models.CharField(max_length=24, blank=True, null=True, verbose_name='昵称')
     email = models.EmailField(blank=True, null=True, verbose_name='邮箱')
-    submit = models.ForeignKey(to='Solution', on_delete=models.CASCADE, null=True, blank=True, verbose_name='提交数量')
-    solved = models.ManyToManyField(to='Problems', blank=True, verbose_name='解决数量')
+    submit = models.ForeignKey(to='Solution', on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name='提交数量')
+    solved = models.ForeignKey(to='Problems', on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name='解决数量')
     defunct = models.BooleanField(default=0, verbose_name='是否隐藏')
     ip = models.GenericIPAddressField(verbose_name='ip地址')
     access_time = models.DateTimeField(blank=True, null=True, verbose_name='登陆时间')
@@ -107,7 +107,7 @@ class User(models.Model):
 
 class LoginLog(models.Model):
     log_id = models.AutoField(primary_key=True, verbose_name='登陆日志')
-    user_id = models.ForeignKey(to='User', on_delete=models.CASCADE, verbose_name='用户账号')
+    user_id = models.ForeignKey(to='Password', on_delete=models.CASCADE, verbose_name='用户账号')
     ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='登录IP')
     time = models.DateTimeField(null=True, blank=True, verbose_name='登入时间')
     login_way = models.CharField(max_length=256, blank=True, null=True, verbose_name='登录方法')

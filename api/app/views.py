@@ -9,6 +9,87 @@ import numpy
 publicMethod = PublicMethod()
 
 
+# --------------------------学校管理----------------------------
+class AddProvince(View):
+    """
+    模块: 学校添加
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class AddMunicipality(View):
+    """
+    模块: 学校添加
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class AddSchool(View):
+    """
+    模块: 学校添加
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class AddCollege(View):
+    """
+    模块: 学校添加
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class AddClass(View):
+    """
+    模块: 学校添加
+    接口信息:
+        GET:
+            None
+        POST:
+            None
+    """
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
 # --------------------------用户功能----------------------------
 # 普通用户
 class Login(View):
@@ -41,7 +122,7 @@ class Login(View):
                     print(capacity)
                     token = publicMethod.create_token({'username': obj.user_id, 'capacity': capacity}, 120)
                     LoginLog.objects.using('app').create(
-                        user_id=username,
+                        user_id=obj,
                         ip=publicMethod.get_ip(request),
                         time=timezone.now(),
                         login_way='JHCOJ'
@@ -136,7 +217,7 @@ class PerfectInfo(View):
             return JsonResponse({'err': "用户认证失败"})
         real_name = request.POST.get('name')
         nick_name = request.POST.get('nickname')
-        school = request.POST.get('school')
+        school_id = request.POST.get('school_id')
         sex = request.POST.get('sex')
         sex = (0 if sex == '男' else 1)
         user = Password.objects.using('app').get(user_id=user_id)
@@ -145,13 +226,23 @@ class PerfectInfo(View):
             obj = obj.first()
             if nick_name:
                 obj.nick = nick_name
-            if school:
-                obj.school = school
+            if school_id:
+                school_obj = School.objects.filter(school_id=school_id)
+                if school_obj.exists():
+                    obj.school = school_obj.first()
+                else:
+                    return JsonResponse({'status': False, 'err': '此学校不存在'})
             obj.ip = publicMethod.get_ip(request)
             obj.reg_time = timezone.now()
             obj.save()
             message = {'status': True, 'err': '信息修改成功'}
         else:
+            if school_id:
+                school_obj = School.objects.filter(school_id=school_id)
+                if school_obj.exists():
+                    school_id = school_obj.first()
+                else:
+                    return JsonResponse({'status': False, 'err': '此学校不存在'})
             User.objects.using('app').create(
                 user_id=user,
                 real_name=real_name,
@@ -159,7 +250,7 @@ class PerfectInfo(View):
                 ip=publicMethod.get_ip(request),
                 access_time=timezone.now(),
                 reg_time=timezone.now(),
-                school=school,
+                school=school_id,
                 sex=sex,
                 role_pri=4,
                 is_delete=0
@@ -313,6 +404,7 @@ class ForgetPassword(View):
         return JsonResponse(message)
 
 
+#  ------------------------------------------------------------------------------------------------
 class GetUserStatus(View):
     """
     模块: 获取用户状态
