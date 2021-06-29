@@ -87,7 +87,7 @@ export default {
       ],
       userNav: [
         { index: "/login", tittle: "登录" },
-        { index: "/logout", tittle: "注销" },
+        { index: "/forgetpassword", tittle: "忘记密码" },
       ],
     };
   },

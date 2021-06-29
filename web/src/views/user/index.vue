@@ -9,6 +9,7 @@
     <el-footer class="home-footer">
         <Footer />
     </el-footer>
+    <el-backtop target=""></el-backtop>
 </div>
 </template>
 
@@ -20,6 +21,7 @@ export default {
     components: {
         Header: defineAsyncComponent(() => import('./Header/Header.vue')),
         Footer: defineAsyncComponent(() => import('./Footer/Footer.vue')),
+        // BackTop: defineAsyncComponent(() => import('@/components/BackTop.vue')),
     },
     data() {
         return {

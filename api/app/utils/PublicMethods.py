@@ -2,12 +2,12 @@ import base64
 import hashlib
 import string
 from django.utils import timezone
-import datetime
 import time
 import random
 import jwt
 from django_redis import get_redis_connection
 from django.core.mail import send_mail
+from django.db import connections
 
 
 class PublicMethod:
@@ -180,3 +180,11 @@ class PublicMethod:
             if data['status']:
                 capacity = data.get('data').get('data').get('capacity')
         return capacity
+
+    # 查询用户做题排名情况，传参为时间datetime，起始，结束
+    def get_rank_list_by_time(self, timer):
+        with connections['app'].cursor() as cursor:
+            cursor.execute(f"SELECT USER.user_id_id, USER.real_name, USER.nick, t.submit, s.solved, USER.school, USER.sex FROM `user` INNER JOIN ( SELECT COUNT( DISTINCT problem_id ) solved, user_id FROM solution WHERE in_date > '{timer}' AND result = 4 GROUP BY user_id ORDER BY solved DESC ) s ON USER.user_id_id = s.user_id INNER JOIN ( SELECT COUNT( problem_id ) submit, user_id FROM solution WHERE in_date > '{timer}' GROUP BY user_id ORDER BY submit DESC ) t ON USER.user_id_id = t.user_id ORDER BY s.solved DESC, t.submit, reg_time;")
+            solution_data = cursor.fetchall()
+        return_data = list(solution_data)
+        return return_data

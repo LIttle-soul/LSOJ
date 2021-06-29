@@ -2,9 +2,391 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ac46385-6647-47c1-9664-b4cd282bcde8" name="默认变更列表" comment="">
+      <change afterPath="$PROJECT_DIR$/../Judger/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Judger/.idea/Judger.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Judger/.idea/Judger.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Judger/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Judger/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/0d1b60fc-e88c-41d7-a7e6-996764b86d82.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/0d1b60fc-e88c-41d7-a7e6-996764b86d82.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0002_auto_20210524_1211.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0003_alter_news_image.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0004_auto_20210606_1204.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/0005_auto_20210610_1448.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/utils/PublicMethods.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/PublicMethods.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.env.development" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.env.production" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.env.staging" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.eslintignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.eslintrc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/README.es.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/README.ja.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/README.zh-CN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/babel.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/build/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/jest.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/jsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/article.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/mock-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/remote-search.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/role/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/role/routes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/mock/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/component/index.hbs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/component/prompt.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/store/index.hbs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/store/prompt.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/view/index.hbs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plop-templates/view/prompt.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/plopfile.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/postcss.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/App.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/api/article.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/api/qiniu.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/api/remote-search.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/api/role.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/api/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/401_images/401.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/404_images/404.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/404_images/404_cloud.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/custom-theme/fonts/element-icons.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/custom-theme/fonts/element-icons.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/assets/custom-theme/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/BackToTop/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Breadcrumb/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Charts/Keyboard.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Charts/LineMarker.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Charts/MixChart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Charts/mixins/resize.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/DndList/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/DragSelect/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Dropzone/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ErrorLog/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/GithubCorner/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Hamburger/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/HeaderSearch/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ImageCropper/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ImageCropper/utils/data2blob.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ImageCropper/utils/effectRipple.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ImageCropper/utils/language.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ImageCropper/utils/mimes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/JsonEditor/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Kanban/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/MDinput/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/MarkdownEditor/default-options.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/MarkdownEditor/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Pagination/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/PanThumb/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/RightPanel/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Screenfull/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Share/DropdownMenu.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/SizeSelect/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Sticky/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/SvgIcon/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/TextHoverEffect/Mallki.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/ThemePicker/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Tinymce/components/EditorImage.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Tinymce/dynamicLoadScript.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Tinymce/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Tinymce/plugins.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Tinymce/toolbar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Upload/SingleImage.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Upload/SingleImage2.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/Upload/SingleImage3.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/components/UploadExcel/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/clipboard/clipboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/clipboard/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/el-drag-dialog/drag.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/el-drag-dialog/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/el-table/adaptive.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/el-table/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/permission/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/permission/permission.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/sticky.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/waves/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/waves/waves.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/directive/waves/waves.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/filters/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/404.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/bug.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/chart.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/clipboard.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/component.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/dashboard.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/documentation.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/drag.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/edit.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/education.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/email.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/example.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/excel.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/exit-fullscreen.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/eye-open.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/eye.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/form.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/fullscreen.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/guide.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/international.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/language.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/link.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/list.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/lock.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/message.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/money.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/nested.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/password.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/pdf.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/people.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/peoples.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/qq.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/search.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/shopping.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/size.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/skill.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/star.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/tab.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/table.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/theme.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/tree-table.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/tree.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/user.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/wechat.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svg/zip.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/icons/svgo.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/AppMain.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Navbar.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Settings/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/FixiOSBug.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/Item.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/Link.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/Logo.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/SidebarItem.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/Sidebar/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/TagsView/ScrollPane.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/TagsView/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/components/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/layout/mixin/ResizeHandler.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/permission.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/router/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/router/modules/charts.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/router/modules/components.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/router/modules/nested.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/router/modules/table.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/settings.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/getters.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/errorLog.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/permission.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/settings.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/tagsView.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/store/modules/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/btn.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/element-ui.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/element-variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/mixin.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/sidebar.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/transition.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/styles/variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/clipboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/error-log.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/get-page-title.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/open-window.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/permission.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/request.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/scroll-to.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/utils/validate.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/vendor/Export2Excel.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/vendor/Export2Zip.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/charts/keyboard.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/charts/line.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/charts/mix-chart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/clipboard/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/avatar-upload.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/back-to-top.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/count-to.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/dnd-list.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/drag-dialog.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/drag-kanban.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/drag-select.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/dropzone.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/json-editor.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/markdown.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/mixin.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/split-pane.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/sticky.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/components-demo/tinymce.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/BarChart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/BoxCard.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/LineChart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/PanelGroup.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/PieChart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/RaddarChart.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/TodoList/Todo.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/TodoList/index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/TodoList/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/TransactionTable.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/components/mixins/resize.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/admin/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/editor/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/dashboard/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/documentation/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/error-log/components/ErrorTestA.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/error-log/components/ErrorTestB.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/error-log/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/error-page/401.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/error-page/404.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/ArticleDetail.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/Dropdown/Comment.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/Dropdown/Platform.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/Dropdown/SourceUrl.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/Dropdown/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/components/Warning.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/create.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/edit.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/example/list.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/components/AutoWidthOption.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/components/BookTypeOption.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/components/FilenameOption.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/export-excel.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/merge-header.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/select-excel.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/excel/upload-excel.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/guide/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/guide/steps.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/icons/element-icons.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/icons/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/icons/svg-icons.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/login/auth-redirect.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/login/components/SocialSignin.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/login/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/menu1-1/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/menu1-2/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/menu1-2/menu1-2-1/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/menu1-2/menu1-2-2/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu1/menu1-3/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/nested/menu2/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/pdf/content.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/pdf/download.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/pdf/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/permission/components/SwitchRoles.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/permission/directive.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/permission/page.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/permission/role.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/profile/components/Account.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/profile/components/Activity.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/profile/components/Timeline.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/profile/components/UserCard.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/profile/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/qiniu/upload.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/redirect/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/tab/components/TabPane.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/tab/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/complex-table.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/drag-table.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/dynamic-table/components/FixedThead.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/dynamic-table/components/UnfixedThead.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/dynamic-table/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/table/inline-edit-table.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/theme/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/src/views/zip/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/.eslintrc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/components/Hamburger.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/components/SvgIcon.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/utils/formatTime.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/utils/param2Obj.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/utils/parseTime.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/tests/unit/utils/validate.spec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-element-admin-4.4.0/vue.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../web/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/babel.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web/babel.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/app.feb9fc6f.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-03c24462.fcc4ec86.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-7cd0ff7a.bb2545e1.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-7ec0eb3d.f05e2bc7.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-99c00aa2.3395ace4.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-c87a177a.df4a36fa.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/chunk-vendors.b3f0d367.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/reset.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/script.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/css/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/fonts/element-icons.abe71f7d.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/fonts/element-icons.d9491be2.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/img/640.4c5c415b.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/img/not-found.0acb35ec.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/admin.a4336f2c.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/admin.a4336f2c.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/app.e841f6c6.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/app.e841f6c6.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-02ff1e3f.44e4d732.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-02ff1e3f.44e4d732.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-03c24462.c3078a58.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-03c24462.c3078a58.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-2d0c5015.3f5f75b0.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-2d0c5015.3f5f75b0.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-2d0e9780.933945d7.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-2d0e9780.933945d7.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-6018d406.31430da2.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-6018d406.31430da2.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-7cd0ff7a.87868e41.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-7cd0ff7a.87868e41.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-7ec0eb3d.3fc02a9f.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-7ec0eb3d.3fc02a9f.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-99c00aa2.855d68ea.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-99c00aa2.855d68ea.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-c87a177a.afa002cb.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-c87a177a.afa002cb.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-vendors.5a5cdee2.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/dist/js/chunk-vendors.5a5cdee2.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../web/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../web/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/public/css/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/public/css/reset.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/public/css/script.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/public/css/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../web/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/components/BackTop.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/components/BackTop.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/components/Footer.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/router/admin.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/router/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/router/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/views/admin/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/admin/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/views/user/Footer/Footer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/user/Footer/Footer.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web/src/views/user/Header/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/user/Header/Header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/views/user/LoginRegister.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/views/user/Problems/Problems.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/src/views/user/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../web/src/views/user/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +425,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
         <env name="DJANGO_SETTINGS_MODULE" value="api.settings" />
       </envs>
-      <option name="SDK_HOME" value="H:\LSOJ\api\venv\Scripts\python.exe" />
+      <option name="SDK_HOME" value="C:\Users\LiSoul\AppData\Local\Programs\Python\Python39\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -87,7 +469,14 @@
       <workItem from="1624014814651" duration="344000" />
       <workItem from="1624015171837" duration="3324000" />
       <workItem from="1624175535441" duration="4701000" />
-      <workItem from="1624239760039" duration="5363000" />
+      <workItem from="1624239760039" duration="5969000" />
+      <workItem from="1624343806367" duration="2382000" />
+      <workItem from="1624358065560" duration="9455000" />
+      <workItem from="1624410504707" duration="13942000" />
+      <workItem from="1624436266266" duration="3480000" />
+      <workItem from="1624445725372" duration="9000" />
+      <workItem from="1624861416087" duration="9188000" />
+      <workItem from="1624927209135" duration="8356000" />
     </task>
     <servers />
   </component>

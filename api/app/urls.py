@@ -10,6 +10,7 @@ urlpatterns = [
     path('changepassword/', views.PasswordModification.as_view(), name='change_password'),
     path('sendemail/', views.SendEmail.as_view(), name='send_email'),
     path('forgetpassword/', views.ForgetPassword.as_view(), name='forget_password'),
+    path('getranklist/', views.GetRankList.as_view(), name='get_rank_list'),
     path('getuserlist/', views.GetUserList.as_view(), name='get_user_list'),
     path('getuserstatus/', views.GetUserStatus.as_view(), name='get_user_status'),
     path('changeusercapacity/', views.ChangeUserCapacity.as_view(), name='change_user_capacity'),

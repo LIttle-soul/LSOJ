@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models import Q, F, Avg, Max, Min, Count, Sum
 from app.utils.PublicMethods import PublicMethod
 from app.models import *
+import numpy
 
 publicMethod = PublicMethod()
 
@@ -367,6 +368,10 @@ class GetUserStatus(View):
                         break
                 solution_list = solution.values("result").annotate(number=Count("user_id"))
                 solved_list = solution.filter(result=4).values("problem_id").annotate(number=Count('user_id'))
+                # print(len(solved_list), len(solution))
+                user.solved = len(solved_list)
+                user.submit = len(solution)
+                user.save()
         else:
             return JsonResponse({'status': False, 'err': '输入用户不存在'})
         return JsonResponse({'user_id': user_id,
@@ -383,6 +388,45 @@ class GetUserStatus(View):
 
     def post(self, request):
         pass
+
+
+class GetRankList(View):
+    """
+    模块: 获取用户排名列表
+    接口信息:
+        GET:
+            None
+        POST:
+            search: 查询字段
+    """
+    def get(self, request):
+        sort_by = request.GET.get('sort_by')
+        end_time = timezone.now()
+        if sort_by == 'year':
+            begin_time = f'{end_time.year - 1}-{end_time.month}-{end_time.day}'
+            obj = publicMethod.get_rank_list_by_time(begin_time)
+        elif sort_by == 'month':
+            begin_time = f'{end_time.year}-{end_time.month - 1}-{end_time.day}'
+            obj = publicMethod.get_rank_list_by_time(begin_time)
+        elif sort_by == 'day':
+            begin_time = f'{end_time.year}-{end_time.month}-{end_time.day - 1}'
+            obj = publicMethod.get_rank_list_by_time(begin_time)
+        else:
+            obj = User.objects.using('app').all().order_by('-solved').values_list('user_id', 'real_name', 'nick', 'submit', 'solved', 'school', 'sex')
+        data2 = list(obj)[:10]
+        data2 = numpy.array(data2)
+        data2 = data2.T
+        return JsonResponse({"data": list(obj), "data2": data2.tolist()})
+
+    def post(self, request):
+        search = request.POST.get('search')
+        obj = User.objects.using('app').filter(
+            Q(user_id__user_id__contains=search) |
+            Q(real_name__contains=search) |
+            Q(nick__contains=search) |
+            Q(school__contains=search)
+        ).values('user_id', 'real_name', 'nick', 'submit', 'solved', 'school', 'sex')
+        return JsonResponse({'data': list(obj)})
 
 
 # 教师管理员功能
@@ -416,6 +460,7 @@ class GetUserList(View):
         return JsonResponse({'data': message})
 
 
+# 管理员权限部分
 class ChangeUserCapacity(View):
     """
     模块: 修改用户权限
@@ -486,9 +531,7 @@ class ResettingUserPassword(View):
 class GetProblemList(View):
     def get(self, request):
         token = request.GET.get('token')
-        print(token)
         user_id = publicMethod.check_user_login(token)
-        print(user_id)
         obj = Problems.objects.using('app').all().values('problem_id', 'title', 'difficulty', 'type', 'accepted', 'submit')
         data = {'status': True, 'data': list(obj)}
         return JsonResponse(data)
