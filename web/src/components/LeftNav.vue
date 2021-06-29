@@ -44,7 +44,16 @@ export default {
                     'icon': 'el-icon-question',
                     'data': [
                         {
-
+                            'title': '问题列表',
+                            'index': 'ProblemList'
+                        },
+                        {
+                            'title': '问题管理',
+                            'index': 'ProblemCon'
+                        },
+                        {
+                            'title': '问题添加',
+                            'index': 'AddProblem'
                         }
                     ]
                 },
