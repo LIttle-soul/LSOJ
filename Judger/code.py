@@ -15,19 +15,22 @@ def runner(problem, language):
                 print(f'测试点： {f[:-3]}')
                 run = Run(in_file, out_file)
                 if language == 'c':
-                    print(run.run_c())
+                    data = run.run_c()
                 elif language == 'cpp':
-                    print(run.run_cpp())
+                    data = run.run_cpp()
                 elif language == 'python2':
-                    print(run.run_python2())
+                    data = run.run_python2()
                 elif language == 'python3':
-                    print(run.run_python3())
+                    data = run.run_python3()
                 elif language == 'java':
-                    print(run.run_java())
+                    data = run.run_java()
                 elif language == 'bash':
-                    print(run.run_bash())
+                    data = run.run_bash()
                 else:
                     return False
+                print(f'结果：{data}')
+            print(f)
+        print(fs)
 
 
 def compiler(language):
@@ -68,25 +71,42 @@ def write_to_file(coder, language):
     return True
 
 
-def replace_word(s):
-    return s.replace('<br\>', '\\n')
-
 if __name__ == '__main__':
     language_list = [
         'c',
         'cpp',
         'java',
     ]
-    code = """#include<bits/stdc++.h>
+    code = """#include <bits/stdc++.h>
 using namespace std;
+#define random(a, b) (rand()%(b-a)+a)
 
-int main(){
-    cout << "Hello, World!<br\>";
-    return 0;
+int main()
+{
+     int i,j,n,x,y,s,c;
+     scanf("%d",&n);
+    // srand((int)time(0));
+    // n = random(2, 100);
+    // cout << n << endl;
+     for(j=0;j<n;j++)
+     {
+        scanf("%d%d",&x,&y);
+        // x = random(1, 100000);
+        // y = random(x, 1000000);
+        // cout << x << " " << y << endl;
+        s=0;
+        i=0;
+        c=y-x;
+        while(s+i<c)
+        {
+            s+=i/2;
+            i++;
+        }
+        printf("%d \\n",i);
+     }
 }"""
-    problem = '2'
+    problem = '2119'
     language = 'cpp'
-    code = replace_word(code)
     if write_to_file(code, language):
         if language in language_list:
             if compiler(language):

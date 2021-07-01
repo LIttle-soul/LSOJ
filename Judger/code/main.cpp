@@ -2,6 +2,6 @@
 using namespace std;
 
 int main(){
-    cout << "Hello, World!\n";
-    return 0;
+	puts("520 13.14");
+	return 0;
 }

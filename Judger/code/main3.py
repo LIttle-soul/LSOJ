@@ -1,7 +1,1 @@
-#include<bits/stdc++.h>
-using namespace std;
-
-int main(){
-    cout << "Hello, World!\n";
-    return 0;
-}
+print('520 13.14')

@@ -3,7 +3,7 @@ import lorun
 
 
 class Run:
-    def __init__(self, in_file, out_file, temp_file='temp.out'):
+    def __init__(self, in_file, out_file, time_limit = 1000, memory_limit = 102400, temp_file='temp.out'):
         super(Run, self).__init__()
         self.build_path = './build'
         self.code_path = './code'
