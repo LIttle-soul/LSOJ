@@ -27,7 +27,7 @@
           >
         </el-menu>
       </el-drawer>
-      <blod class="icon">LSOJ</blod>
+      <h3 class="icon">LSOJ</h3>
       <el-menu
         class="header-menu"
         mode="horizontal"
@@ -60,8 +60,8 @@
       </el-dropdown>
       <div class="header-search">
         <el-input
+          class="textarea"
           size="mini"
-          input-style="border-radius: 15px; background-color: rgba(240,240,240, 0.9)"
           prefix-icon="el-icon-search"
         >
         </el-input>
@@ -95,6 +95,14 @@ export default {
 </script>
 
 <style scope>
+a {
+  text-decoration: none;
+  color: black;
+}
+.textarea .el-input__inner {
+  border-radius: 15px!important; 
+  background-color: rgba(240,240,240, 0.9)!important;
+}
 .nav {
   position: sticky;
   background-color: rgba(50, 50, 50, 0.8);

@@ -9,7 +9,7 @@
     <el-footer class="home-footer">
         <Footer />
     </el-footer>
-    <el-backtop target=""></el-backtop>
+    <el-backtop></el-backtop>
 </div>
 </template>
 
@@ -39,10 +39,7 @@ export default {
 }
 </script>
 
-<style>
-a {
-  text-decoration: none;
-}
+<style scoped>
 .home-header {
     width: 100%;
     position: fixed;

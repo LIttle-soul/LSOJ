@@ -7,7 +7,7 @@
     </el-affix>
         <el-container>
             <el-header>
-                <el-button @click="IsShow = !IsShow" round="true" icon="el-icon-apple"></el-button>
+                <el-button @click="IsShow = !IsShow" :round="true" icon="el-icon-apple"></el-button>
                 header
             </el-header>
             <el-main>
