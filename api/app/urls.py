@@ -5,6 +5,7 @@ from app import views
 urlpatterns = [
     path('login/', cache_page(0)(views.Login.as_view()), name='login'),
     path('register/', cache_page(0)(views.Register.as_view()), name='register'),
+    path('getusertokeninfo/', views.GetUserTokenInfo.as_view(), name='get_user_token_info'),
     path('perfectinfo/', views.PerfectInfo.as_view(), name='perfect_info'),
     path('logout/', views.Logout.as_view(), name='logout'),
     path('changepassword/', views.PasswordModification.as_view(), name='change_password'),

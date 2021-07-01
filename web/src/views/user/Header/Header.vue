@@ -52,7 +52,10 @@
             :key="item.index"
             :index="item.index"
           >
-            <router-link :to="item.index">
+            <router-link v-if="item.sort_index === 8" :to="item.index" @click="logout">
+              {{ item.tittle }}
+            </router-link>
+            <router-link v-else :to="item.index">
               {{ item.tittle }}
             </router-link>
           </el-dropdown-item>
@@ -69,10 +72,12 @@
     </div>
 </template>
 
-<script>
+<script type="text/javascript">
 export default {
   name: "Header",
-  components: {},
+  mounted() {
+    this.getUserProvince();
+  },
   updated() {},
   data() {
     return {
@@ -91,6 +96,69 @@ export default {
       ],
     };
   },
+  methods: {
+    SelectUserMenu(province) {
+      this.userNav = []
+      while(province != -1){
+        switch (province) {
+          case 0:     // 超级管理员菜单列表
+            this.userNav.push({ index: "/admin", tittle: "我的管理", sort_index: 1});
+            province = 4;
+            break;
+          case 1:    // 管理员菜单列表
+            this.userNav.push({ index: "/home1", tittle: "我的管理", sort_index: 1});
+            province = 4;
+            break;
+          case 2:     // 教师菜单列表
+            this.userNav.push({ index: "/home1", tittle: "我的管理", sort_index: 1});
+            province = 4;
+            break;
+          case 3:     // 志愿者菜单列表
+            this.userNav.push({ index: "/home1", tittle: "我的管理", sort_index: 1});
+            province = 4;
+            break;
+          case 4:     // 普通用户菜单列表
+            this.userNav.push({ index: "/home2", tittle: "我的信息", sort_index: 2});
+            this.userNav.push({ index: "/home3", tittle: "我的状态", sort_index: 3});
+            this.userNav.push({ index: "/home4", tittle: "我的题解", sort_index: 4});
+            this.userNav.push({ index: "/home5", tittle: "我的收藏", sort_index: 5});
+            this.userNav.push({ index: "/home6", tittle: "我的比赛", sort_index: 6});
+            this.userNav.push({ index: "/home7", tittle: "我的提交", sort_index: 7});
+            this.userNav.push({ index: "/home", tittle: "用户注销", sort_index: 8});
+            province = -1;
+            break;
+          default:    // 未登录用户菜单列表
+            this.userNav.push({ index: "/login", tittle: "登录", sort_index: 1});
+            this.userNav.push({ index: "/forgetpassword", tittle: "忘记密码" , sort_index: 2});
+            province = -1;
+        }
+      }
+    },
+    getUserProvince() {
+      if(this.$cookies.isKey('token')) {
+        this.$http({
+          url: '/api/getusertokeninfo/',
+          methods: 'get',
+          params: {
+            'token': this.$cookies.get('token')
+          }
+        }).then( res => {
+          // console.log(res.data)
+          this.SelectUserMenu(res.data.data.data.capacity)
+          if(res.data.remind) {
+            this.$cookies.set('token', res.data.new_token)
+            console.log('set new token!')
+          }
+        })
+      } else {
+        this.SelectUserMenu(5)
+      }
+    },
+    logout() {
+      this.$cookies.remove('token');
+      location.reload();
+    }
+  }
 };
 </script>
 

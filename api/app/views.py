@@ -111,7 +111,7 @@ class Login(View):
         username = request.POST.get('user_id')
         password = request.POST.get('password')
         code = request.POST.get('code')
-        print(username, password, code)
+        # print(username, password, code)
         if publicMethod.check_capture(requester=request, code=code):
             obj = Password.objects.using('app').filter(user_id=username)
             if obj.exists():
@@ -119,7 +119,7 @@ class Login(View):
                 if publicMethod.check_password(password_new=password, password_old=obj.password):
                     user_obj = User.objects.using('app').filter(user_id=obj)
                     capacity = user_obj.first().role_pri if user_obj.exists() else 4
-                    print(capacity)
+                    # print(capacity)
                     token = publicMethod.create_token({'username': obj.user_id, 'capacity': capacity}, 120)
                     LoginLog.objects.using('app').create(
                         user_id=obj,
@@ -183,6 +183,24 @@ class Register(View):
         else:
             state = {'status': False, 'err': '验证码错误'}
         return JsonResponse(state)
+
+
+class GetUserTokenInfo(View):
+    """
+    模块: 获取用户权限信息
+    接口信息:
+        GET:
+            token: 用户token
+        POST:
+            None
+    """
+    def get(self, request):
+        token = request.GET.get('token')
+        data = publicMethod.parse_payload(token)
+        return JsonResponse(data)
+
+    def post(self, request):
+        pass
 
 
 class PerfectInfo(View):

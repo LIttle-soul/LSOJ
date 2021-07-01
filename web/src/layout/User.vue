@@ -19,8 +19,8 @@ import { defineAsyncComponent } from '@vue/runtime-core'
 export default {
     name: "User",
     components: {
-        Header: defineAsyncComponent(() => import('./Header/Header.vue')),
-        Footer: defineAsyncComponent(() => import('./Footer/Footer.vue')),
+        Header: defineAsyncComponent(() => import('@/views/user/Header/Header.vue')),
+        Footer: defineAsyncComponent(() => import('@/views/user/Footer/Footer.vue')),
         // BackTop: defineAsyncComponent(() => import('@/components/BackTop.vue')),
     },
     data() {

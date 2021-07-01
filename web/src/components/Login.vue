@@ -1,7 +1,7 @@
 <template>
   <el-form
     :model="ruleForm"
-    status-icon="true"
+    :status-icon="true"
     :rules="rules"
     ref="ruleForm"
     label-position="left"
@@ -130,7 +130,7 @@ export default {
               'code': this.ruleForm.code,
             }
           }).then( res => {
-            console.log('res=>', res);
+            // console.log('res=>', res);
             alert(res.data.err);
             if(res.data.status){
               this.$cookies.set('token', res.data.token)
@@ -138,7 +138,7 @@ export default {
             }
           })
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });
@@ -148,8 +148,8 @@ export default {
     },
     getCode() {
       this.$http.get('/api/login/').then(response => (
-          this.ruleForm.true_code = response.data.capture,
-          console.log(response.data.capture)
+          this.ruleForm.true_code = response.data.capture
+          // console.log(response.data.capture)
       ));
     }
   },

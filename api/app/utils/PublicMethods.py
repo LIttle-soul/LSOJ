@@ -144,14 +144,16 @@ class PublicMethod:
             'remind': False,
             'time': timezone.now(),
             'data': None,
-            'error': None
+            'error': None,
+            'new_token': None
         }
         try:
             verified_payload = jwt.decode(token, key=self.JWT_SALT, algorithms="HS256")
             result['status'] = True
             result['data'] = verified_payload
-            if verified_payload['exp'] - int(time.time()) < 1800:
+            if verified_payload['exp'] - int(time.time()) < 600:
                 result['remind'] = True
+                result['new_token'] = self.create_token(verified_payload['data'], 120)
         except jwt.ExpiredSignatureError:
             result['error'] = 'token已失效'
         except jwt.DecodeError:

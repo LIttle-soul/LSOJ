@@ -1,7 +1,7 @@
 <template>
   <el-form
     :model="ruleForm"
-    status-icon="true"
+    :status-icon="true"
     :rules="rules"
     ref="ruleForm"
     label-position="left"
@@ -143,7 +143,7 @@ export default {
               'code': this.ruleForm.code,
             }
           )).then( res => {
-            console.log('res=>', res);
+            // console.log('res=>', res);
             if(res.data.status){
               alert(res.data.err + '请登录')
             } else {
@@ -151,7 +151,7 @@ export default {
             }
           })
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });
@@ -161,8 +161,8 @@ export default {
     },
     getCode() {
       this.$http.get('/api/register/').then(response => (
-          this.ruleForm.true_code = response.data.capture,
-          console.log(response.data.capture)
+          this.ruleForm.true_code = response.data.capture
+          // console.log(response.data.capture)
       ));
     }
   },
