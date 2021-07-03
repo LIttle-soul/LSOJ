@@ -3,9 +3,7 @@ from django.db import models
 
 # ------------------------------------------------------地址管理----------------------------------------
 class Province(models.Model):
-    # province_id = models.AutoField()
     province_name = models.CharField(max_length=25, verbose_name='省份')
-    province_municipality = models.ForeignKey(to='Municipality', on_delete=models.CASCADE, null=True, blank=True, verbose_name='省份城市')
 
     class Meta:
         managed = True
@@ -13,10 +11,8 @@ class Province(models.Model):
 
 
 class Municipality(models.Model):
-    # municipality_id = models.AutoField()
     municipality_name = models.CharField(max_length=50, verbose_name='市级城市')
-    # municipality_province = models.ForeignKey(to='Province', on_delete=models.CASCADE, null=True, blank=True, verbose_name='城市所在省份')
-    municipality_school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='城市学校')
+    municipality_province = models.ForeignKey(to='Province', on_delete=models.CASCADE, null=True, blank=True, verbose_name='城市所在省份')
 
     class Meta:
         managed = True
@@ -25,11 +21,9 @@ class Municipality(models.Model):
 
 # -------------------------------------------------------学校管理---------------------------------------
 class School(models.Model):
-    # school_id = models.AutoField()
     school_name = models.CharField(max_length=50, verbose_name='学校名称')
     school_describe = models.TextField(null=True, blank=True, verbose_name='学校描述')
-    school_college = models.ForeignKey(to='College', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学校学院')
-    # school_class = models.ForeignKey(to='Class', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学校班级')
+    school_municipality = models.ForeignKey(to='Municipality', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学校所在城市')
 
     class Meta:
         managed = True
@@ -37,10 +31,8 @@ class School(models.Model):
 
 
 class College(models.Model):
-    # college_id = models.AutoField()
     college_name = models.CharField(max_length=50, verbose_name='学院名称')
-    # college_school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='班级所在学校')
-    college_class = models.ForeignKey(to='Class', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学院班级')
+    college_school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学院所在学校')
 
     class Meta:
         managed = True
@@ -48,12 +40,9 @@ class College(models.Model):
 
 
 class Class(models.Model):
-    # class_id = models.AutoField()
     class_name = models.CharField(max_length=50, verbose_name='班级名称')
-    # class_school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='班级所在学校')
-    # class_college = models.ForeignKey(to='College', on_delete=models.CASCADE, null=True, blank=True, verbose_name='班级所在学院')
-    class_student = models.ForeignKey(to='User', on_delete=models.CASCADE, related_name='class_student', null=True, blank=True, verbose_name='班级成员')
-    class_teacher = models.ForeignKey(to='User', on_delete=models.CASCADE, related_name='class_teacher', null=True, blank=True, verbose_name='班级教师')
+    class_college = models.ForeignKey(to='College', on_delete=models.CASCADE, null=True, blank=True, verbose_name='班级所在学院')
+    class_teacher = models.ManyToManyField(to='User', blank=True, verbose_name='班级教师')
 
     class Meta:
         managed = True
@@ -62,8 +51,8 @@ class Class(models.Model):
 
 # -------------------------------------------------------用户管理---------------------------------------
 class Password(models.Model):
-    user_id = models.CharField(max_length=32, primary_key=True, verbose_name='学号/工号')
-    password = models.CharField(max_length=64, verbose_name='密码')
+    user_id = models.CharField(max_length=32, primary_key=True, verbose_name='用户账号')
+    password = models.CharField(max_length=64, verbose_name='用户密码')
 
     class Meta:
         managed = True
@@ -85,20 +74,20 @@ class User(models.Model):
     ]
 
     user_id = models.OneToOneField(to='Password', to_field='user_id', on_delete=models.CASCADE, primary_key=True, verbose_name='已注册用户')
-    real_name = models.CharField(max_length=20, null=True, blank=True, verbose_name='真实姓名')
-    nick = models.CharField(max_length=24, blank=True, null=True, verbose_name='昵称')
-    email = models.EmailField(blank=True, null=True, verbose_name='邮箱')
-    submit = models.ForeignKey(to='Solution', on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name='提交数量')
-    solved = models.ForeignKey(to='Problems', on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name='解决数量')
-    defunct = models.BooleanField(default=0, verbose_name='是否隐藏')
-    ip = models.GenericIPAddressField(verbose_name='ip地址')
-    access_time = models.DateTimeField(blank=True, null=True, verbose_name='登陆时间')
+    student_id = models.CharField(max_length=50, null=True, blank=True, verbose_name='用户学号')
+    user_name = models.CharField(max_length=20, null=True, blank=True, verbose_name='用户姓名')
+    user_nick = models.CharField(max_length=24, blank=True, null=True, verbose_name='用户昵称')
+    user_power = models.SmallIntegerField(choices=POWER_CHOICE, default=4, verbose_name='用户身份')
+    user_score = models.IntegerField(default=0, verbose_name='用户得分')
+    user_sex = models.SmallIntegerField(choices=SEX_CHOICE, verbose_name='用户性别')
+    user_telephone = models.CharField(max_length=20, blank=True, null=True, verbose_name='用户电话')
+    user_email = models.EmailField(blank=True, null=True, verbose_name='用户邮箱')
+    user_birthday = models.DateTimeField(blank=True, null=True, verbose_name='用户生日')
     reg_time = models.DateTimeField(blank=True, null=True, verbose_name='注册时间')
-    school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='学校')
-    score = models.IntegerField(default=0, verbose_name='得分')
-    sex = models.IntegerField(choices=SEX_CHOICE, verbose_name='性别')
-    role_pri = models.IntegerField(choices=POWER_CHOICE, default='4', verbose_name='权限')
-    is_delete = models.BooleanField(default=0, verbose_name='保护')
+    user_school = models.ForeignKey(to='School', on_delete=models.CASCADE, null=True, blank=True, verbose_name='用户所在学校')
+    user_class = models.ForeignKey(to='Class', on_delete=models.CASCADE, null=True, blank=True, verbose_name='用户所在班级')
+    user_team = models.ForeignKey(to='Team', on_delete=models.CASCADE, null=True, blank=True, verbose_name='用户所在团队')
+    user_address = models.ForeignKey(to='Municipality', on_delete=models.CASCADE, null=True, blank=True, verbose_name='用户所在地址')
 
     class Meta:
         managed = True
@@ -135,9 +124,8 @@ class Team(models.Model):
     team_id = models.AutoField(primary_key=True)
     team_name = models.CharField(max_length=50, verbose_name='队伍名')
     team_manifesto = models.TextField(null=True, blank=True, verbose_name='团队宣言')
-    users = models.ForeignKey(to='User', related_name='team_user', on_delete=models.CASCADE, verbose_name='团队成员')
     trainer = models.ManyToManyField(to='User', related_name='team_trainer', blank=True, verbose_name='指导老师')
-    school = models.ForeignKey(to='School', on_delete=models.CASCADE, verbose_name='学校名')
+    school = models.ForeignKey(to='School', on_delete=models.CASCADE, verbose_name='团队所在学校')
     defunct = models.BooleanField(default='0', verbose_name='是否屏蔽')
 
     class Meta:
@@ -161,9 +149,7 @@ class Problems(models.Model):
     time_limit = models.IntegerField(default=1000, verbose_name='时间限制')
     memory_limit = models.IntegerField(default=128, verbose_name='空间限制')
     defunct = models.BooleanField(default=0, verbose_name='是否隐藏')
-    accepted = models.ForeignKey(to='Solution', related_name='problem_accepted', null=True, blank=True, on_delete=models.CASCADE, verbose_name='通过数')
-    submit = models.ForeignKey(to='Solution', related_name='problem_submit', null=True, blank=True, on_delete=models.CASCADE, verbose_name='提交数')
-    # solved = models.IntegerField(blank=True, null=True, verbose_name='解答')
+    solved_user = models.ManyToManyField(to='User', related_name='solved_user', blank=True, verbose_name='以通过题目的用户')
     type = models.CharField(max_length=100, blank=True, null=True, verbose_name='知识点')
     difficulty = models.IntegerField(blank=True, null=True, verbose_name='难度')
     creator = models.ForeignKey(to='User', to_field='user_id', on_delete=models.CASCADE, blank=True, null=True, verbose_name='创建者')
@@ -280,8 +266,8 @@ class ContestProblem(models.Model):
     contest_id = models.ForeignKey(to='Contest', on_delete=models.CASCADE, verbose_name='竞赛编号')
     problem_id = models.ForeignKey(to='Problems', on_delete=models.CASCADE, verbose_name='题目编号')
     num = models.IntegerField(verbose_name='竞赛题目编号')
-    submit = models.ForeignKey(to='Solution', related_name='contest_submit', on_delete=models.CASCADE, verbose_name='题目提交')
-    solved = models.ForeignKey(to='Solution', related_name='contest_solved', on_delete=models.CASCADE, verbose_name='题目正确')
+    # submit = models.ForeignKey(to='Solution', related_name='contest_submit', on_delete=models.CASCADE, verbose_name='题目提交')
+    # solved = models.ForeignKey(to='Solution', related_name='contest_solved', on_delete=models.CASCADE, verbose_name='题目正确')
 
     class Meta:
         managed = True

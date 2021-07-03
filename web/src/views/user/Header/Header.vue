@@ -45,7 +45,7 @@
         >
       </el-menu>
       <el-dropdown class="header-head" type="primary" trigger="click">
-        <el-avatar :src="circleUrl"></el-avatar>
+        <el-avatar :src="circleUrl" alt="Hello"></el-avatar>
         <template #dropdown>
           <el-dropdown-item
             v-for="item in userNav"
@@ -118,7 +118,7 @@ export default {
             province = 4;
             break;
           case 4:     // 普通用户菜单列表
-            this.userNav.push({ index: "/home2", tittle: "我的信息", sort_index: 2});
+            this.userNav.push({ index: "/userinfo", tittle: "我的信息", sort_index: 2});
             this.userNav.push({ index: "/home3", tittle: "我的状态", sort_index: 3});
             this.userNav.push({ index: "/home4", tittle: "我的题解", sort_index: 4});
             this.userNav.push({ index: "/home5", tittle: "我的收藏", sort_index: 5});

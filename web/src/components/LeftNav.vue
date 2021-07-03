@@ -2,6 +2,7 @@
 <template>
     <el-menu
         default-active="UserList"
+        :unique-opened="true"
         class="el-menu-vertical-demo"
         :collapse="isCollapse"
     >
@@ -64,6 +65,17 @@ export default {
                     'data': [
                         {
                             
+                        }
+                    ]
+                },
+                {
+                    'title': '学校管理',
+                    'key': 'school',
+                    'icon': 'el-icon-school',
+                    'data': [
+                        {
+                            'title': '学校添加',
+                            'index': 'AddSchool'
                         }
                     ]
                 },

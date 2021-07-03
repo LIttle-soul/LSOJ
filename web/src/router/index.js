@@ -26,11 +26,11 @@ const routes = [
         name: 'Contest',
         component: () => import('@/views/user/Contest/ContestList.vue')
       },
-      // {
-      //   path: '/userinfo',
-      //   name: 'UserInfo',
-      //   component: () => import('@/views/user/Login/UserInfo.vue')
-      // }
+      {
+        path: '/userinfo',
+        name: 'UserInfo',
+        component: () => import('@/views/user/UserInfo/UserInfo.vue')
+      }
     ]
   },
   {

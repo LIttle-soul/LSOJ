@@ -7,7 +7,6 @@ urlpatterns = [
     path('register/', cache_page(0)(views.Register.as_view()), name='register'),
     path('getusertokeninfo/', views.GetUserTokenInfo.as_view(), name='get_user_token_info'),
     path('perfectinfo/', views.PerfectInfo.as_view(), name='perfect_info'),
-    path('logout/', views.Logout.as_view(), name='logout'),
     path('changepassword/', views.PasswordModification.as_view(), name='change_password'),
     path('sendemail/', views.SendEmail.as_view(), name='send_email'),
     path('forgetpassword/', views.ForgetPassword.as_view(), name='forget_password'),
@@ -18,4 +17,7 @@ urlpatterns = [
     path('resettinguserpassword/', views.ResettingUserPassword.as_view(), name='resetting_user_password'),
     path('addnews/', views.AddNews.as_view(), name='add_news'),
     path('getproblemlist/', views.GetProblemList.as_view(), name='get_problem_list'),
+    path('addprovince/', views.AddProvince.as_view(), name='add_province'),
+    path('addmunicipality/', views.AddMunicipality.as_view(), name='add_municipality'),
+    path('addschool/', views.AddSchool.as_view(), name='add_school'),
 ]

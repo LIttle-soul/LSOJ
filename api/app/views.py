@@ -9,85 +9,329 @@ import numpy
 publicMethod = PublicMethod()
 
 
-# --------------------------学校管理----------------------------
+# --------------------------地址管理----------------------------
 class AddProvince(View):
     """
-    模块: 学校添加
+    模块: 省份管理
     接口信息:
         GET:
             None
         POST:
-            None
+            province: 要添加的省份名称
+    返回数据:
+        GET:
+            所有省份列表
+        POST:
+            执行操作状态
     """
     def get(self, request):
-        pass
+        obj = Province.objects.using('app').all().values_list('province_name')
+        return JsonResponse({'status': True, 'data': list(obj)})
 
     def post(self, request):
-        pass
+        province = request.POST.get('province')
+        obj = Province.objects.using('app').filter(province_name=province)
+        if obj.exists():
+            message = {'status': False, 'info': '此省份已添加'}
+        else:
+            Province.objects.using('app').create(
+                province_name=province
+            )
+            message = {'status': True, 'info': '省份添加成功'}
+        return JsonResponse(message)
 
 
 class AddMunicipality(View):
     """
-    模块: 学校添加
+    模块: 城市管理
     接口信息:
         GET:
-            None
+            province: 要获取城市列表的省份
         POST:
-            None
+            province: 要添加城市的省份
+            municipality: 要添加的城市
+    返回数据:
+        GET:
+            当前省份下的所有城市列表
+        POST:
+            城市添加状态
     """
     def get(self, request):
-        pass
+        province = request.GET.get('province')
+        obj = Province.objects.using('app').filter(province_name=province)
+        if obj.exists():
+            province_obj = obj.first()
+            data = province_obj.municipality_set.all().values_list('municipality_name')
+            message = {'status': True, 'info': list(data)}
+        else:
+            message = {'status': False, 'info': '请先添加此省份'}
+        return JsonResponse(message)
 
     def post(self, request):
-        pass
+        province = request.POST.get('province')
+        municipality = request.POST.get('municipality')
+        obj1 = Province.objects.using('app').filter(province_name=province)
+        if obj1.exists():
+            province_obj = obj1.first()
+            obj2 = province_obj.municipality_set.filter(municipality_name=municipality)
+            if obj2.exists():
+                message = {'status': False, 'info': '当前城市已添加'}
+            else:
+                province_obj.municipality_set.create(municipality_name=municipality)
+                message = {'status': True, 'info': '城市添加成功'}
+        else:
+            message = {'status': False, 'info': '请先添加此省份'}
+        return JsonResponse(message)
 
 
+# --------------------------学校管理----------------------------
 class AddSchool(View):
     """
-    模块: 学校添加
+    模块: 学校管理
     接口信息:
         GET:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
         POST:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学校名称
+    返回数据:
+        GET:
+            当前城市下面的所有学校
+        POST:
+            添加学校的状态
     """
     def get(self, request):
-        pass
+        province = request.GET.get('province')
+        municipality = request.GET.get('municipality')
+        obj = Municipality.objects.using('app').filter(
+            Q(municipality_province__province_name=province) &
+            Q(municipality_name=municipality)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            data = obj1.school_set.all().values('school_name', 'school_describe')
+            message = {'status': True, 'info': list(data)}
+        else:
+            message = {'status': False, 'info': '请先添加相关城市信息'}
+        return JsonResponse(message)
 
     def post(self, request):
-        pass
+        province = request.POST.get('province')
+        municipality = request.POST.get('municipality')
+        school = request.POST.get('school')
+        describe = request.POST.get('describe')
+        obj = Municipality.objects.using('app').filter(
+            Q(municipality_province__province_name=province) &
+            Q(municipality_name=municipality)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            obj2 = obj1.school_set.filter(school_name=school)
+            if obj2.exists():
+                message = {'status': False, 'info': '此学校已添加'}
+            else:
+                obj1.school_set.create(school_name=school, school_describe=describe)
+                message = {'status': True, 'info': '学校添加成功'}
+        else:
+            message = {'status': False, 'info': '请先添加相关城市信息'}
+        return JsonResponse(message)
 
 
 class AddCollege(View):
     """
-    模块: 学校添加
+    模块: 学院添加
     接口信息:
         GET:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在的学校
         POST:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在学校
+            college: 学院名称
+    返回数据:
+        GET:
+            当前学校下面的所有学院
+        POST:
+            添加学院的状态
     """
     def get(self, request):
-        pass
+        province = request.GET.get('province')
+        municipality = request.GET.get('municipality')
+        school = request.GET.get('school')
+        obj = School.objects.using('app').filter(
+            Q(school_municipality__municipality_province__province_name=province) &
+            Q(school_municipality__municipality_name=municipality) &
+            Q(school_name=school)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            data = obj1.college_set.all().values_list('college_name')
+            message = {'status': True, 'info': list(data)}
+        else:
+            message = {'status': False, 'info': '请先添加相关城市信息'}
+        return JsonResponse(message)
 
     def post(self, request):
-        pass
+        province = request.POST.get('province')
+        municipality = request.POST.get('municipality')
+        school = request.POST.get('school')
+        college = request.POST.get('college')
+        obj = School.objects.using('app').filter(
+            Q(school_municipality__municipality_province__province_name=province) &
+            Q(school_municipality__municipality_name=municipality) &
+            Q(school_name=school)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            obj2 = obj1.college_set.filter(college_name=college)
+            if obj2.exists():
+                message = {'status': False, 'info': '此学院已添加'}
+            else:
+                obj1.college_set.create(college_name=college)
+                message = {'status': True, 'info': '学院添加成功'}
+        else:
+            message = {'status': False, 'info': '请先添加相关学校信息'}
+        return JsonResponse(message)
 
 
 class AddClass(View):
     """
-    模块: 学校添加
+    模块: 班级添加
     接口信息:
         GET:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在的学校
+            college: 班级所在学院
         POST:
-            None
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在学校
+            college: 班级所在学院
+            user_class: 班级名称
+    返回数据:
+        GET:
+            当前学院下面的所有班级
+        POST:
+            添加班级的状态
     """
     def get(self, request):
-        pass
+        province = request.GET.get('province')
+        municipality = request.GET.get('municipality')
+        school = request.GET.get('school')
+        college = request.GET.get('college')
+        obj = College.objects.using('app').filter(
+            Q(college_school__school_municipality__municipality_province__province_name=province) &
+            Q(college_school__school_municipality__municipality_name=municipality) &
+            Q(college_school__school_name=school) &
+            Q(college_name=college)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            data = obj1.class_set.all().values_list('class_name')
+            message = {'status': True, 'info': list(data)}
+        else:
+            message = {'status': False, 'info': '请先添加相关学院信息'}
+        return JsonResponse(message)
 
     def post(self, request):
-        pass
+        province = request.POST.get('province')
+        municipality = request.POST.get('municipality')
+        school = request.POST.get('school')
+        college = request.POST.get('college')
+        user_class = request.POST.get('user_class')
+        obj = College.objects.using('app').filter(
+            Q(college_school__school_municipality__municipality_province__province_name=province) &
+            Q(college_school__school_municipality__municipality_name=municipality) &
+            Q(college_school__school_name=school) &
+            Q(college_name=college)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            obj2 = obj1.class_set.filter(class_name=user_class)
+            if obj2.exists():
+                message = {'status': False, 'info': '此班级已添加'}
+            else:
+                obj1.class_set.create(college_name=user_class)
+                message = {'status': True, 'info': '班级添加成功'}
+        else:
+            message = {'status': False, 'info': '请先添加相关学院信息'}
+        return JsonResponse(message)
+
+
+class AddStudent(View):
+    """
+    模块: 学生添加
+    接口信息:
+        GET:
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在的学校
+            college: 班级所在学院
+            user_class: 学生所在班级
+        POST:
+            province: 学校所在的省份
+            municipality: 学校所在的城市
+            school: 学院所在学校
+            college: 班级所在学院
+            user_class: 学生所在班级
+            student: 学生编号
+    返回数据:
+        GET:
+            当前班级下面的所有学生
+        POST:
+            添加学生的状态
+    """
+    def get(self, request):
+        province = request.GET.get('province')
+        municipality = request.GET.get('municipality')
+        school = request.GET.get('school')
+        college = request.GET.get('college')
+        user_class = request.GET.get('user_class')
+        obj = Class.objects.using('app').filter(
+            Q(class_college__college_school__school_municipality__municipality_province__province_name=province) &
+            Q(class_college__college_school__school_municipality__municipality_name=municipality) &
+            Q(class_college__college_school__school_name=school) &
+            Q(class_college__college_name=college) &
+            Q(class_name=user_class)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            data = obj1.user_set.all().values()
+            message = {'status': True, 'info': list(data)}
+        else:
+            message = {'status': False, 'info': '请先添加相关班级信息'}
+        return JsonResponse(message)
+
+    def post(self, request):
+        province = request.POST.get('province')
+        municipality = request.POST.get('municipality')
+        school = request.POST.get('school')
+        college = request.POST.get('college')
+        user_class = request.POST.get('user_class')
+        student = request.POST.get('student')
+        obj = Class.objects.using('app').filter(
+            Q(class_college__college_school__school_municipality__municipality_province__province_name=province) &
+            Q(class_college__college_school__school_municipality__municipality_name=municipality) &
+            Q(class_college__college_school__school_name=school) &
+            Q(class_college__college_name=college) &
+            Q(class_name=user_class)
+        )
+        if obj.exists():
+            obj1 = obj.first()
+            obj2 = obj1.user_set.filter(user_id__user_id=student)
+            if obj2.exists():
+                message = {'status': False, 'info': '此学生已添加'}
+            else:
+                obj1.user_set.add(User.objects.get(user_id__user_id=student))
+                message = {'status': True, 'info': '学生添加成功'}
+        else:
+            message = {'status': False, 'info': '请先添加相关学院信息'}
+        return JsonResponse(message)
 
 
 # --------------------------用户功能----------------------------
@@ -102,6 +346,11 @@ class Login(View):
             user_id: 用户学号、工号
             password: 用户密码
             code: 图片验证码
+    返回数据:
+        GET:
+            图片验证码内容
+        POST:
+            用户登录状态和提示信息
     """
     def get(self, request):
         res = publicMethod.capture(requester=request)
@@ -118,7 +367,7 @@ class Login(View):
                 obj = obj.first()
                 if publicMethod.check_password(password_new=password, password_old=obj.password):
                     user_obj = User.objects.using('app').filter(user_id=obj)
-                    capacity = user_obj.first().role_pri if user_obj.exists() else 4
+                    capacity = user_obj.first().user_power if user_obj.exists() else 4
                     # print(capacity)
                     token = publicMethod.create_token({'username': obj.user_id, 'capacity': capacity}, 120)
                     LoginLog.objects.using('app').create(
@@ -137,18 +386,6 @@ class Login(View):
         return JsonResponse(massage)
 
 
-class Logout(View):
-    def get(self, request):
-        token = request.GET.get('token')
-        data = publicMethod.parse_payload(token)
-        message = {'err': data}
-        return JsonResponse(message)
-
-    def post(self, request):
-        message = {'err': '注销成功'}
-        return JsonResponse(message)
-
-
 class Register(View):
     """
     模块: 用户注册
@@ -160,6 +397,11 @@ class Register(View):
             password: 用户密码
             check_pass: 重复密码
             code: 图片验证码
+    返回数据:
+        GET:
+            图片验证码内容
+        POST:
+            用户注册状态和提示信息
     """
     def get(self, request):
         res = publicMethod.capture(requester=request)
@@ -191,6 +433,11 @@ class GetUserTokenInfo(View):
     接口信息:
         GET:
             token: 用户token
+        POST:
+            None
+    返回数据:
+        GET:
+            用户token所包含信息
         POST:
             None
     """
