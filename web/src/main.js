@@ -9,7 +9,13 @@ import cookies from 'vue-cookies'
 import 'element-plus/lib/theme-chalk/index.css'
 import 'element-plus/lib/theme-chalk/display.css'
 
+// day.js
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+
 const app = createApp(App)
+app.config.globalProperties.$dayJS=dayjs
 app.config.globalProperties.$http=axios
 app.config.globalProperties.$qs=qs
 app.config.globalProperties.$cookies=cookies

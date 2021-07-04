@@ -74,9 +74,11 @@ class User(models.Model):
     ]
 
     user_id = models.OneToOneField(to='Password', to_field='user_id', on_delete=models.CASCADE, primary_key=True, verbose_name='已注册用户')
+    user_icon = models.ImageField(upload_to='user_icon', null=True, blank=True, verbose_name='用户头像')
     student_id = models.CharField(max_length=50, null=True, blank=True, verbose_name='用户学号')
     user_name = models.CharField(max_length=20, null=True, blank=True, verbose_name='用户姓名')
     user_nick = models.CharField(max_length=24, blank=True, null=True, verbose_name='用户昵称')
+    user_maxim = models.CharField(max_length=200, blank=True, null=True, verbose_name='用户座右铭')
     user_power = models.SmallIntegerField(choices=POWER_CHOICE, default=4, verbose_name='用户身份')
     user_score = models.IntegerField(default=0, verbose_name='用户得分')
     user_sex = models.SmallIntegerField(choices=SEX_CHOICE, verbose_name='用户性别')
@@ -312,3 +314,13 @@ class Reply(models.Model):
     class Meta:
         managed = True
         db_table = 'reply'
+
+
+class Document(models.Model):
+    title = models.CharField(max_length=200)
+    uploadedFile = models.FileField(upload_to="Uploaded Files/")
+    dateTimeOfUpload = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = True
+        db_table = 'document'

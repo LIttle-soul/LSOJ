@@ -36,6 +36,7 @@
           {{'列表内容' + item}}
         </div>
       </el-card>
+      <UpLoad />
     </el-aside>
     <el-main>
       <el-skeleton :row="5" animated v-for="item in 10" :key="item" style="margin: 50px auto;"></el-skeleton>
@@ -44,10 +45,15 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from '@vue/runtime-core'
+
 export default {
   name: "Home",
   setup() {
     
+  },
+  components: {
+    UpLoad: defineAsyncComponent(() => import('@/components/UpLoad.vue')),
   }
 }
 </script>

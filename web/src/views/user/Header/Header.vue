@@ -81,7 +81,7 @@ export default {
   updated() {},
   data() {
     return {
-      circleUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+      circleUrl: "/api/upload/",
       drawer: false,
       headerNav: [
         { index: "/home", tittle: "首页" },
@@ -144,10 +144,15 @@ export default {
           }
         }).then( res => {
           // console.log(res.data)
-          this.SelectUserMenu(res.data.data.data.capacity)
-          if(res.data.remind) {
-            this.$cookies.set('token', res.data.new_token)
-            console.log('set new token!')
+          if (res.data.status) {
+            this.SelectUserMenu(res.data.data.data.capacity)
+            if(res.data.remind) {
+              this.$cookies.set('token', res.data.new_token)
+              console.log('set new token!')
+            }
+          } else {
+            alert(res.data.error)
+            this.$router.push('/login')
           }
         })
       } else {

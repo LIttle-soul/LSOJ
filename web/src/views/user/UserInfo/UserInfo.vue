@@ -5,6 +5,9 @@
         <i class="el-icon-user-solid"></i>
         个人信息
       </template>
+      <template #extra>
+        <el-button type="primary" @click="ChangeUserInfo" size="small">信息修改</el-button>
+      </template>
       <el-descriptions-item>
         <template #label>
           <i class="el-icon-user"></i>
@@ -106,18 +109,22 @@ export default {
         // console.log(res.data)
         if(res.data.status){
           this.user_data.user_id = res.data.data.user_id_id
-          this.user_data.user_nick = res.data.data.nick
-          this.user_data.user_name = res.data.data.real_name
-          this.user_data.user_score = res.data.data.score
-          this.user_data.registration_time = res.data.data.reg_time
-          this.user_data.user_school = res.data.data.school_id
-          this.user_data.user_sex = res.data.data.sex === 0 ? '男' : '女'
-          this.user_data.user_telephone = res.data.data.telephone
-          this.user_data.user_email = res.data.data.enail
+          this.user_data.user_nick = res.data.data.user_nick
+          this.user_data.user_name = res.data.data.user_name
+          this.user_data.user_score = res.data.data.user_score
+          this.user_data.registration_time = this.$dayJS(res.data.data.reg_time).format('YYYY年MM月DD日')
+          this.user_data.user_school = res.data.data.user_school
+          this.user_data.user_sex = res.data.data.user_sex === 0 ? '男' : '女'
+          this.user_data.user_telephone = res.data.data.user_telephone
+          this.user_data.user_email = res.data.data.user_email
         } else {
           alert(res.data.err)
+          this.$router.push('/perfectuserinfo')
         }
       })
+    },
+    ChangeUserInfo() {
+      this.$router.push('/perfectuserinfo')
     }
   }
 };

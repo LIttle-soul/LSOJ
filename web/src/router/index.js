@@ -30,6 +30,11 @@ const routes = [
         path: '/userinfo',
         name: 'UserInfo',
         component: () => import('@/views/user/UserInfo/UserInfo.vue')
+      },
+      {
+        path: '/perfectuserinfo',
+        name: 'PerfectUserInfo',
+        component: () => import('@/views/user/UserInfo/PerfectUserInfo.vue')
       }
     ]
   },

@@ -1,4 +1,6 @@
-from django.http import JsonResponse
+import time
+
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import View
 from django.utils import timezone
 from django.db.models import Q, F, Avg, Max, Min, Count, Sum
@@ -470,7 +472,8 @@ class PerfectInfo(View):
             return JsonResponse({'status': False, 'err': '用户未登录'})
         obj = User.objects.using('app').filter(user_id__user_id=user_id)
         if obj.exists():
-            messages = {'status': True, 'err': '个人用户信息', 'data': obj.values().first()}
+            data = obj.values().first()
+            messages = {'status': True, 'err': '个人用户信息', 'data': data}
         else:
             messages = {'status': False, 'err': '请先完善用户信息'}
         return JsonResponse(messages)
@@ -480,45 +483,38 @@ class PerfectInfo(View):
         user_id = publicMethod.check_user_login(token)
         if not user_id:
             return JsonResponse({'err': "用户认证失败"})
-        real_name = request.POST.get('name')
-        nick_name = request.POST.get('nickname')
-        school_id = request.POST.get('school_id')
-        sex = request.POST.get('sex')
-        sex = (0 if sex == '男' else 1)
+        user_name = request.POST.get('user_name')
+        user_nick = request.POST.get('user_nick')
+        user_maxim = request.POST.get('user_maxim')
+        user_birthday = request.POST.get('user_birthday')
+        user_telephone = request.POST.get('user_telephone')
+        user_sex = request.POST.get('user_sex')
+        user_sex = (0 if user_sex == '男' else 1)
         user = Password.objects.using('app').get(user_id=user_id)
         obj = User.objects.using('app').filter(user_id=user)
+        # print(user_birthday)
         if obj.exists():
-            obj = obj.first()
-            if nick_name:
-                obj.nick = nick_name
-            if school_id:
-                school_obj = School.objects.filter(school_id=school_id)
-                if school_obj.exists():
-                    obj.school = school_obj.first()
-                else:
-                    return JsonResponse({'status': False, 'err': '此学校不存在'})
-            obj.ip = publicMethod.get_ip(request)
-            obj.reg_time = timezone.now()
-            obj.save()
+            user_obj = obj.first()
+            if user_nick:
+                user_obj.user_nick = user_nick
+            if user_maxim:
+                user_obj.user_maxim = user_maxim
+            if user_telephone:
+                user_obj.user_telephone = user_telephone
+            user_obj.save()
             message = {'status': True, 'err': '信息修改成功'}
         else:
-            if school_id:
-                school_obj = School.objects.filter(school_id=school_id)
-                if school_obj.exists():
-                    school_id = school_obj.first()
-                else:
-                    return JsonResponse({'status': False, 'err': '此学校不存在'})
             User.objects.using('app').create(
                 user_id=user,
-                real_name=real_name,
-                nick=nick_name,
-                ip=publicMethod.get_ip(request),
-                access_time=timezone.now(),
-                reg_time=timezone.now(),
-                school=school_id,
-                sex=sex,
-                role_pri=4,
-                is_delete=0
+                user_name=user_name,
+                user_nick=user_nick,
+                user_maxim=user_maxim,
+                user_birthday=user_birthday,
+                user_sex=user_sex,
+                user_power=4,
+                user_score=0,
+                user_telephone=user_telephone,
+                reg_time=timezone.now()
             )
             message = {'status': True, 'err': '信息完善成功'}
         return JsonResponse(message)
@@ -882,6 +878,21 @@ class ResettingUserPassword(View):
         else:
             message = {'status': False, 'err': '你未拥有此权限'}
         return JsonResponse(message)
+
+
+class UpLoad(View):
+    def get(self, request):
+        image = Document.objects.get(title='logo.ico').uploadedFile
+        return HttpResponse(image, content_type='image/png')
+
+    def post(self, request):
+        file = request.FILES.get('hunter')
+        # print(file.name)
+        Document.objects.create(
+            title=file.name,
+            uploadedFile=file
+        )
+        return JsonResponse({'status': True})
 
 
 # ---------------------------问题功能---------------------------

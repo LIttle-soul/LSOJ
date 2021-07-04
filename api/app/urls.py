@@ -20,4 +20,5 @@ urlpatterns = [
     path('addprovince/', views.AddProvince.as_view(), name='add_province'),
     path('addmunicipality/', views.AddMunicipality.as_view(), name='add_municipality'),
     path('addschool/', views.AddSchool.as_view(), name='add_school'),
+    path('upload/', views.UpLoad.as_view(), name='up_load'),
 ]
