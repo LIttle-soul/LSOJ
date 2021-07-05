@@ -7,7 +7,7 @@
         @click="drawer = !drawer"
       ></el-button>
       <el-drawer
-        title="LSOJ"
+        :title="web_icon"
         v-model="drawer"
         :with-header="true"
         direction="ltr"
@@ -27,7 +27,7 @@
           >
         </el-menu>
       </el-drawer>
-      <h3 class="icon">LSOJ</h3>
+      <h3 class="icon">{{web_icon}}</h3>
       <el-menu
         class="header-menu"
         mode="horizontal"
@@ -81,7 +81,8 @@ export default {
   updated() {},
   data() {
     return {
-      circleUrl: "/api/upload/",
+      circleUrl: "/api/bindusericon/?token=" + this.$cookies.get('token'),
+      web_icon: "LSOJ",
       drawer: false,
       headerNav: [
         { index: "/home", tittle: "首页" },
@@ -89,6 +90,7 @@ export default {
         { index: "/ranking", tittle: "排名" },
         { index: "/contest", tittle: "竞赛" },
         { index: "/collage", tittle: "闯关" },
+        {index: "/home1", tittle: "课程"}
       ],
       userNav: [
         { index: "/login", tittle: "登录" },
@@ -174,7 +176,7 @@ a {
 }
 .textarea .el-input__inner {
   border-radius: 15px!important; 
-  background-color: rgba(240,240,240, 0.9)!important;
+  background-color: rgba(250,250,250, 0.9)!important;
 }
 .nav {
   position: sticky;
@@ -213,6 +215,7 @@ a {
   float: left;
   background: none;
 }
+
 .nav-menu {
   width: 100%;
   text-align: center;

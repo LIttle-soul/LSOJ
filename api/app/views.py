@@ -880,6 +880,47 @@ class ResettingUserPassword(View):
         return JsonResponse(message)
 
 
+class BindUserIcon(View):
+    def get(self, request):
+        token = request.GET.get('token')
+        user_id = publicMethod.check_user_login(token)
+        image = Document.objects.get(title='logo.ico').uploadedFile
+        # print(user_id)
+        if not user_id:
+            # print('默认1')
+            return HttpResponse(image, content_type='image/png')
+        obj = User.objects.using('app').filter(user_id__user_id=user_id)
+        if obj.exists():
+            obj = obj.first()
+            icon = obj.user_icon
+            # print(icon.url)
+            if icon:
+                return HttpResponse(icon, content_type='image/png')
+            else:
+                return HttpResponse(image, content_type='image/png')
+        else:
+            # print('默认')
+            return HttpResponse(image, content_type='image/png')
+
+    def post(self, request):
+        token = request.POST.get('token')
+        icon = request.FILES.get('file')
+        user_id = publicMethod.check_user_login(token)
+        if not user_id:
+            return JsonResponse({'status': False, 'info': "用户认证失败"})
+        obj = User.objects.using('app').filter(user_id__user_id=user_id)
+        # print(icon.name)
+        if obj.exists():
+            obj = obj.first()
+            obj.user_icon = icon
+            obj.save()
+            message = {'status': True, 'info': '头像上传成功'}
+        else:
+            message = {'status': False, 'info': '请先完善用户信息'}
+        return JsonResponse(message)
+
+
+
 class UpLoad(View):
     def get(self, request):
         image = Document.objects.get(title='logo.ico').uploadedFile
@@ -887,11 +928,12 @@ class UpLoad(View):
 
     def post(self, request):
         file = request.FILES.get('hunter')
-        # print(file.name)
-        Document.objects.create(
-            title=file.name,
-            uploadedFile=file
-        )
+        date = request.POST.get('token')
+        print(file, date)
+        # Document.objects.create(
+        #     title=file.name,
+        #     uploadedFile=file
+        # )
         return JsonResponse({'status': True})
 
 

@@ -40,6 +40,7 @@
     </el-aside>
     <el-main>
       <el-skeleton :row="5" animated v-for="item in 10" :key="item" style="margin: 50px auto;"></el-skeleton>
+      <BindEmail />
     </el-main>
   </el-container>
 </template>
@@ -54,6 +55,7 @@ export default {
   },
   components: {
     UpLoad: defineAsyncComponent(() => import('@/components/UpLoad.vue')),
+    BindEmail: defineAsyncComponent(() => import('@/components/EmailBind.vue'))
   }
 }
 </script>

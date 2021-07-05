@@ -11,7 +11,8 @@
                 header
             </el-header>
             <el-main>
-                <Home />
+                <!-- <Home /> -->
+                <HelloWorld />
             </el-main>
         </el-container>
         <el-backtop target=""></el-backtop>
@@ -24,7 +25,8 @@ export default {
     name: "Admin",
     components: {
         LeftNav:  defineAsyncComponent(() => import('@/components/LeftNav.vue')),
-        Home: defineAsyncComponent(() => import('@/views/user/Home/Home.vue'))
+        // Home: defineAsyncComponent(() => import('@/views/user/Home/Home.vue')),
+        HelloWorld: defineAsyncComponent(() => import('@/components/HelloWorld.vue'))
     },
     props: {
     },

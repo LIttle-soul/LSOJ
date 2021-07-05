@@ -80,34 +80,34 @@
   export default {
     name: "ProblemList",
     mounted() {
-      this.$http({
-        url: '/api/getproblemlist/',
-        methods: 'get',
-        params: {
-          'token': this.$cookies.get('token')
-        }
-      }).then( res => {
-        this.Data = []
-        for(let i in res.data.data){
-          let item = res.data.data[i]
-          this.Data.push({
-              problem_id: item.problem_id,
-              tittle: item.title,
-              degree: item.difficulty,
-              tag: item.type,
-              solved: item.accepted,
-              submit: item.submit
-            })
-        }
-        this.total = this.Data.length;
-        // this.handleCurrentChange(this.current_page);
-      })
+      // this.$http({
+      //   url: '/api/getproblemlist/',
+      //   methods: 'get',
+      //   params: {
+      //     'token': this.$cookies.get('token')
+      //   }
+      // }).then( res => {
+      //   this.Data = []
+      //   for(let i in res.data.data){
+      //     let item = res.data.data[i]
+      //     this.Data.push({
+      //         problem_id: item.problem_id,
+      //         tittle: item.title,
+      //         degree: item.difficulty,
+      //         tag: item.type,
+      //         solved: item.accepted,
+      //         submit: item.submit
+      //       })
+      //   }
+      //   this.total = this.Data.length;
+      //   // this.handleCurrentChange(this.current_page);
+      // })
     },
     methods: {
       tableRowClassName({row, rowIndex}) {
-        if (row.problem_id % 5 === 1) {
+        if (row.status === 1) {
           return 'success-row';
-        } else if (row.problem_id % 9 === 2) {
+        } else if (row.status === -1) {
           return 'warning-row';
         } else {
           return '';
@@ -119,7 +119,6 @@
       handleCurrentChange(val) {
         this.current_page=val;
       },
-
       filterDegree(value, row) {
         return row.degree === value;
       }
@@ -128,7 +127,35 @@
       return {
         current_page: 1,
         page_sizes: 50,
-        Data: [],
+        Data: [
+          {
+            problem_id: 1001,
+            tittle: 'Hello, World',
+            degree: 4,
+            tag: '基础题',
+            solved: 0,
+            submit: 0,
+            status: 1
+          },
+          {
+            problem_id: 1002,
+            tittle: 'Hello, Json',
+            degree: 2,
+            tag: '基础题',
+            solved: 0,
+            submit: 0,
+            status: 0
+          },
+          {
+            problem_id: 1003,
+            tittle: 'Hello, Python',
+            degree: 2,
+            tag: '基础题',
+            solved: 0,
+            submit: 0,
+            status: -1
+          },
+        ],
         total: 0,
         listQuery: {
           page: 1,

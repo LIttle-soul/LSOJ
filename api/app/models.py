@@ -1,4 +1,11 @@
 from django.db import models
+import uuid
+
+
+def user_directory_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid.uuid4().hex[:8], ext)
+    return "{0}/{1}/{2}".format(instance.user_id_id, "user_icon", filename)
 
 
 # ------------------------------------------------------地址管理----------------------------------------
@@ -74,7 +81,7 @@ class User(models.Model):
     ]
 
     user_id = models.OneToOneField(to='Password', to_field='user_id', on_delete=models.CASCADE, primary_key=True, verbose_name='已注册用户')
-    user_icon = models.ImageField(upload_to='user_icon', null=True, blank=True, verbose_name='用户头像')
+    user_icon = models.ImageField(upload_to=user_directory_path, null=True, blank=True, verbose_name='用户头像')
     student_id = models.CharField(max_length=50, null=True, blank=True, verbose_name='用户学号')
     user_name = models.CharField(max_length=20, null=True, blank=True, verbose_name='用户姓名')
     user_nick = models.CharField(max_length=24, blank=True, null=True, verbose_name='用户昵称')
