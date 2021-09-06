@@ -1,12 +1,11 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+import userSettings from './modules/userSettings';
+import admin from './modules/admin';
+
 
 export default createStore({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
+    userSettings: userSettings,
+    admin: admin
   }
 })
