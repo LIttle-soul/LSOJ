@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="user">
     <div class="home-header">
       <Header />
     </div>
@@ -31,6 +31,10 @@ export default {
 </script>
 
 <style scoped>
+.user {
+  min-height: 100%;
+  position: relative;
+}
 .home-header {
   width: 100%;
   min-width: 360px;
@@ -46,12 +50,12 @@ export default {
 .home-main {
   width: 100%;
   min-width: 360px;
+  min-height: calc(100vh - 197px);
   position: relative;
 }
 .home-footer {
   width: 100%;
   min-width: 360;
-  position: relative;
 }
 .router-link-active {
   text-decoration: none;

@@ -8,16 +8,18 @@ module.exports = {
     port: 8080,
     https: false,
     // proxy: {
-    //     '/api': {
-    //         target: 'http://serve.iqgb.py/eijmssmw/',
-    //         ws: true,
-    //         secure: false,
-    //         changOrigin: true,
-    //         pathRewrite: {
-    //             '^/api': ''
-    //         }
-    //     }
-    // }
+    //   "/api": {
+    //     // target: "http://81.70.218.179:8081/",
+    //     // target: 'http://192.168.123.83:8081/',
+    //     target: 'http://127.0.0.1:8081/',
+    //     ws: true,
+    //     secure: false,
+    //     changOrigin: true,
+    //     pathRewrite: {
+    //       "^/api": "",
+    //     },
+    //   },
+    // },
   },
   configureWebpack: {
     module: {
@@ -33,7 +35,7 @@ module.exports = {
       new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
-        'windows.jQoery': 'jquery'
+        'windows.jQuery': 'jquery'
       })
     ],
   },

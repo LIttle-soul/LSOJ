@@ -7,7 +7,7 @@
       @change="changeLanguage"
     >
       <el-option
-        v-for="item in sets.language"
+        v-for="item in language"
         :key="item"
         :label="item"
         :value="item"
@@ -29,56 +29,20 @@
 </template>
 <script>
 import * as monaco from "monaco-editor";
+import { mapState } from 'vuex';
 export default {
   mounted() {
     this.editor_init();
   },
+  computed: {
+    ...mapState({
+      language: state => state.codeConfig.language,
+      editor_config: state => state.codeConfig.editor_config
+    })
+  },
   data() {
     return {
-      sets: {
-        language: {
-          c: "c",
-          cpp: "cpp",
-          csharp: "csharp",
-          go: "go",
-          java: "java",
-          javascript: "javascript",
-          pascal: "pascal",
-          perl: "perl",
-          php: "php",
-          python: "python",
-          r: "r",
-          ruby: "ruby",
-          rust: "rust",
-          swift: "swift",
-          vb: "vb"
-        },
-      },
-      editor_config: {
-        value: "",
-        language: "cpp",
-        theme: "vs-dark",
-        cursorStyle: "line",
-        contextmenu: true,
-        automaticLayout: true,
-        autoIndent: false,
-        lineNumbers: true,
-        mouseStyle: "text",
-        quickSuggestions: false,
-        renderLineHighlight: "none",
-        wordWrap: "off",
-        stopRenderingLineAfter: -1,
-        scrollbar: {
-          horizontal: "auto",
-          vertical: "hidden",
-          verticalScrollbarSize: 0,
-        },
-        minimap: {
-          enabled: false,
-        },
-        lineDecorationsWidth: 0,
-        lineNumbersMinChars: 3,
-      },
+      
     };
   },
   methods: {

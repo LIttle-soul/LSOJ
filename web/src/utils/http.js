@@ -6,7 +6,8 @@ import axios from 'axios'
 const service = axios.create({
     timeout: 3000,
     headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Access-Control-Allow-Origin': '*'
       },
     //   transformRequest: [function(data) {
     //     let ret = ''

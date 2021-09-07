@@ -1,5 +1,7 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import user from './modules/user'
+import admin from './modules/admin'
+import others from './modules/others'
 
 const routes = [
   {
@@ -13,12 +15,16 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
-    component: () => import('@/layout/Admin')
-  }
+    component: () => import('@/layout/Admin'),
+    children: [
+      ...admin
+    ]
+  },
+  ...others
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 

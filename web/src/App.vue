@@ -56,5 +56,6 @@ export default {
 
 #app {
   position: relative;
+  height: 100%;
 }
 </style>

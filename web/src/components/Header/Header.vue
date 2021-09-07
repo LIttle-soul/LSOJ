@@ -256,7 +256,7 @@ a {
   background-color: rgba(50, 50, 50, 0.8);
   height: 60px;
   line-height: 60px;
-  border-radius: 28px;
+  /* border-radius: 28px; */
   position: relative;
 }
 .nav-button {

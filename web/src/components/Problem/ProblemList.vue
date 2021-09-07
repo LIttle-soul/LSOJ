@@ -178,45 +178,51 @@
 
 <script>
 import ProblemDataList from "@/components/Problem/ProblemDataList.vue";
+import { mapState } from 'vuex';
 
 export default {
   name: "ProblemList",
   components: {
     ProblemDataList: ProblemDataList,
   },
-  mounted() {
-    this.Data = this.listenDataMsg;
-    this.total = this.listenDataMsg.lenth;
-  },
+  // mounted() {
+  //   this.Data = this.listenDataMsg;
+  //   this.total = this.listenDataMsg.lenth;
+  // },
+  // computed: {
+  //   listenSoreMsg() {
+  //     return this.$store.state.search_data;
+  //   },
+  //   listenDataMsg() {
+  //     return this.$store.state.problem_data.map((item) => ({
+  //       problem_id: item.problem_id,
+  //       problem_title: item.problem_title,
+  //       problem_degree: item.problem_difficult,
+  //       problem_tag: item.problem_tag,
+  //       problem_solved: item.problem_accepted,
+  //       problem_submit: item.problem_submit,
+  //       problem_status: item.problem_status,
+  //       problem_source: item.problem_course,
+  //       creation_time: this.$dayJS(item.creation_time).format('YYYY-MM-DD HH:mm:ss'),
+  //       submit_status: 0,
+  //       centerDialogVisible: false,
+  //     }));
+  //   },
+  // },
+  // watch: {
+  //   listenSoreMsg() {
+  //     this.search_data = this.listenSoreMsg;
+  //     this.search_all_data();
+  //   },
+  //   listenDataMsg() {
+  //     // console.log(this.listenDataMsg);
+  //     this.Data = this.listenDataMsg;
+  //   },
+  // },
   computed: {
-    listenSoreMsg() {
-      return this.$store.state.search_data;
-    },
-    listenDataMsg() {
-      return this.$store.state.problem_data.map((item) => ({
-        problem_id: item.problem_id,
-        problem_title: item.problem_title,
-        problem_degree: item.problem_difficult,
-        problem_tag: item.problem_tag,
-        problem_solved: item.problem_accepted,
-        problem_submit: item.problem_submit,
-        problem_status: item.problem_status,
-        problem_source: item.problem_course,
-        creation_time: this.$dayJS(item.creation_time).format('YYYY-MM-DD HH:mm:ss'),
-        submit_status: 0,
-        centerDialogVisible: false,
-      }));
-    },
-  },
-  watch: {
-    listenSoreMsg() {
-      this.search_data = this.listenSoreMsg;
-      this.search_all_data();
-    },
-    listenDataMsg() {
-      // console.log(this.listenDataMsg);
-      this.Data = this.listenDataMsg;
-    },
+    ...mapState('problem', {
+      Data: state => state.problemList
+    })
   },
   props: {
     admin: {
@@ -237,21 +243,21 @@ export default {
         { text: "四星", value: 4 },
         { text: "五星", value: 5 },
       ],
-      Data: [
-        {
-          problem_id: 1001,
-          problem_title: "Hello, World",
-          problem_degree: 4,
-          problem_tag: "基础题",
-          problem_solved: 0,
-          problem_submit: 0,
-          problem_status: true,
-          problem_source: "汉语言文学",
-          creation_time: "2020-01-01 08:00:00",
-          submit_status: -1,
-          centerDialogVisible: false,
-        },
-      ],
+      // Data: [
+      //   {
+      //     problem_id: 1001,
+      //     problem_title: "Hello, World",
+      //     problem_degree: 4,
+      //     problem_tag: "基础题",
+      //     problem_solved: 0,
+      //     problem_submit: 0,
+      //     problem_status: true,
+      //     problem_source: "汉语言文学",
+      //     creation_time: "2020-01-01 08:00:00",
+      //     submit_status: -1,
+      //     centerDialogVisible: false,
+      //   },
+      // ],
       total: 0,
       listQuery: {
         page: 1,
