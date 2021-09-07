@@ -140,34 +140,34 @@
 
 export default {
   name: "UserListChild",
-  mounted() {this.Data = this.listenDataMsg},
-  computed: {
-    listenSoreMsg() {
-      return this.$store.state.search_data;
-    },
-    listenDataMsg() {
-      return this.$store.state.user_data.map(item => ({
-        user_id: item.user_id,
-          user_nick: item.user_nick,
-          user_name: item.user_name,
-          user_school: item.user_school?item.user_school.school_name:null,
-          user_power: item.user_power,
-          user_status: true,
-          registration_time: this.$dayJS(item.registration_time).format('YYYY-MM-DD HH:mm:ss'),
-          centerDialogVisible: false
-      }));
-    }
-  },
-  watch: {
-    listenSoreMsg() {
-      this.search_data = this.listenSoreMsg;
-      this.search_all_data();
-    },
-    listenDataMsg() {
-      // console.log(this.listenDataMsg);
-      this.Data = this.listenDataMsg;
-    }
-  },
+  // mounted() {this.Data = this.listenDataMsg},
+  // computed: {
+  //   listenSoreMsg() {
+  //     return this.$store.state.search_data;
+  //   },
+  //   listenDataMsg() {
+  //     return this.$store.state.user_data.map(item => ({
+  //       user_id: item.user_id,
+  //         user_nick: item.user_nick,
+  //         user_name: item.user_name,
+  //         user_school: item.user_school?item.user_school.school_name:null,
+  //         user_power: item.user_power,
+  //         user_status: true,
+  //         registration_time: this.$dayJS(item.registration_time).format('YYYY-MM-DD HH:mm:ss'),
+  //         centerDialogVisible: false
+  //     }));
+  //   }
+  // },
+  // watch: {
+  //   listenSoreMsg() {
+  //     this.search_data = this.listenSoreMsg;
+  //     this.search_all_data();
+  //   },
+  //   listenDataMsg() {
+  //     // console.log(this.listenDataMsg);
+  //     this.Data = this.listenDataMsg;
+  //   }
+  // },
   data() {
     return {
       resetting_password: '',

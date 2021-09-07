@@ -70,33 +70,33 @@
 <script>
 export default {
   name: "UserRankList",
-  mounted() {
-    this.Data = this.sort_data(this.listenDataMsg);
-  },
-  computed: {
-    listenSoreMsg() {
-      return this.$store.state.search_data;
-    },
-    listenDataMsg() {
-      return this.$store.state.user_data.map(item => ({
-        user_id: item.user_id,
-          user_nick: item.user_nick,
-          true_submit: item.user_solution_data.user_solved.length,
-          all_submit: item.user_solution_data.user_submit,
-          percentage: item.user_solution_data.user_submit===0?'0.00%':(item.user_solution_data.user_solved.length*100/item.user_solution_data.user_submit).toFixed(2)+"%",
-      }));
-    }
-  },
-  watch: {
-    listenSoreMsg() {
-      this.search_data = this.listenSoreMsg;
-      this.search_all_data();
-    },
-    listenDataMsg() {
-      // console.log(this.listenDataMsg);
-      this.Data = this.sort_data(this.listenDataMsg);
-    }
-  },
+  // mounted() {
+  //   this.Data = this.sort_data(this.listenDataMsg);
+  // },
+  // computed: {
+  //   listenSoreMsg() {
+  //     return this.$store.state.search_data;
+  //   },
+  //   listenDataMsg() {
+  //     return this.$store.state.user_data.map(item => ({
+  //       user_id: item.user_id,
+  //         user_nick: item.user_nick,
+  //         true_submit: item.user_solution_data.user_solved.length,
+  //         all_submit: item.user_solution_data.user_submit,
+  //         percentage: item.user_solution_data.user_submit===0?'0.00%':(item.user_solution_data.user_solved.length*100/item.user_solution_data.user_submit).toFixed(2)+"%",
+  //     }));
+  //   }
+  // },
+  // watch: {
+  //   listenSoreMsg() {
+  //     this.search_data = this.listenSoreMsg;
+  //     this.search_all_data();
+  //   },
+  //   listenDataMsg() {
+  //     // console.log(this.listenDataMsg);
+  //     this.Data = this.sort_data(this.listenDataMsg);
+  //   }
+  // },
   data() {
     return {
       search_data: "",

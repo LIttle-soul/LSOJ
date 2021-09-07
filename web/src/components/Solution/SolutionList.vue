@@ -103,36 +103,36 @@
 <script>
 export default {
   name: "UserRankList",
-  mounted() {this.Data = this.listenDataMsg},
-  computed: {
-    listenSoreMsg() {
-      return this.$store.state.search_data;
-    },
-    listenDataMsg() {
-      // console.log(this.$store.state.solution_data);
-      return this.$store.state.solution_data.map(item => ({
-        solution_id: item.solution_id,
-          user_id: item.user_id,
-          problem_id: item.problem_id,
-          solution_result: item.run_result,
-          solution_memory: item.run_memory,
-          solution_consuming: 0,
-          solution_language: item.solution_language,
-          solution_length: item.code_length + 'B',
-          solution_time: this.$dayJS(item.solution_time).format('YYYY-MM-DD HH:mm:ss')
-      }));
-    }
-  },
-  watch: {
-    listenSoreMsg() {
-      this.search_data = this.listenSoreMsg;
-      this.search_all_data();
-    },
-    listenDataMsg() {
-      // console.log(this.listenDataMsg);
-      this.Data = this.listenDataMsg;
-    }
-  },
+  // mounted() {this.Data = this.listenDataMsg},
+  // computed: {
+  //   listenSoreMsg() {
+  //     return this.$store.state.search_data;
+  //   },
+  //   listenDataMsg() {
+  //     // console.log(this.$store.state.solution_data);
+  //     return this.$store.state.solution_data.map(item => ({
+  //       solution_id: item.solution_id,
+  //         user_id: item.user_id,
+  //         problem_id: item.problem_id,
+  //         solution_result: item.run_result,
+  //         solution_memory: item.run_memory,
+  //         solution_consuming: 0,
+  //         solution_language: item.solution_language,
+  //         solution_length: item.code_length + 'B',
+  //         solution_time: this.$dayJS(item.solution_time).format('YYYY-MM-DD HH:mm:ss')
+  //     }));
+  //   }
+  // },
+  // watch: {
+  //   listenSoreMsg() {
+  //     this.search_data = this.listenSoreMsg;
+  //     this.search_all_data();
+  //   },
+  //   listenDataMsg() {
+  //     // console.log(this.listenDataMsg);
+  //     this.Data = this.listenDataMsg;
+  //   }
+  // },
   data() {
     return {
       search_data: "",

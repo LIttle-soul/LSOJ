@@ -127,17 +127,17 @@
 export default {
   name: "UserContestList",
   mounted() {},
-  computed: {
-    listenSoreMsg() {
-      return this.$store.state.search_data;
-    }
-  },
-  watch: {
-    listenSoreMsg() {
-      this.search_data = this.listenSoreMsg;
-      this.search_all_data();
-    },
-  },
+  // computed: {
+  //   listenSoreMsg() {
+  //     return this.$store.state.search_data;
+  //   }
+  // },
+  // watch: {
+  //   listenSoreMsg() {
+  //     this.search_data = this.listenSoreMsg;
+  //     this.search_all_data();
+  //   },
+  // },
   props: {
     admin: {
       type: Boolean,
