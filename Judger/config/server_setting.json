@@ -1,0 +1,8 @@
+{
+    "db_user": "JHCOJ",
+    "db_password": "12345678",
+    "db_ip": "81.70.218.179",
+    "db_port": "3306",
+    "db_database": "jhcoj",
+    "server_port": 8805
+}
