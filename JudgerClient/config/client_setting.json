@@ -1,0 +1,30 @@
+{
+    "db_host": "81.70.218.179",
+    "db_port": 3306,
+    "db_user": "JHCOJ",
+    "db_password": "12345678",
+    "db_database": "jhcoj",
+    
+    "server_host": "192.168.137.1",
+    "server_port": 8805,
+    "file_server_port": 8806,
+
+    "client_name": "LSOJ",
+    "client_host": "localhost",
+    "client_token": "rch",
+    
+    "problem_data_path": "./Client/ProblemData/",
+    "problem_targz_path": "./Client/ProblemZipData/",
+    "log_path": "./logs/",
+    "run_data_path": "./RunData/",
+
+    "c_path": "/usr/bin/gcc",
+    "cpp_path": "/usr/bin/g++",
+    "java_path": "/usr/bin/java",
+    "javac_path": "/usr/bin/javac",
+    "python2_path": "/usr/bin/python2",
+    "python3_path": "/usr/bin/python3",
+    "bash_path": "/bin/sh",
+    "pascal_path": "/usr/bin/fpc"
+
+}

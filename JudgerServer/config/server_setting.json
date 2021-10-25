@@ -1,0 +1,12 @@
+{
+    "db_user": "JHCOJ",
+    "db_password": "12345678",
+    "db_ip": "81.70.218.179",
+    "db_port": "3306",
+    "db_database": "jhcoj",
+    "judger_server_port": 8805,
+    "file_server_port": 8806,
+
+    "problem_data_path": "./ProblemData/",
+    "problem_targz_path": "./ProblemZipFile/"
+}
