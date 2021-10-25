@@ -1,239 +1,174 @@
 <template>
   <div class="problem-list-child">
-    <el-card>
-      <template #header>
-        <div class="table-header">
-          <i class="el-icon-collection"></i>
-          问题列表
-          <el-input
-            placeholder="请输入内容"
+    <el-table
+      :data="
+        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
+      "
+      size="mini"
+      @cell-click="show_problem"
+      @filter-change="filterProblemBYDegree"
+      :row-class-name="tableRowClassName"
+      :default-sort="{ prop: 'problem_id', order: 'aescending' }"
+    >
+      <el-table-column v-if="contest" prop="problem_num" label="编号">
+      </el-table-column>
+      <el-table-column v-else prop="problem_id" label="编号"> </el-table-column>
+      <el-table-column prop="problem_title" label="题目"> </el-table-column>
+      <el-table-column
+        prop="problem_tag"
+        label="类型"
+        v-if="!admin && !contest"
+      >
+        <template #default="scope">
+          <el-tag
+            v-for="item in scope.row.problem_tag"
+            :key="item"
             size="mini"
-            v-model="search_data"
-            class="input-with-select"
+            :color="color16()"
+            >{{ item }}</el-tag
           >
-            <template #append>
-              <el-button
-                icon="el-icon-search"
-                @click="search_all_data"
-              ></el-button>
-            </template>
-          </el-input>
-        </div>
-      </template>
-      <div>
-        <el-table
-          :data="
-            Data.slice(
-              (current_page - 1) * page_sizes,
-              current_page * page_sizes
-            )
-          "
-          size="mini"
-          @cell-click="show_problem"
-          :row-class-name="tableRowClassName"
-          :default-sort="{ prop: 'problem_id', order: 'aescending' }"
-        >
-          <el-table-column prop="problem_id" label="编号"> </el-table-column>
-          <el-table-column prop="problem_title" label="题目"> </el-table-column>
-          <el-table-column prop="problem_tag" label="类型" v-if="!admin">
-            <template #default="scope">
-              <el-tag
-                :type="
-                  scope.row.problem_tag === '基础题' ? 'primary' : 'success'
-                "
-                disable-transitions
-                >{{ scope.row.problem_tag }}</el-tag
-              >
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="problem_degree"
-            width="150"
-            label="难度"
-            :filters="filter_degree_data"
-          >
-            <template #default="scope">
-              <el-rate
-                v-model="scope.row.problem_degree"
-                :disabled="!admin"
-              ></el-rate>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="problem_solved"
-            sortable
-            width="70"
-            label="正确"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="problem_submit"
-            sortable
-            width="70"
-            label="提交"
-          >
-          </el-table-column>
-          <el-table-column prop="problem_source" label="题目来源">
-          </el-table-column>
-          <el-table-column prop="creation_time" label="创建时间" v-if="admin">
-          </el-table-column>
-          <el-table-column
-            prop="problem_status"
-            fixed="right"
-            width="50px"
-            label="状态"
-            v-if="admin"
-          >
-            <template #default="scope">
-              <el-switch
-                v-model="scope.row.problem_status"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-              ></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            width="165px"
-            label="操作"
-            v-if="admin"
-          >
-            <template #default="scope">
-              <el-button
-                size="mini"
-                type="primary"
-                circle
-                icon="el-icon-edit"
-                @click="handleEditClick(scope.row)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="success"
-                circle
-                icon="el-icon-check"
-                @click="handleCheckClick(scope.row)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                circle
-                icon="el-icon-delete"
-                @click="handleDeleteClick(scope.row)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="warning"
-                circle
-                icon="el-icon-box"
-                @click="handleDataClick(scope.row)"
-              ></el-button>
-              <el-dialog
-                title="测试数据"
-                v-model="scope.row.centerDialogVisible"
-                width="90%"
-              >
-                <ProblemDataList />
-                <template #footer>
-                  <span class="dialog-footer">
-                    <el-button @click="upload_data">上传文件</el-button>
-                    <el-button
-                      type="primary"
-                      @click="scope.row.centerDialogVisible = false"
-                      >确 定</el-button
-                    >
-                  </span>
-                </template>
-              </el-dialog>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <el-pagination
-        class="pagination-1"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="current_page"
-        :page-sizes="[20, 50, 100, 200]"
-        :page-size="page_sizes"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="Data.length"
-        :hide-on-single-page="true"
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="problem_degree"
+        width="150"
+        label="难度"
+        filter-placement="bottom-end"
+        :filters="filter_degree_data"
+        :column-key="'sStatus'"
+        v-if="!contest"
       >
-      </el-pagination>
-      <el-pagination
-        class="pagination-2"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="current_page"
-        :page-sizes="[20, 50, 100, 200]"
-        :page-size="page_sizes"
-        layout="prev, pager, next"
-        :total="Data.length"
-        :hide-on-single-page="true"
+        <template #default="scope">
+          <el-rate
+            v-model="scope.row.problem_degree"
+            :disabled="!admin"
+          ></el-rate>
+        </template>
+      </el-table-column>
+      <el-table-column prop="problem_solved" sortable width="70" label="正确">
+      </el-table-column>
+      <el-table-column prop="problem_submit" sortable width="70" label="提交">
+      </el-table-column>
+      <el-table-column prop="problem_source" label="题目来源" v-if="!contest">
+      </el-table-column>
+      <el-table-column prop="creation_time" label="创建时间" v-if="admin">
+      </el-table-column>
+      <el-table-column
+        prop="problem_status"
+        fixed="right"
+        width="50px"
+        label="状态"
+        v-if="admin"
       >
-      </el-pagination>
-    </el-card>
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.problem_status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" width="165px" label="操作" v-if="admin">
+        <template #default="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            circle
+            icon="el-icon-edit"
+            @click="handleEditClick(scope.row)"
+          ></el-button>
+          <el-button
+            size="mini"
+            type="success"
+            circle
+            icon="el-icon-check"
+            @click="handleCheckClick(scope.row)"
+          ></el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            circle
+            icon="el-icon-delete"
+            @click="handleDeleteClick(scope.row)"
+          ></el-button>
+          <el-button
+            size="mini"
+            type="warning"
+            circle
+            icon="el-icon-box"
+            @click="handleDataClick(scope.row)"
+          ></el-button>
+          <el-dialog
+            title="测试数据"
+            v-model="scope.row.centerDialogVisible"
+            width="90%"
+            :destroy-on-close="true"
+          >
+            <ProblemDataList :problem_id="scope.row.problem_id" />
+          </el-dialog>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      class="pagination-1"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="current_page"
+      :page-sizes="[20, 50, 100, 200]"
+      :page-size="page_sizes"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="Data.length"
+      :hide-on-single-page="true"
+    >
+    </el-pagination>
+    <el-pagination
+      class="pagination-2"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="current_page"
+      :page-sizes="[20, 50, 100, 200]"
+      :page-size="page_sizes"
+      layout="prev, pager, next"
+      :total="Data.length"
+      :hide-on-single-page="true"
+    >
+    </el-pagination>
   </div>
 </template>
 
 <script>
 import ProblemDataList from "@/components/Problem/ProblemDataList.vue";
-import { mapState } from 'vuex';
+import { changeProblemData, deleteProblemData } from "@/api/problem";
 
 export default {
   name: "ProblemList",
   components: {
     ProblemDataList: ProblemDataList,
   },
-  // mounted() {
-  //   this.Data = this.listenDataMsg;
-  //   this.total = this.listenDataMsg.lenth;
-  // },
-  // computed: {
-  //   listenSoreMsg() {
-  //     return this.$store.state.search_data;
-  //   },
-  //   listenDataMsg() {
-  //     return this.$store.state.problem_data.map((item) => ({
-  //       problem_id: item.problem_id,
-  //       problem_title: item.problem_title,
-  //       problem_degree: item.problem_difficult,
-  //       problem_tag: item.problem_tag,
-  //       problem_solved: item.problem_accepted,
-  //       problem_submit: item.problem_submit,
-  //       problem_status: item.problem_status,
-  //       problem_source: item.problem_course,
-  //       creation_time: this.$dayJS(item.creation_time).format('YYYY-MM-DD HH:mm:ss'),
-  //       submit_status: 0,
-  //       centerDialogVisible: false,
-  //     }));
-  //   },
-  // },
-  // watch: {
-  //   listenSoreMsg() {
-  //     this.search_data = this.listenSoreMsg;
-  //     this.search_all_data();
-  //   },
-  //   listenDataMsg() {
-  //     // console.log(this.listenDataMsg);
-  //     this.Data = this.listenDataMsg;
-  //   },
-  // },
-  computed: {
-    ...mapState('problem', {
-      Data: state => state.problemList
-    })
-  },
   props: {
     admin: {
       type: Boolean,
-      define: false,
+      default: false,
     },
+    contest: {
+      type: Boolean,
+      default: false,
+    },
+    contest_id: {
+      type: Number,
+      default: -1,
+    },
+    Data: {
+      type: undefined,
+      default: [],
+    },
+  },
+  emits: ["onLoading"],
+  mounted() {
+    this.$emit("onLoading");
   },
   data() {
     return {
-      // centerDialogVisible: false,
-      search_data: "",
       current_page: 1,
       page_sizes: 50,
       filter_degree_data: [
@@ -243,26 +178,6 @@ export default {
         { text: "四星", value: 4 },
         { text: "五星", value: 5 },
       ],
-      // Data: [
-      //   {
-      //     problem_id: 1001,
-      //     problem_title: "Hello, World",
-      //     problem_degree: 4,
-      //     problem_tag: "基础题",
-      //     problem_solved: 0,
-      //     problem_submit: 0,
-      //     problem_status: true,
-      //     problem_source: "汉语言文学",
-      //     creation_time: "2020-01-01 08:00:00",
-      //     submit_status: -1,
-      //     centerDialogVisible: false,
-      //   },
-      // ],
-      total: 0,
-      listQuery: {
-        page: 1,
-        limit: 10,
-      },
     };
   },
   methods: {
@@ -270,9 +185,9 @@ export default {
       if (this.admin) {
         return "";
       }
-      if (row.submit_status === 1) {
+      if (+row.submit_status === 1) {
         return "success-row";
-      } else if (row.submit_status === -1) {
+      } else if (+row.submit_status === -1) {
         return "warning-row";
       } else {
         return "";
@@ -284,64 +199,97 @@ export default {
     handleCurrentChange(val) {
       this.current_page = val;
     },
-    filterDegree(value, row) {
-      return row.degree === value;
-    },
-    search_all_data() {
-      console.log(this.search_data);
+    filterProblemBYDegree(value) {
+      // console.log(value.sStatus);
+      this.$emit("filterProblemByDegree", value.sStatus);
     },
     show_problem(row) {
-      // console.log(row);
+      // console.log(row, this.contest_id);
       if (!this.admin) {
-        this.$router.push("/showproblem/"+row.problem_id);
+        this.$router.push({
+          path: "/showproblem",
+          query: {
+            problem_id: row.problem_id,
+            contest_id: this.contest_id,
+            problem_title: escape(row.problem_title),
+            problem_description: escape(row.problem_description),
+            time_limit: row.time_limit,
+            memory_limit: row.memory_limit,
+          },
+        });
       }
     },
-    handleEditClick(val) {
-      console.log(val);
+    handleEditClick(row) {
+      this.$router.push("/admin/addproblem/" + row.problem_id);
     },
-    handleCheckClick(val) {
-      console.log(val);
+    async handleCheckClick(row) {
+      // console.log(row);
+      let data = {
+        problem_id: row.problem_id,
+        probelm_difficult: row.problem_degree,
+        problem_status: row.problem_status,
+      };
+      let back_data = await changeProblemData(data);
+      if (back_data.status) {
+        this.$message({
+          type: "success",
+          message: back_data.message,
+        });
+        this.$store.dispatch("problem/getProblemDataList");
+      } else {
+        this.$message({
+          type: "error",
+          message: back_data.message,
+        });
+      }
     },
-    handleDeleteClick(val) {
-      console.log(val);
+    async handleDeleteClick(row) {
+      let back_data = await deleteProblemData(row.problem_id);
+      if (back_data.status) {
+        this.$message({
+          type: "success",
+          message: back_data.message,
+        });
+        this.$store.dispatch("problem/getProblemDataList");
+      } else {
+        this.$message({
+          type: "error",
+          message: back_data.message,
+        });
+      }
     },
     handleDataClick(val) {
-      console.log(val);
+      // console.log(val);
       val.centerDialogVisible = true;
     },
-    upload_data() {
-      console.log("文件上传");
+    color16() {
+      var r = Math.floor(Math.random() * 256);
+      var g = Math.floor(Math.random() * 256);
+      var b = Math.floor(Math.random() * 256);
+      var a = Math.floor(Math.random() * 50);
+      var color =
+        "#" + r.toString(16) + g.toString(16) + b.toString(16) + a.toString(16);
+      return color;
     },
   },
 };
 </script>
 
 <style>
-.problem-list-child .el-table .warning-row {
+.problem-list-child .warning-row {
   background: rgba(245, 127, 127, 0.5);
 }
-
-.problem-list-child .el-table .success-row {
+.problem-list-child .success-row {
   background: rgb(40, 211, 154, 0.5);
 }
-.problem-list-child .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-}
-.problem-list-child .input-with-select {
-  width: 230px;
-  float: right;
-  margin-right: 10px;
-  transform: translateY(-1px);
-}
+</style>
+
+<style scoped>
 .problem-list-child .pagination-2 {
   display: none;
 }
 @media screen and (max-width: 600px) {
-  .problem-list-child .input-with-select {
-    display: none;
-  }
-  .problem-list-child .pagination-2 {
+  .oblem-list-child .pagination-2 {
     display: block;
   }
   .problem-list-child .pagination-1 {

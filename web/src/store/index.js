@@ -1,7 +1,7 @@
 import { createStore } from 'vuex';
 import userSettings from './modules/userSettings';
 import admin from './modules/admin';
-import codeConfig from './modules/code';
+import code from './modules/code';
 import problem from './modules/problem';
 import contest from './modules/contest';
 import course from './modules/course';
@@ -10,6 +10,9 @@ import level from './modules/level';
 import news from './modules/news';
 import solution from './modules/solution';
 import user from './modules/user';
+import address from './modules/address';
+import school from './modules/school'
+import rank from './modules/rank'
 
 
 export default createStore({
@@ -24,12 +27,10 @@ export default createStore({
       state.search_data = val;
     }
   },
-  actions: {
-  },
   modules: {
     userSettings: userSettings,
+    code: code,
     admin: admin,
-    codeConfig: codeConfig,
     problem: problem,
     contest: contest,
     course: course,
@@ -37,6 +38,9 @@ export default createStore({
     level: level,
     news: news,
     solution: solution,
-    user: user
+    user: user,
+    address: address,
+    school: school,
+    rank: rank
   }
 })

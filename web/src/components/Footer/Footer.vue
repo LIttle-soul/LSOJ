@@ -62,6 +62,7 @@ export default {
 .web-footer {
   height: 127px;
   background: #333333;
+  min-width: 800px;
 }
 .left-content {
   width: 49%;

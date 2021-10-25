@@ -1,14 +1,18 @@
 const Mock = require('mockjs')   //引入mock
-import { test } from './test.js'
-import { problem } from './problem.js'
+import problem from './modules/problem.js'
+import user from './modules/user.js'
+import solution from './modules/solution'
+import contest from './modules/contest'
 
 Mock.setup({
   timeout: 2000
 })
 
 var data = [
-  ...test,
-  ...problem
+  ...problem,
+  ...user,
+  ...solution,
+  ...contest
 ]
 
 // console.log(data);

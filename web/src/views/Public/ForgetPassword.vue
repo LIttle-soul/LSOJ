@@ -1,17 +1,12 @@
 <template>
   <el-card class="forget-password">
-    <el-form
-      :model="ruleForm"
-      :rules="rules"
-      ref="ruleForm"
-      label-width="165px"
-    >
+    <el-form ref="form" :model="form" :rules="rules" label-width="165px">
       <h3 class="header-font">
         忘记密码
       </h3>
-      <el-form-item label="用户名" prop="name">
+      <el-form-item label="用户名" prop="username">
         <el-input
-          v-model="ruleForm.name"
+          v-model="form.username"
           maxlength="16"
           placeholder="用户名（学号）最长16位*"
           style="width: 290px;float: left;"
@@ -21,50 +16,50 @@
       <el-form-item label="新密码" prop="password">
         <el-input
           type="password"
-          v-model="ruleForm.password"
+          v-model="form.password"
           placeholder="密码"
           style="width: 290px;float: left;"
           show-password
           prefix-icon="el-icon-lock"
         ></el-input>
       </el-form-item>
-      <el-form-item label="确认密码" prop="checkpassword">
+      <el-form-item label="确认密码" prop="check_password">
         <el-input
           type="password"
-          v-model="ruleForm.checkpassword"
-          auto-complete="off"
+          v-model="form.check_password"
           placeholder="确认密码"
           style="width: 290px;float: left;"
           show-password
           prefix-icon="el-icon-lock"
         ></el-input>
       </el-form-item>
-      <div class="check" v-if="!isShow">
-        <el-form-item label="验证码" prop="verifycode" style="width:570px">
-          <el-input
-            v-model="ruleForm.verifycode"
-            placeholder="验证码"
-            size="small"
-            style="width: 170px;float: left;"
-            prefix-icon="el-icon-suitcase"
-          ></el-input>
-        </el-form-item>
-        <!-- 验证码 -->
-        <el-form-item>
-          <div class="identifybox">
-            <div @click="makeCode">
-              <SIdentify :identifyCode="identifyCode"></SIdentify>
-            </div>
-            <el-button @click="makeCode" type="text" class="textbtn"
-              >看不清，换一张</el-button
+      <el-form-item label="验证码" prop="verifycode" style="width:570px">
+        <el-input
+          v-model="form.verifycode"
+          placeholder="验证码"
+          style="width: 290px;float: left;"
+          prefix-icon="el-icon-suitcase"
+        >
+          <template #append>
+            <el-button
+              @click="sendEmailCode"
+              :disabled="send_email_button.status"
+              >{{ send_email_button.text }}</el-button
             >
-          </div>
-        </el-form-item>
-      </div>
-      <el-button @click="verifyEmail" style="width: 180px;">邮箱验证</el-button>
+          </template>
+        </el-input>
+      </el-form-item>
       <el-button
+        class="bottom-button"
+        type="warning"
+        @click="linkTo()"
+        style="width: 180px;"
+        >返回登录</el-button
+      >
+      <el-button
+        class="bottom-button"
         type="primary"
-        @click="submitForm('ruleForm')"
+        @click="onSubmit('form')"
         style="width: 180px;"
         >提交</el-button
       >
@@ -73,16 +68,10 @@
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
-import { defineAsyncComponent } from "vue";
+import { submitForgetPasswordForm, sendEmailCode } from "@/api/user";
 
 export default {
   name: "ForgetPassword",
-  components: {
-    SIdentify: defineAsyncComponent(() =>
-      import("@/components/User/Verification.vue")
-    ),
-  },
   data() {
     var checkUser = (rule, value, callback) => {
       if (!value) {
@@ -109,163 +98,87 @@ export default {
     var validateCheckPass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入密码"));
-      } else if (value !== this.ruleForm.password) {
+      } else if (value !== this.form.password) {
         return callback(new Error("两次输入密码不一致"));
-      } else {
-        callback();
-      }
-    };
-    var checkCode = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入验证码"));
-      } else if (value.toLowerCase() !== this.identifyCode.toLowerCase()) {
-        callback(new Error("验证码输入错误"));
       } else {
         callback();
       }
     };
     return {
       isShow: false,
-      identifyCode: "",
-      ruleForm: {
-        name: "",
+      button_text: "发送邮件",
+      send_email_button: {
+        status: false,
+        text: "获取验证码",
+      },
+      form: {
+        username: "",
         password: "",
-        checkpassword: "",
+        check_password: "",
         verifycode: "",
       },
       rules: {
         name: [{ validator: checkUser, trigger: "blur" }],
         password: [{ validator: validatePass, trigger: "blur" }],
-        checkpassword: [{ validator: validateCheckPass, trigger: "blur" }],
-        verifycode: [{ validator: checkCode, trigger: "blur" }],
+        check_password: [{ validator: validateCheckPass, trigger: "blur" }],
       },
     };
   },
-  mounted() {
-    // 初始化验证码
-    this.identifyCode = "";
-    this.makeCode(this.identifyCodes, 4);
-  },
   methods: {
-    verifyEmail() {
-       if(this.getEmailCode()){
-        this.$prompt("请输入邮箱验证码", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(({ value }) => {
-          this.postEmailCode(value);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
-     }
-    },
     onSubmit(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          //   console.log(this.form);
-          this.$http({
-            url: "/api/user/forgetpassword/",
-            method: "post",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            transformRequest: [
-              function(data) {
-                let ret = "";
-                for (let it in data) {
-                  ret +=
-                    encodeURIComponent(it) +
-                    "=" +
-                    encodeURIComponent(data[it]) +
-                    "&";
-                }
-                return ret;
-              },
-            ],
-            params: {},
-            data: {
-              user_id: this.ruleForm.name,
-              new_password: this.ruleForm.password,
-              check_password: this.ruleForm.checkpassword,
-              code: this.ruleForm.verifycode,
-            },
-          }).then((res) => {
-            // console.log('res=>', res);
-            if (res.data.status) {
-              ElMessage.success(res.data.err);
-              this.$router.push("/login");
-            } else {
-              ElMessage.error(res.data.err);
-            }
-          });
+          var val = await submitForgetPasswordForm(this.form);
+          if (val.status) {
+            this.$message({
+              type: "success",
+              message: val.message,
+            });
+            this.$router.push("/login");
+          } else {
+            this.$message({
+              type: "error",
+              message: val.message,
+            });
+          }
         } else {
-          ElMessage.error("请正确填写表单信息！！！");
+          this.$message({
+            type: "error",
+            message: "请正确填写表单信息！！！",
+          });
           return false;
         }
       });
     },
-    getEmailCode() {
-        this.$http({
-            url: "/api/user/sendemail/",
-            method: "get",
-            params: {
-                user_id: this.ruleForm.name
-            },
-          }).then((res) => {
-            // console.log('res=>', res);
-            if (res.data.status) {
-              ElMessage.success(res.data.err);
-              return true;
-            } else {
-              alert(res.data.err);
-              return false;
-            }
-          });
-    },
-    postEmailCode(value) {
-        this.$http({
-            url: "/api/user/sendemail/",
-            method: "post",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            transformRequest: [
-              function(data) {
-                let ret = "";
-                for (let it in data) {
-                  ret +=
-                    encodeURIComponent(it) +
-                    "=" +
-                    encodeURIComponent(data[it]) +
-                    "&";
-                }
-                return ret;
-              },
-            ],
-            params: {},
-            data: {
-              user_id: this.ruleForm.name,
-              code: value,
-            },
-          }).then((res) => {
-            // console.log('res=>', res);
-            if (res.data.status) {
-              ElMessage.success(res.data.err);
-            } else {
-              ElMessage.error(res.data.err);
-            }
-          });
-    },
-    // 获取四位随机验证码
-    makeCode() {
-      this.$http.get("/api/user/forgetpassword/").then((res) => {
-        this.identifyCode = res.data.capture;
+    async sendEmailCode() {
+      this.send_email_button.status = true;
+      var data = await sendEmailCode({
+        user_id: this.form.username,
       });
+      if (data.status) {
+        this.$message({
+          type: "success",
+          message: data.message,
+        });
+        let time_out = 60;
+        let inter = setInterval(() => {
+          this.send_email_button.text = "请在" + time_out + "秒后再试";
+          time_out--;
+          if (time_out <= 0) {
+            this.send_email_button.status = false;
+            this.send_email_button.text = "获取验证码";
+            clearInterval(inter);
+          }
+        }, 1000);
+      } else {
+        this.$message({
+          type: "error",
+          message: data.message,
+        });
+      }
+    },
+    linkTo() {
+      this.$router.push("/login");
     },
   },
 };
@@ -282,17 +195,12 @@ export default {
 
 .forget-password {
   width: 600px;
-  margin: 100px auto;
+  height: 450px;
+  margin: 140px auto;
   border-radius: 15px;
 }
 
-.el-button {
-  margin-left: 15%;
-}
-
-.identifybox {
-  float: right;
-  margin-right: 25%;
-  margin-top: -15%;
+.bottom-button {
+  margin-left: 12%;
 }
 </style>

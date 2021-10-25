@@ -1,31 +1,27 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import user from './modules/user'
-import admin from './modules/admin'
-import others from './modules/others'
+import { createRouter, createWebHistory } from "vue-router";
+import user from "./modules/user";
+import admin from "./modules/admin";
+import others from "./modules/others";
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: () => import('@/layout/User'),
-    children: [
-      ...user
-    ]
+    path: "/",
+    name: "Home",
+    component: () => import("@/layout/User"),
+    children: [...user],
   },
   {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('@/layout/Admin'),
-    children: [
-      ...admin
-    ]
+    path: "/admin",
+    name: "Admin",
+    component: () => import("@/layout/Admin"),
+    children: [...admin],
   },
-  ...others
-]
+  ...others,
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes: routes,
+});
 
-export default router
+export default router;

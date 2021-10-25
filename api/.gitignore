@@ -1,0 +1,10 @@
+# Editor directories and files
+.idea
+.vscode
+
+# Local venv file
+/venv
+/JHCOJ_venv
+/logs
+/files/*
+!/files/icon.jpg

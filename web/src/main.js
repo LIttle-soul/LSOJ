@@ -5,13 +5,13 @@ import store from "./store";
 
 // Element-plus 插件布局
 import ElementPlus from "element-plus";
-import 'element-plus/dist/index.css'
+import "element-plus/dist/index.css";
 import "dayjs/locale/zh-cn";
 import locale from "element-plus/lib/locale/lang/zh-cn";
 
 // axios请求
 import http from "./utils/http";
-require("../mock");
+// require("../mock");
 
 // day.js时间日期格式化插件
 import dayjs from "dayjs";
@@ -91,15 +91,23 @@ VMdEditor.xss.extend({
   },
 });
 
-import $ from 'jquery'
+import $ from "jquery";
+
+// vue-cookies设置cookies
+import cookies from "vue-cookies";
+
+// vue3-seamless-scroll
+import vue3SeamlessScroll from "vue3-seamless-scroll";
 
 const app = createApp(App);
 app.config.globalProperties.$dayJS = dayjs;
 app.config.globalProperties.$http = http;
 app.config.globalProperties.$ECharts = ECharts;
-app.config.globalProperties.$ = $
+app.config.globalProperties.$Cookies = cookies;
+app.config.globalProperties.$ = $;
 app.use(ElementPlus, { locale });
 app.use(VMdEditor);
 app.use(store);
 app.use(router);
+app.use(vue3SeamlessScroll);
 app.mount("#app");

@@ -50,25 +50,23 @@
             size="small"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
-            :readonly="!activate"
             placeholder="成功完善生日信息有惊喜哦"
           >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="我的地址">
           <el-cascader
-            @change="getSchoolList"
             placeholder="别怕，这是你学校的地址"
             v-model="user_form.user_address"
-            :props="city_list"
-            :filterable="false"
+            :options="city_list"
+            :filterable="true"
             :clearable="true"
           >
           </el-cascader>
         </el-form-item>
         <el-form-item label="我的学校">
           <el-cascader
-            placeholder="地址可缩小学校范围哦"
+            placeholder="想知道你的校友有谁吗？"
             v-model="user_form.user_school"
             :options="school_list"
             :filterable="true"
@@ -96,169 +94,97 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { submitUserInfoForm } from "@/api/user";
+
 export default {
+  computed: {
+    ...mapState("address", {
+      city_list: (state) =>
+        state.address_list.map((item) => ({
+          value: item.id,
+          label: item.name,
+          children: item.children.map((item2) => ({
+            value: item2.id,
+            label: item2.name,
+          })),
+        })),
+    }),
+    ...mapState("school", {
+      school_list: (state) =>
+        state.school_list.map((item) => ({
+          value: item.school_id,
+          label: item.school_name,
+        })),
+    }),
+    ...mapState("user", {
+      user_info: (state) => state.user_info,
+    }),
+  },
+  watch: {
+    user_info() {
+      this.inputUserInfo(this.user_info);
+    },
+  },
+  mounted() {
+    this.inputUserInfo(this.user_info);
+  },
   data() {
-    let self = this;
     return {
       form_title: "基础信息完善",
       activate: false,
       school_status: true,
-      city_list: {
-        lazy: true,
-        lazyLoad(node, resolve) {
-          // console.log(node, resolve);
-          const { level, value } = node;
-          setTimeout(() => {
-            if(level == 0) {
-              self.getProvinceList().then((res) => {
-                // console.log(res);
-                resolve(res);
-              });
-            } else if(level == 1) {
-              self.getMunicipalityList(value).then((res) => {
-                resolve(res);
-              });
-            } else {
-              resolve([]);
-            }
-          }, 100);
-        }
-      },
-      school_list: [
-      ],
-      class_list: [
-      ],
+      class_list: [],
       user_form: {
-        user_name: '',
-        user_nick: '',
-        user_introduce: '',
-        user_telephone: '',
+        user_name: "",
+        user_nick: "",
+        user_introduce: "",
+        user_telephone: "",
         user_birthday: "2000-01-01",
-        user_school: '',
-        user_class: '',
-        user_address: '',
+        user_school: null,
+        user_class: "",
+        user_address: null,
         user_sex: 0,
       },
     };
   },
-  mounted() {
-    this.InputUserInfo();
-    this.getSchoolList();
-  },
   methods: {
-    InputUserInfo() {
-      this.$http({
-        url: "/api/user/perfectinfo/",
-        methods: "get",
-        params: {
-          token: this.$cookies.get("token"),
-        },
-      }).then((res) => {
-        // console.log(res.data);
-        if (res.data.status) {
-          this.user_form.user_name = res.data.data.user_name;
-          this.user_form.user_nick = res.data.data.user_nick;
-          this.user_form.user_introduce = res.data.data.user_introduce;
-          this.user_form.user_telephone = res.data.data.user_telephone;
-          this.user_form.user_birthday = this.$dayJS(res.data.data.user_birthday).format('YYYY-MM-DD');
-          this.user_form.user_school = res.data.data.user_school.school_id;
-          this.user_form.user_class = res.data.data.user_class;
-          let user_address = res.data.data.user_address.municipality_id;
-          this.user_form.user_sex = res.data.data.user_sex;
-          this.user_form.user_address = [Math.floor(user_address/100), user_address];
-          this.activate = true;
-          this.form_title = "基础信息修改";
-        }
-      });
+    inputUserInfo(val) {
+      if (val != null && val != undefined) {
+        this.user_form = {
+          user_name: val.user_name,
+          user_nick: val.user_nick,
+          user_introduce: val.user_introduce,
+          user_telephone: val.user_telephone,
+          user_birthday: this.$dayJS(val.user_birthday).format("YYYY-MM-DD"),
+          user_school: val.user_school ? val.user_school.school_id : null,
+          user_class: val.user_class,
+          user_address: val.user_address
+            ? [
+                Math.floor(val.user_address.address_id / 100),
+                val.user_address.address_id,
+              ]
+            : null,
+          user_sex: val.user_sex,
+        };
+      }
     },
-    onSubmit() {
-      let address = this.user_form.user_address;
-      address = address?address[1]:null;
-      let school = this.user_form.user_school
-      school = school?school[0]:null
-      this.$http({
-        url: "/api/user/perfectinfo/",
-        method: "post",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        transformRequest: [
-          function(data) {
-            let ret = "";
-            for (let it in data) {
-              ret +=
-                encodeURIComponent(it) +
-                "=" +
-                encodeURIComponent(data[it]) +
-                "&";
-            }
-            return ret;
-          },
-        ],
-        params: {},
-        data: {
-          token: this.$cookies.get("token"),
-          user_name: this.user_form.user_name,
-          user_nick: this.user_form.user_nick,
-          user_introduce: this.user_form.user_introduce,
-          user_telephone: this.user_form.user_telephone,
-          user_birthday: this.user_form.user_birthday,
-          user_school: school,
-          user_class: this.user_form.user_class,
-          user_address: address,
-          user_sex: this.user_form.user_sex,
-        },
-      }).then((res) => {
-        // console.log('res=>', res.data);
-        alert(res.data.err);
-      });
+    async onSubmit() {
+      let back_data = await submitUserInfoForm(this.user_form);
+      // console.log(back_data);
+      if (back_data.status) {
+        this.$message({
+          type: "success",
+          message: back_data.message,
+        });
+        this.$store.dispatch("user/getUserInfo");
+      } else {
+        this.$message({
+          type: "success",
+          message: back_data.message,
+        });
+      }
     },
-    getProvinceList() {
-      return this.$http({
-        url: "/api/address/getprovince/",
-        methods: "get",
-        params: {
-        },
-      }).then((res) => {
-        // console.log(res.data.data);
-        return res.data.data.map(item => ({
-          value: item.province_id,
-          label: item.province_name
-        }));
-      });
-    },
-    getMunicipalityList(province_id) {
-      return this.$http({
-        url: "/api/address/getmunicipality/",
-        methods: "get",
-        params: {
-          province_id: province_id
-        },
-      }).then((res) => {
-        // console.log(res.data.data);
-        return res.data.data.map(item => ({
-          value: item.municipality_id,
-          label: item.municipality_name,
-          leaf: true
-        }));
-      });
-    },
-    getSchoolList() {
-      let value = this.user_form.user_address;
-      this.$http({
-        url: "/api/school/getschool/",
-        methods: "get",
-        params: {
-          municipality_id: value?value[1]:null
-        },
-      }).then((res) => {
-        // console.log(res.data.data);
-        this.school_list = res.data.data.map(item => ({
-          value: item.school_id,
-          label: item.school_name
-        }));
-      });
-    }
   },
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="count-down">
     <p class="itemss">
-      <span>距离比赛开始还有</span>
+      <span>{{ text }}</span>
     </p>
     <p class="itemss">
       <span>{{ day }}天</span>
@@ -32,6 +32,10 @@ export default {
     }, 500);
   },
   props: {
+    text: {
+      type: String,
+      default: "距离比赛开始还有",
+    },
     endTime: {
       type: String,
     },
@@ -46,13 +50,18 @@ export default {
       let m = this.formate(parseInt((leftTime / 60) % 60));
       let s = this.formate(parseInt(leftTime % 60));
       if (leftTime <= 0) {
+        this.day = 0; //天
+        this.hour = 0; //时
+        this.minute = 0; //分
+        this.second = 0; //秒
         this.flag = true;
         this.$emit("time-end");
+      } else {
+        this.day = d; //天
+        this.hour = h; //时
+        this.minute = m; //分
+        this.second = s; //秒
       }
-      this.day = d; //天
-      this.hour = h; //时
-      this.minute = m; //分
-      this.second = s; //秒
     },
     formate(time) {
       if (time >= 10) {

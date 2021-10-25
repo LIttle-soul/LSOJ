@@ -22,7 +22,7 @@
           class="t1"
         ></el-input>
       </el-form-item>
-        <el-form-item label="确认密码" prop="checkpassword">
+      <el-form-item label="确认密码" prop="checkpassword">
         <el-input
           type="password"
           v-model="form.checkpassword"
@@ -76,14 +76,14 @@
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
 import { defineAsyncComponent } from "vue";
+import { submitRegisterForm } from "@/api/user";
 
 export default {
   name: "Register",
   components: {
     SIdentify: defineAsyncComponent(() =>
-      import("@/components/User/Verification.vue")
+      import("@/components/Other/Verification.vue")
     ),
   },
   data() {
@@ -110,14 +110,14 @@ export default {
       }
     };
     var validateCheckPass = (rule, value, callback) => {
-        if (value === "") {
+      if (value === "") {
         callback(new Error("请输入密码"));
-      } else if(value !== this.form.password) {
-          return callback(new Error("两次输入密码不一致"))
+      } else if (value !== this.form.password) {
+        return callback(new Error("两次输入密码不一致"));
       } else {
         callback();
       }
-    }
+    };
     var checkCode = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入验证码"));
@@ -139,7 +139,7 @@ export default {
       rules: {
         username: [{ validator: checkUser, trigger: "blur" }],
         password: [{ validator: validatePass, trigger: "blur" }],
-        checkpassword: [{ validator: validateCheckPass, trigger: "blur"}],
+        checkpassword: [{ validator: validateCheckPass, trigger: "blur" }],
         verifycode: [{ validator: checkCode, trigger: "blur" }],
       },
     };
@@ -147,50 +147,32 @@ export default {
   mounted() {
     // 初始化验证码
     this.identifyCode = "";
-    this.makeCode(this.identifyCodes, 4);
+    this.makeCode();
   },
   methods: {
     onSubmit(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-        //   console.log(this.form);
-          this.$http({
-            url: "/api/user/register/",
-            method: "post",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            transformRequest: [
-              function(data) {
-                let ret = "";
-                for (let it in data) {
-                  ret +=
-                    encodeURIComponent(it) +
-                    "=" +
-                    encodeURIComponent(data[it]) +
-                    "&";
-                }
-                return ret;
-              },
-            ],
-            params: {},
-            data: {
-              user_id: this.form.username,
-              password: this.form.password,
-              check_pass: this.form.checkpassword,
-              code: this.form.verifycode,
-            },
-          }).then((res) => {
-            // console.log('res=>', res);
-            if(res.data.status){
-              ElMessage.success(res.data.err);
-              this.$router.push("/login");
-            } else {
-              ElMessage.error(res.data.err);
-            }
-          });
+          let val = await submitRegisterForm(this.form);
+          console.log(val);
+          if (val.status) {
+            this.$message({
+              type: "success",
+              message: val.message,
+            });
+            this.$Cookies.set("token", val.token);
+            this.$router.push("/perfectuserinfo"); // 跳转完善信息页面
+          } else {
+            this.$message({
+              type: "error",
+              message: val.message,
+            });
+          }
         } else {
-          ElMessage.error("请正确填写表单信息！！！");
+          this.$message({
+            type: "error",
+            message: "请正确填写表单信息！！！",
+          });
           return false;
         }
       });
@@ -200,9 +182,14 @@ export default {
     },
     // 获取四位随机验证码
     makeCode() {
-      this.$http.get("/api/user/register/").then((res) => {
-        this.identifyCode = res.data.capture;
-      });
+      var s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      var code = "";
+      for (var i = 0; i < 4; i++) {
+        var index = Math.floor(Math.random() * 62);
+
+        code += s.charAt(index);
+      }
+      this.identifyCode = code;
     },
   },
 };

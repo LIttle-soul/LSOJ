@@ -1,7 +1,7 @@
 <template>
   <div class="user-status">
     <div class="header">
-      <el-card class="lefter" :body-style="{ 'border-radius':'5px'}">
+      <el-card class="lefter" :body-style="{ 'border-radius': '5px' }">
         <p v-for="item in user_info" :key="item.name">
           {{ item.name }}: {{ item.value }}
         </p>
@@ -12,40 +12,51 @@
         id="user_status_echart"
         :style="{ width: '400px', height: '400px' }"
       ></div>
-      
     </div>
     <el-card class="context">
-      <a v-for="item in solved_data" :key="item.problem_id" href="#" class="text">
-        {{ item.problem_id }}({{ item.count}})
+      <a
+        v-for="item in solved_data"
+        :key="item.problem_id"
+        href="#"
+        class="text"
+      >
+        {{ item.problem_id }}({{ item.count }})
       </a>
     </el-card>
   </div>
 </template>
 
 <script>
+import { getUserStatus } from "@/api/user";
+import { ElLoading } from "element-plus";
+
 export default {
   setup() {},
   mounted() {
     this.setData(this.$route.params.user_id);
     this.echartsInit();
   },
+  watch: {
+    user_info() {
+      this.echartsInit();
+    },
+  },
   data() {
     return {
       user_info: {
-        user_id: { name: "账号", value: "201910101600040" },
-        user_nick: { name: "昵称", value: "LiSoul" },
-        // user_rank: { name: "排名", value: 1 },
-        user_solved: { name: "解决", value: 520 },
-        user_submit: { name: "提交", value: 1314 },
-        user_accurate: { name: "正确", value: 256 },
-        format_error: { name: "格式错误", value: 5 },
-        wrong_answer: { name: "答案错误", value: 25 },
-        time_over: { name: "时间超限", value: 18 },
-        memory_over: { name: "内存超限", value: 16 },
-        output_over: { name: "输出超限", value: 28 },
-        runtime_error: { name: "运行错误", value: 8 },
-        compile_error: { name: "编译错误", value: 1 },
-        user_school: { name: "学校", value: "金华职业技术学院" },
+        user_id: { name: "账号", value: "" },
+        user_nick: { name: "昵称", value: "" },
+        user_solved: { name: "解决", value: 0 },
+        user_submit: { name: "提交", value: 0 },
+        user_accurate: { name: "正确", value: 0 },
+        format_error: { name: "格式错误", value: 0 },
+        wrong_answer: { name: "答案错误", value: 0 },
+        time_over: { name: "时间超限", value: 0 },
+        memory_over: { name: "内存超限", value: 0 },
+        output_over: { name: "输出超限", value: 0 },
+        runtime_error: { name: "运行错误", value: 0 },
+        compile_error: { name: "编译错误", value: 0 },
+        user_school: { name: "学校", value: "" },
       },
       solved_data: [
         {
@@ -68,27 +79,48 @@ export default {
     };
   },
   methods: {
-    setData(user_id) {
-      let val = this.$store.getters.getUserDataByUserId(user_id);
+    async setData(user_id) {
+      const loading = ElLoading.service({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      let val = null;
+      if (user_id) {
+        val = await getUserStatus({
+          user_id: user_id[0],
+        });
+      } else {
+        val = await getUserStatus();
+      }
       // console.log(val);
-      this.user_info.user_id.value = val.user_id;
-      this.user_info.user_nick.value = val.user_nick;
-      // this.user_info.user_rank.value = val.user_solution_data.user_rank;
-      this.user_info.user_solved.value = val.user_solution_data.user_solved.length;
-      this.user_info.user_submit.value = val.user_solution_data.user_submit;
-      this.user_info.user_accurate.value = val.user_solution_data.user_accurate;
-      this.user_info.format_error.value = val.user_solution_data.format_error;
-      this.user_info.wrong_answer.value = val.user_solution_data.wrong_answer;
-      this.user_info.time_over.value = val.user_solution_data.time_over;
-      this.user_info.memory_over.value = val.user_solution_data.memory_over;
-      this.user_info.output_over.value = val.user_solution_data.output_over;
-      this.user_info.runtime_error.value = val.user_solution_data.runtime_error;
-      this.user_info.compile_error.value = val.user_solution_data.compile_error;
-      this.user_info.user_school.value = val.user_school?val.user_school.school_name:null;
-      this.solved_data = val.user_solution_data.user_solved.map(item => ({
-        problem_id: item.problem_id,
-        count: item.number
-      }));
+      if (val.status) {
+        let temp = val.message;
+        this.user_info = {
+          user_id: { name: "账号", value: temp.user_id },
+          user_nick: { name: "昵称", value: temp.user_nick },
+          user_solved: { name: "解决", value: temp.user_solved },
+          user_submit: { name: "提交", value: temp.user_submit },
+          user_accurate: { name: "正确", value: temp.user_accurate },
+          format_error: { name: "格式错误", value: temp.format_error },
+          wrong_answer: { name: "答案错误", value: temp.wrong_answer },
+          time_over: { name: "时间超限", value: temp.time_over },
+          memory_over: { name: "内存超限", value: temp.memory_over },
+          output_over: { name: "输出超限", value: temp.output_over },
+          runtime_error: { name: "运行错误", value: temp.runtime_error },
+          compile_error: { name: "编译错误", value: temp.compile_error },
+          user_school: { name: "学校", value: temp.user_school },
+        };
+        this.solved_data = [];
+        for (var item in temp.solved_data) {
+          this.solved_data.push({
+            problem_id: item,
+            count: temp.solved_data[item],
+          });
+        }
+        loading.close();
+      }
     },
     echartsInit() {
       //柱形图
@@ -100,11 +132,11 @@ export default {
             text: "我的状态",
             subtext: this.user_info.user_id.value,
             left: "center",
-            show: true
+            show: true,
           },
           tooltip: {
             trigger: "item",
-            show: true
+            show: true,
           },
           legend: {
             orient: "vertical",
@@ -123,7 +155,7 @@ export default {
                 this.user_info.memory_over,
                 this.user_info.output_over,
                 this.user_info.runtime_error,
-                this.user_info.compile_error
+                this.user_info.compile_error,
               ],
               emphasis: {
                 itemStyle: {
@@ -152,7 +184,7 @@ export default {
   float: left;
 }
 .header {
-  margin-bottom: 80PX;
+  margin-bottom: 80px;
 }
 .header .el-card {
   border-radius: 25px;

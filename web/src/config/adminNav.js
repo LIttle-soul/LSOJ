@@ -100,9 +100,14 @@ export const nav_menu = [
         src: "/admin/addcontest",
       },
       {
-        title: "竞赛审核",
-        index: "ContestCheck",
-        src: "/admin/checkcontest",
+        title: "竞赛问题",
+        index: "ContestProblem",
+        src: "/admin/contestproblem",
+      },
+      {
+        title: "竞赛用户",
+        index: "ContestUser",
+        src: "/admin/contestuser",
       },
     ],
   },
@@ -128,6 +133,11 @@ export const nav_menu = [
     key: "地址",
     icon: "el-icon-office-building",
     data: [
+      {
+        title: "地址管理",
+        index: "AdderssList",
+        src: "/admin/addresslist",
+      },
       {
         title: "省份管理",
         index: "ProvinceList",

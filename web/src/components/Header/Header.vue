@@ -23,7 +23,7 @@
           v-for="item in headerNav"
           :key="item.index"
           :index="item.index"
-          >{{ item.tittle }}</el-menu-item
+          >{{ item.title }}</el-menu-item
         >
       </el-menu>
     </el-drawer>
@@ -41,28 +41,20 @@
         v-for="item in headerNav"
         :key="item.index"
         :index="item.index"
-        >{{ item.tittle }}</el-menu-item
+        >{{ item.title }}</el-menu-item
       >
     </el-menu>
-    <el-dropdown class="header-head" type="primary" trigger="click">
+    <el-dropdown class="header-head" type="primary" trigger="hover">
       <el-avatar :src="circleUrl"></el-avatar>
       <template #dropdown>
-        <el-dropdown-item
-          v-for="item in userNav"
-          :key="item.index"
-          :index="item.index"
-        >
-          <router-link
-            v-if="item.sort_index === 8"
-            :to="item.index"
-            @click="logout"
+        <el-dropdown-menu>
+          <el-dropdown-item
+            v-for="(item, index) in userNav"
+            :key="index"
+            @click="linkTo(item)"
+            >{{ item.title }}</el-dropdown-item
           >
-            {{ item.tittle }}
-          </router-link>
-          <router-link v-else :to="item.index">
-            {{ item.tittle }}
-          </router-link>
-        </el-dropdown-item>
+        </el-dropdown-menu>
       </template>
     </el-dropdown>
     <div class="header-search">
@@ -71,7 +63,7 @@
         size="mini"
         prefix-icon="el-icon-search"
         v-model="search_data"
-        @keydown.enter="send_message"
+        @keydown.enter="setSearchData(search_data)"
         placeholder="Enter搜索"
       >
       </el-input>
@@ -80,163 +72,84 @@
 </template>
 
 <script type="text/javascript">
+import { mapState } from "vuex";
+import { loadData } from "@/utils/loadData";
+import { getMyContest } from "@/api/contest";
 export default {
   name: "Header",
+  computed: {
+    ...mapState("user", {
+      headerNav: (state) => state.user_nav,
+      userNav: (state) => state.login_nav,
+      user_info: (state) => state.user_info,
+    }),
+    ...mapState("userSettings", {
+      web_icon: (state) => state.title,
+    }),
+  },
+  watch: {
+    user_info() {
+      this.setInfo();
+    },
+  },
   mounted() {
-    // this.getUserProvince();
-    // this.getUserIcon();
+    this.setInfo();
+    // console.log(this.headerNav, this.userNav, this.user_info, this.web_icon);
   },
   data() {
     return {
       search_data: "",
-      // circleUrl: "/api/user/getusericon/?token=" + this.$cookies.get('token'),
-      circleUrl:
-        "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-      web_icon: "JHCOJ",
+      circleUrl: "/api/user/getusericon/",
       drawer: false,
-      headerNav: [
-        { index: "/home", tittle: "首页" },
-        { index: "/problemlist", tittle: "问题" },
-        { index: "/ranklist", tittle: "排名" },
-        { index: "/solutionlist", tittle: "状态" },
-        { index: "/contestlist", tittle: "竞赛" },
-        { index: "/level", tittle: "闯关" },
-        { index: "/courselist", tittle: "课程" },
-        { index: "/forum", tittle: "讨论" },
-      ],
-      userNav: [
-        { index: "/login", tittle: "登录" },
-        { index: "/forgetpassword", tittle: "忘记密码" },
-      ],
     };
   },
   methods: {
-    SelectUserMenu(province) {
-      this.userNav = [];
-      while (province != -1) {
-        switch (province) {
-          case 0: // 超级管理员菜单列表
-            this.userNav.push({
-              index: "/admin",
-              tittle: "我的管理",
-              sort_index: 1,
-            });
-            province = 4;
-            break;
-          case 1: // 管理员菜单列表
-            this.userNav.push({
-              index: "/admin",
-              tittle: "我的管理",
-              sort_index: 1,
-            });
-            province = 4;
-            break;
-          case 2: // 教师菜单列表
-            this.userNav.push({
-              index: "/admin",
-              tittle: "我的管理",
-              sort_index: 1,
-            });
-            province = 4;
-            break;
-          case 3: // 志愿者菜单列表
-            this.userNav.push({
-              index: "/admin",
-              tittle: "我的管理",
-              sort_index: 1,
-            });
-            province = 4;
-            break;
-          case 4: // 普通用户菜单列表
-            this.userNav.push({
-              index: "/showuserinfo",
-              tittle: "我的信息",
-              sort_index: 2,
-            });
-            this.userNav.push({
-              index: "/userstatus/" + this.$cookies.get("user_id"),
-              tittle: "我的状态",
-              sort_index: 3,
-            });
-            // this.userNav.push({ index: "/home4", tittle: "我的题解", sort_index: 4});
-            // this.userNav.push({ index: "/home5", tittle: "我的收藏", sort_index: 5});
-            this.userNav.push({
-              index: "/contestlist",
-              tittle: "我的比赛",
-              sort_index: 6,
-            });
-            this.userNav.push({
-              index: "/solutionlist",
-              tittle: "我的提交",
-              sort_index: 7,
-            });
-            this.userNav.push({
-              index: "/home",
-              tittle: "用户注销",
-              sort_index: 8,
-            });
-            province = -1;
-            break;
-          default:
-            // 未登录用户菜单列表
-            this.userNav.push({
-              index: "/login",
-              tittle: "登录",
-              sort_index: 1,
-            });
-            this.userNav.push({
-              index: "/forgetpassword",
-              tittle: "忘记密码",
-              sort_index: 2,
-            });
-            province = -1;
-        }
-      }
-    },
-    getUserProvince() {
-      if (this.$cookies.isKey("token")) {
-        this.$http({
-          url: "/api/user/getusertokeninfo/",
-          methods: "get",
-          params: {
-            token: this.$cookies.get("token"),
-          },
-        }).then((res) => {
-          // console.log(res.data)
-          if (res.data.status) {
-            this.SelectUserMenu(res.data.data.data.capacity);
-            if (res.data.remind) {
-              this.$cookies.set("token", res.data.new_token);
-              console.log("set new token!");
-            }
-          } else {
-            alert(res.data.error);
-            this.$cookies.remove("token");
-            this.$router.push("/login");
-          }
+    async linkTo(val) {
+      if (val.name === "Logout") {
+        this.$Cookies.remove("token");
+        this.$store.commit("user/clearUserInfo");
+        loadData();
+        console.log("注销成功");
+      } else if (val.name === "SolutionList") {
+        this.$router.push({
+          name: val.name,
+          params: { user_id: this.user_info.user_id },
         });
+      } else if (val.name === "ContestList") {
+        let back_data = await getMyContest();
+        if (back_data.status) {
+          this.$router.push({
+            name: val.name,
+            params: { contest_list: back_data.message },
+          });
+        } else {
+          this.$router.push({ name: val.name, params: { contest_list: [] } });
+        }
       } else {
-        this.SelectUserMenu(5);
+        this.$router.push({ name: val.name });
       }
     },
-    getUserIcon() {
-      this.$http({
-        url: "/api/user/getusericon/",
-        method: "get",
-        params: {
-          token: this.$cookies.get("token"),
-        },
-      }).then((res) => {
-        // console.log(res.data)
-        this.circleUrl = "data:image/png;base64," + res.data.img;
-      });
+    setSearchData(val) {
+      this.$store.commit("set_search_data", val);
     },
-    logout() {
-      this.$cookies.remove("token");
-      location.reload();
-    },
-    send_message() {
-      this.$store.commit("set_search_data", this.search_data);
+    setInfo() {
+      let token = this.$Cookies.get("token");
+      // console.log(token);
+      if (token !== undefined && token !== null) {
+        if (this.user_info === null || this.user_info === undefined) {
+          this.$store.dispatch("user/getUserInfo");
+        } else {
+          this.circleUrl = this.user_info.user_icon
+            ? `data:image/png;base64,${this.user_info.user_icon}`
+            : "/api/user/getusericon/";
+        }
+        if (this.login_nav === null || this.login_nav === undefined) {
+          this.$store.commit("user/setLoginNav");
+        }
+      } else {
+        this.$store.commit("user/clearUserInfo");
+        this.$store.commit("user/setLoginNav");
+      }
     },
   },
 };
@@ -292,6 +205,7 @@ a {
 .nav-menu {
   width: 100%;
   text-align: center;
+  border: unset;
 }
 .header-search {
   width: 20%;

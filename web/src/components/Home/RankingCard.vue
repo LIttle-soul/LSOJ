@@ -1,88 +1,93 @@
 <template>
-    <el-card class="ranking-card">
-        <template #header>
-            <span class="ranking-ranking1">排名</span>
-            <span class="ranking-ranking2">
-              <el-button @click="changeMonth" type="text">每月</el-button>
-              <el-button @click="changeWeek" type="text">每周</el-button>
-              <el-button @click="changeDay" type="text">每日</el-button>
-            </span>
-        </template>
-        <div v-for="item in conInfo" :key="item.key" class="card-info">
-          <span>{{item.title}}</span>
-          <span>{{item.text}}</span>
-        </div>
-        <el-button class="bottom-button" type="text">more</el-button>
-      </el-card>
+  <el-card class="ranking-card">
+    <template #header>
+      <span class="ranking-ranking1">排名</span>
+      <span class="ranking-ranking2">
+        <el-button @click="sort_by('month')" type="text">每月</el-button>
+        <el-button @click="sort_by('week')" type="text">每周</el-button>
+        <el-button @click="sort_by('day')" type="text">每日</el-button>
+      </span>
+    </template>
+    <div v-for="(item, index) in Data" :key="index" class="card-info">
+      <span>{{ item.user_nick }}</span>
+      <span>{{ item.true_submit }}</span>
+    </div>
+    <el-button class="bottom-button" type="text" @click="to('ranklist')"
+      >more</el-button
+    >
+  </el-card>
 </template>
 <script>
-// import { defineAsyncComponent } from '@vue/runtime-core'
+import { mapState } from "vuex";
+import { getRankList } from "@/api/rank";
 
 export default {
   name: "Home",
-  setup() {},
+  computed: {
+    ...mapState("rank", {
+      temp_data: (state) => state.rank_list,
+    }),
+  },
+  watch: {
+    temp_data() {
+      this.Data = this.formatData(this.temp_data);
+    },
+  },
+  created() {
+    this.Data = this.formatData(this.temp_data);
+  },
   data() {
     return {
-      conInfo: [
-        {'title': '总提交量1', 'text': 12456, 'key': 1},
-        {'title': '昨日提交', 'text': 250, 'key': 2},
-        {'title': '题目总数', 'text': 3215, 'key': 3},
-        {'title': '注册用户', 'text': 6343, 'key': 4},
-      ]
-    }
-  },
-  components: {
+      Data: [],
+    };
   },
   methods: {
-    changeMonth() {
-      this.conInfo = [
-        {'title': '总提交量2', 'text': 12456, 'key': 1},
-        {'title': '昨日提交', 'text': 250, 'key': 2},
-        {'title': '题目总数', 'text': 3215, 'key': 3},
-        {'title': '注册用户', 'text': 6343, 'key': 4},
-      ]
+    formatData(val) {
+      let len = Math.min(val.length, 10);
+      return val
+        .map((item) => ({
+          user_nick: item.user_nick,
+          true_submit: item.solved,
+        }))
+        .splice(-len);
     },
-    changeWeek() {
-      this.conInfo = [
-        {'title': '总提交量3', 'text': 12456, 'key': 1},
-        {'title': '昨日提交', 'text': 250, 'key': 2},
-        {'title': '题目总数', 'text': 3215, 'key': 3},
-        {'title': '注册用户', 'text': 6343, 'key': 4},
-      ]
+    async sort_by(val) {
+      let temp = await getRankList(val);
+      this.Data = this.formatData(temp.message);
     },
-    changeDay() {
-      this.conInfo = [
-        {'title': '总提交量4', 'text': 12456, 'key': 1},
-        {'title': '昨日提交', 'text': 250, 'key': 2},
-        {'title': '题目总数', 'text': 3215, 'key': 3},
-        {'title': '注册用户', 'text': 6343, 'key': 4},
-      ]
-    }
-  }
+    to(val) {
+      this.$router.push({ path: val });
+    },
+  },
 };
 </script>
 
+<style lang="css">
+.ranking-card .el-card__header {
+  font-size: 16px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px;
+}
+</style>
+
 <style scoped>
 .ranking-card {
-    width: 95%;
+  width: 95%;
+  min-height: 200px;
+  position: relative;
 }
-.ranking-card .el-card__header {
-    font-size: 16px;
-    height: 40px;
-    line-height: 40px;
-    padding: 0 10px;
+.ranking-ranking1 {
+  width: 50%;
+  float: left;
+  height: 40px;
+  /* background-color: aqua; */
 }
-.ranking-ranking1{
-    width: 50%;
-    float: left;
-    height: 40px;
-    /* background-color: aqua; */
-}
-.ranking-ranking2{
-    width: 50%;
-    height: 40px;
-    float: left;
-    /* background-color: beige; */
+.ranking-ranking2 {
+  width: 50%;
+  height: 40px;
+  float: left;
+  /* background-color: beige; */
 }
 .ranking-ranking2 .el-button {
   color: #000;
@@ -92,13 +97,15 @@ export default {
   float: right;
 }
 .ranking-card .card-info {
-  line-height: 20px;
+  line-height: 16px;
   font-size: 14px;
 }
 .ranking-card .card-info span:last-child {
   float: right;
 }
 .ranking-card .bottom-button {
-    float: right;
+  position: absolute;
+  bottom: 0;
+  right: 20px;
 }
 </style>

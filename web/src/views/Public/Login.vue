@@ -66,14 +66,15 @@
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
 import { defineAsyncComponent } from "vue";
+import { submitLoginForm } from "@/api/user";
+import { loadData } from "@/utils/loadData";
 
 export default {
   name: "Login",
   components: {
     SIdentify: defineAsyncComponent(() =>
-      import("@/components/User/Verification.vue")
+      import("@/components/Other/Verification.vue")
     ),
   },
   data() {
@@ -126,51 +127,33 @@ export default {
   mounted() {
     // 初始化验证码
     this.identifyCode = "";
-    this.makeCode(this.identifyCodes, 4);
+    this.makeCode();
   },
   methods: {
     onSubmit(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-        //   console.log(this.form);
-          this.$http({
-            url: "/api/user/login/",
-            method: "post",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            transformRequest: [
-              function(data) {
-                let ret = "";
-                for (let it in data) {
-                  ret +=
-                    encodeURIComponent(it) +
-                    "=" +
-                    encodeURIComponent(data[it]) +
-                    "&";
-                }
-                return ret;
-              },
-            ],
-            params: {},
-            data: {
-              user_id: this.form.username,
-              password: this.form.password,
-              code: this.form.verifycode,
-            },
-          }).then((res) => {
-            // console.log('res=>', res);
-            if (res.data.status) {
-              ElMessage.success(res.data.err);
-              this.$cookies.set("token", res.data.token);
-              this.$cookies.set("user_id", this.form.username);
-              this.$router.push("/home");
-            } else {
-              ElMessage.error(res.data.err);
-            }
-          });
+          var val = await submitLoginForm(this.form);
+          if (val.status) {
+            this.$store.dispatch("user/getUserInfo");
+            loadData();
+            this.$message({
+              type: "success",
+              message: val.message,
+            });
+            this.$Cookies.set("token", val.token);
+            this.$router.push("/home");
+          } else {
+            this.$message({
+              type: "error",
+              message: val.message,
+            });
+          }
         } else {
-          ElMessage.error("请正确填写表单信息！！！");
+          this.$message({
+            type: "error",
+            message: "请正确填写表单信息！！！",
+          });
           return false;
         }
       });
@@ -180,9 +163,14 @@ export default {
     },
     // 获取四位随机验证码
     makeCode() {
-      this.$http.get("/api/user/login/").then((res) => {
-        this.identifyCode = res.data.capture;
-      });
+      var s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      var code = "";
+      for (var i = 0; i < 4; i++) {
+        var index = Math.floor(Math.random() * 62);
+
+        code += s.charAt(index);
+      }
+      this.identifyCode = code;
     },
   },
 };

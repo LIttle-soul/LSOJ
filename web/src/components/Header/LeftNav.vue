@@ -36,8 +36,8 @@ export default {
     },
   },
   computed: {
-    ...mapState({
-      nav_menu: state => state.admin.nav_menu
+    ...mapState('admin', {
+      nav_menu: state => state.nav_menu
     })
   },
   data() {
