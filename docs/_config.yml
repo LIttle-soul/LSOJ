@@ -3,22 +3,22 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: LSOJ
-subtitle: 'LSOJ文档中心'
-description: 'LSOJ的部署以及开发文档'
-keywords: LSOJ LiSoul
+title: LiSoul
+subtitle: 'LiSoul'
+description: '一只小菜鸟的学习日志'
+keywords: [lsoj, lisoul, LiSoul, LSOJ, renchenghui, Little-Soul, littlesoul]
 author: LiSoul
 language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url:  https://little-soul.github.io/LSOJ/
+url: https://little-soul.github.io/LSOJ/
 permalink: :month/:day/:title/
 permalink_defaults:
 pretty_urls:
-  trailing_index: false # Set to false to remove trailing 'index.html' from permalinks
-  trailing_html: false # Set to false to remove trailing '.html' from permalinks
+  trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
+  trailing_html: true # Set to false to remove trailing '.html' from permalinks
 
 # Directory
 source_dir: source
@@ -33,7 +33,6 @@ skip_render:
 # Writing
 new_post_name: :title.md # File name of new posts
 default_layout: post
-auto_spacing: true
 titlecase: false # Transform title into titlecase
 external_link:
   enable: true # Open external links in new tab

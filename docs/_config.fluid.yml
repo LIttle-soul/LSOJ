@@ -961,6 +961,8 @@ static_prefix:
   internal_css: /css
   internal_img: /img
 
+  live2d_widget: /live2d-widget
+
   anchor: https://cdn.jsdelivr.net/npm/anchor-js@4/
 
   github_markdown: https://cdn.jsdelivr.net/npm/github-markdown-css@4/
@@ -1002,3 +1004,5 @@ static_prefix:
   twikoo: https://cdn.jsdelivr.net/npm/twikoo@1/dist/
 
   hint: /lib/hint/
+
+  font_awesome: https://cdn.jsdelivr.net/npm/font-awesome/css/
