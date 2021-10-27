@@ -3,7 +3,10 @@ body {
 }
 
 #waifu {
+  width: 300px;
+  height: 300px;
   left: 0px;
   bottom: 0px;
   z-index: 10;
+  /* background-color: beige; */
 }
