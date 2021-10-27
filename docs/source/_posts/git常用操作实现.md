@@ -1,19 +1,19 @@
 ---
 title: git 常用操作流程实现
 tags: [Git]
-categories: [Blog]
-index_img: /image/page_image/git1.jpg
+categories: [Git]
+# index_img: /image/page_image/git1.jpg
 banner_img: /image/background/background11.jpg
 date: 2021-10-10 08:00:00
 hide: false
 ---
 
-## 一. 基础git命令
+## 一. 基础 git 命令
 
 ### 1. 身份设置实现: `git config`
 
 ```bash
-git config --global user.name "Your name"  
+git config --global user.name "Your name"
 git config --global user.email "Your email"
 ```
 
@@ -95,7 +95,7 @@ git checkout <branch_name>
 git checkout -b <your_new_branch_name>
 ```
 
-## 二. 中级git命令
+## 二. 中级 git 命令
 
 ### 1. 远程连接: `git remote`
 
@@ -119,7 +119,7 @@ git push -u <short_name> <your_branch_name>
 
 ### 3. 远程设置: `git push --set-upstream`
 
-> 在使用 git push 之前，我们应先设置好origin和upstream。
+> 在使用 git push 之前，我们应先设置好 origin 和 upstream。
 
 ```bash
 git push --set-upstream <short_name> <your_branch_name>
@@ -150,13 +150,13 @@ git pull <remote_url>
 git stash
 ```
 
-- 查看所有stash
+- 查看所有 stash
 
 ```bash
 git stash list
 ```
 
-- 应用stash到分支
+- 应用 stash 到分支
 
 ```bash
 git stash apply
@@ -164,7 +164,7 @@ git stash apply
 
 ### 7. `git log`
 
-> 在git log的帮助下，你可以看到所有之前的提交，并且最近的提交出现在最前面。
+> 在 git log 的帮助下，你可以看到所有之前的提交，并且最近的提交出现在最前面。
 
 - 用法
 
@@ -180,8 +180,8 @@ git log --all
 
 ### 8. `git shortlog`
 
-> git shortlog命令会显示来自git log命令的摘要。如果你只对简短的摘要感兴趣，那么此命令就非常有用了。
-这个命令有助于查看谁处理了什么，因为它对作者及其提交进行了分组。
+> git shortlog 命令会显示来自 git log 命令的摘要。如果你只对简短的摘要感兴趣，那么此命令就非常有用了。
+> 这个命令有助于查看谁处理了什么，因为它对作者及其提交进行了分组。
 
 - 用法
 
@@ -191,7 +191,7 @@ git shortlog
 
 ### 9. `git show`
 
-> 与git log相比，此命令将显示有关特定提交的详细信息。
+> 与 git log 相比，此命令将显示有关特定提交的详细信息。
 
 - 用法
 
@@ -201,8 +201,8 @@ git show <your_commit_hash>
 
 ### 10. `git rm`
 
-> 有时你需要从代码库中删除文件，在这种情况下，可以使用git rm命令。
-它可以从索引和工作目录中删除跟踪的文件。
+> 有时你需要从代码库中删除文件，在这种情况下，可以使用 git rm 命令。
+> 它可以从索引和工作目录中删除跟踪的文件。
 
 - 用法
 
@@ -212,7 +212,7 @@ git rm <your_file_name>
 
 ### 11. `git merge`
 
-> git merge可帮助将来自两个分支的更改集成到单个分支中。
+> git merge 可帮助将来自两个分支的更改集成到单个分支中。
 
 - 用法
 
@@ -224,12 +224,12 @@ git merge <branch_name>
 
 <font color='#ff0000' face='楷体' size=5>注: 我们可以使用此命令实现合并内容到自己分支。</font>
 
-## 三. 高级Git命令
+## 三. 高级 Git 命令
 
 ### 1. `git rebase`
 
-> git rebase类似于git merge命令。它把两个分支集成到一个分支中，但有一个不一样的地方：git rebase命令将会重写提交记录。
-当你有多个私有分支合并到单个分支时，应使用git rebase命令。它将使得提交历史成为线性的。
+> git rebase 类似于 git merge 命令。它把两个分支集成到一个分支中，但有一个不一样的地方：git rebase 命令将会重写提交记录。
+> 当你有多个私有分支合并到单个分支时，应使用 git rebase 命令。它将使得提交历史成为线性的。
 
 - 用法
 
@@ -239,33 +239,33 @@ git rebase <base>
 
 ### 2. `git bisect`
 
-> git bisect命令可帮助查找糟糕的提交。
+> git bisect 命令可帮助查找糟糕的提交。
 
 - 用法
 
-1. 启动git bisect
+1. 启动 git bisect
 
 ```bash
 git bisect start
 ```
 
-1. 让git bisect知道什么是好的提交
+1. 让 git bisect 知道什么是好的提交
 
 ```bash
 git bisect good a123
 ```
 
-1. 让git bisect知道什么是糟糕的提交
+1. 让 git bisect 知道什么是糟糕的提交
 
 ```bash
 git bisect bad z123
 ```
 
-> 通过git bisect，只要几分钟你就可以缩小问题代码的范围。
+> 通过 git bisect，只要几分钟你就可以缩小问题代码的范围。
 
 ### 3. `git cherry-pick`
 
-> git cherry-pick是一个蛮有用的命令，允许你从任意分支中选择任意提交并将其应用于其他任意分支。
+> git cherry-pick 是一个蛮有用的命令，允许你从任意分支中选择任意提交并将其应用于其他任意分支。
 
 - 用法
 
@@ -273,11 +273,11 @@ git bisect bad z123
 git cherry-pick <commit-hash>
 ```
 
-> git cherry-pick不会修改存储库的历史记录；相反，它会添加到历史记录。
+> git cherry-pick 不会修改存储库的历史记录；相反，它会添加到历史记录。
 
 ### 4. `git archive`
 
-> git archive命令会把多个文件合并为单个文件。就好像zip实用程序一样，所以你可以提取存档文件以获取单个文件。
+> git archive 命令会把多个文件合并为单个文件。就好像 zip 实用程序一样，所以你可以提取存档文件以获取单个文件。
 
 - 用法
 
@@ -285,12 +285,12 @@ git cherry-pick <commit-hash>
 git archive --format zip HEAD > archive-HEAD.zip
 ```
 
-> 它将创建当前修订的zip存档。
+> 它将创建当前修订的 zip 存档。
 
 ### 5. `git pull --rebase`
 
-> 在大多数情况下，当你使用git pull时，你需要重新设置基准（并且不进行合并）。
-此时，你就可以使用此选项。
+> 在大多数情况下，当你使用 git pull 时，你需要重新设置基准（并且不进行合并）。
+> 此时，你就可以使用此选项。
 
 - 用法
 
@@ -302,7 +302,7 @@ git pull --rebase
 
 ### 6. `git blame`
 
-> 如果你需要逐行检查任意文件的内容，则需要使用git blame命令。它可以帮助确定是谁对文件进行了更改。
+> 如果你需要逐行检查任意文件的内容，则需要使用 git blame 命令。它可以帮助确定是谁对文件进行了更改。
 
 - 用法
 
@@ -312,7 +312,7 @@ git blame <your_file_name>
 
 ### 7. `git tag`
 
-> 在Git中，标签很有用，你可以使用它们来管理发布。你可以将git tag视为不会改变的分支。尤其是要公开发布的时候，则更为重要了。
+> 在 Git 中，标签很有用，你可以使用它们来管理发布。你可以将 git tag 视为不会改变的分支。尤其是要公开发布的时候，则更为重要了。
 
 - 用法
 
@@ -322,7 +322,7 @@ git tag -a v1.0.0
 
 ### 8. `git verify-commit`
 
-> git verify-commit命令将检查gpg签名。GPG，GNU Privacy Guard，是sign文件中使用的工具，包含签名。
+> git verify-commit 命令将检查 gpg 签名。GPG，GNU Privacy Guard，是 sign 文件中使用的工具，包含签名。
 
 - 用法
 
@@ -342,7 +342,7 @@ git verify-tag <tag>
 
 ### 10. `git diff`
 
-> 大多数情况下，在提交或推送之前，你需要比较两个git文件或分支。用这个命令就方便多了。
+> 大多数情况下，在提交或推送之前，你需要比较两个 git 文件或分支。用这个命令就方便多了。
 
 - 用法
 
@@ -360,7 +360,7 @@ git diff <source branch> <target branch>
 
 ### 11. `git citool`
 
-> git citool是Git提交的图形化替代。
+> git citool 是 Git 提交的图形化替代。
 
 - 用法
 
@@ -370,7 +370,7 @@ git citool
 
 ### 12. `git mv`
 
-> 重命名git文件。接受两个参数，源文件名和目标文件名。
+> 重命名 git 文件。接受两个参数，源文件名和目标文件名。
 
 - 用法
 
@@ -380,7 +380,7 @@ git mv <old-file-name> <new-file-name>
 
 ### 13. `git clean`
 
-> 你可以使用git clean命令处理未跟踪的文件。可以使用此命令从工作目录中删除所有未跟踪的文件。如果要处理跟踪的文件，则需要使用git reset命令。
+> 你可以使用 git clean 命令处理未跟踪的文件。可以使用此命令从工作目录中删除所有未跟踪的文件。如果要处理跟踪的文件，则需要使用 git reset 命令。
 
 - 用法
 
@@ -390,7 +390,7 @@ git clean
 
 ### 14. `git help`
 
-> Git中有许多命令，如果你需要其他命令的帮助，则可以随时在终端上使用git help。
+> Git 中有许多命令，如果你需要其他命令的帮助，则可以随时在终端上使用 git help。
 
 - 用法
 
@@ -400,7 +400,7 @@ git help <git_command>
 
 ### 15. `git whatchanged`
 
-> 此命令的作用与git log相同，但为原始格式。并且由于历史原因，它也是git的一份子。
+> 此命令的作用与 git log 相同，但为原始格式。并且由于历史原因，它也是 git 的一份子。
 
 - 用法
 
