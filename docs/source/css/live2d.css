@@ -1,0 +1,9 @@
+body {
+  height: auto;
+}
+
+#waifu {
+  left: 0px;
+  bottom: 0px;
+  z-index: 10;
+}
