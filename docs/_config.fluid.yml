@@ -215,17 +215,17 @@ web_analytics:  # 网页访问统计
   # 百度统计的 Key，值需要获取下方链接中 `hm.js?` 后边的字符串
   # Baidu analytics, get the string behind `hm.js?`
   # See: https://tongji.baidu.com/sc-web/10000033910/home/site/getjs?siteId=13751376
-  baidu: ce9c072d26ddac1e2b587b6e0797cc09
+  baidu: b7dd1be358088afd106bff2e9d064a6b
 
   # Google 统计的 Tracking ID
   # Google analytics, set Tracking ID
   # See: https://developers.google.com/analytics/devguides/collection/analyticsjs
-  google: G-HLD3EBCE7B
+  google:
 
   # Google gtag.js 的媒体资源 ID
   # Google gtag.js GA_MEASUREMENT_ID
   # See: https://developers.google.com/analytics/devguides/collection/gtagjs/
-  gtag: G-HLD3EBCE7B
+  gtag:
 
   # 腾讯统计的 H5 App ID，开启高级功能才有cid
   # Tencent analytics, set APP ID
@@ -385,9 +385,9 @@ footer:
   # 页脚第一行文字的 HTML，建议保留 Fluid 的链接，用于向更多人推广本主题
   # HTML of the first line of the footer, it is recommended to keep the Fluid link to promote this theme to more people
   content: '
-    <a href="https://github.com/LIttle-soul" target="_blank" rel="nofollow noopener"><span>LiSoul</span></a>
+    <a href="https://little-soul.github.io/" target="_blank" rel="nofollow noopener"><span>LiSoul</span></a>
     <i class="iconfont icon-love"></i>
-    <a href="https://github.com/LIttle-soul" target="_blank" rel="nofollow noopener"><span>github</span></a>
+    <a href="https://github.com/LIttle-soul/" target="_blank" rel="nofollow noopener"><span>github</span></a>
     <div style="font-size: 0.85rem">
       <span id="timeDate">载入天数...</span>
       <span id="times">载入时分秒...</span>
@@ -867,8 +867,8 @@ about:
   # 更多图标可从 https://hexo.fluid-dev.com/docs/icon/ 查找，`class` 代表图标的 css class，添加 `qrcode` 后，图标不再是链接而是悬浮二维码
   # More icons can be found from https://hexo.fluid-dev.com/docs/en/icon/  `class` is the css class of the icon. If adding `qrcode`, The icon is no longer a link, but a hovering QR code
   icons:
-    - { class: "iconfont icon-github-fill", link: "https://github.com", tip: "GitHub" }
-    - { class: "iconfont icon-douban-fill", link: "https://douban.com", tip: "豆瓣" }
+    - { class: "iconfont icon-github-fill", link: "https://github.com/LIttle-soul/", tip: "GitHub" }
+    - { class: "iconfont icon-mini-program-fill", link: "https://little-soul.github.io/", tip: "Blog" }
     - { class: "iconfont icon-wechat-fill", qrcode: "/img/favicon.png" }
 
 
