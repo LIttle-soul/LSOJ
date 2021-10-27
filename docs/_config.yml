@@ -106,3 +106,13 @@ deploy:
   type: git
   repo: git@github.com:LIttle-soul/little-soul.github.io.git
   branch: main
+
+math:
+  engine: katex
+  katex:
+    css: https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css
+    js: https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js
+    config:
+      # KaTeX config
+      throwOnError: false
+      errorColor: "#cc0000"

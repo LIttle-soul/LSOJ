@@ -20,10 +20,10 @@ hexo.extend.injector.register(
   `<script src='/live2d-widget/autoload.js'></script>`
 );
 
-hexo.extend.injector.register(
-  "head_end",
-  `<link rel="stylesheet" href='/css/mouse.css'>`
-);
+// hexo.extend.injector.register(
+//   "head_end",
+//   `<link rel="stylesheet" href='/css/mouse.css'>`
+// );
 
 hexo.extend.injector.register(
   "head_end",
