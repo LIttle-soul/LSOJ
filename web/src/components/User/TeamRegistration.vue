@@ -1,124 +1,194 @@
 <template>
   <div class="team-registration">
-    <el-form>
-      <el-form-item label="团队名称">
-        <el-input v-model="teamData.team_title"></el-input>
+    <el-form label-width="80px" ref="form_ref" :rules="team_data_rules" :model="teamData">
+      <el-form-item label="团队名称" prop="team_title">
+        <el-input v-model="teamData.team_title" input-style="width: 208px"></el-input>
       </el-form-item>
       <el-form-item label="团队介绍">
-        <el-input type="textarea" v-model="teamData.team_introduce"></el-input>
+        <el-input
+          type="textarea"
+          v-model="teamData.team_introduce"
+          input-style="width: 208px"
+        ></el-input>
       </el-form-item>
-      <el-form-item
-        v-for="(item, index) in teamData.team_user_list"
-        :key="index"
-        :label="'成员' + (index + 1)"
-      >
-        <el-select v-model="item.user_id" filterable placeholder="Select">
-          <el-option
-            v-for="item2 in user_list"
-            :key="item2.user_id"
-            :label="item2.user_id"
-            :value="item2.user_id"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="指导老师">
-        <el-select
+      <el-form-item label="指导老师" prop="team_teacher">
+        <el-input
           v-model="teamData.team_teacher"
-          filterable
-          placeholder="Select"
+          placeholder="请输入老师账号"
+          input-style="width: 208px"
         >
-          <el-option
-            v-for="item in user_list"
-            :key="item.user_id"
-            :label="item.user_id"
-            :value="item.user_id"
-          ></el-option>
-        </el-select>
+        </el-input>
       </el-form-item>
-      <el-form-item label="学校">
-        <el-select
+      <el-form-item label="学校" prop="team_school">
+        <el-cascader
+          placeholder="请选择团队所在学校"
           v-model="teamData.team_school"
-          filterable
-          placeholder="Select"
+          :props="school_list"
+          :clearable="true"
         >
-          <el-option
-            v-for="item in school_list"
-            :key="item.school_id"
-            :label="item.school_name"
-            :value="item.school_id"
-          ></el-option>
-        </el-select>
+        </el-cascader>
       </el-form-item>
     </el-form>
-    <div class="bottom-button">
-      <el-button type="primary" size="medium" @click="submitTeamData(teamData)"
-        >提交</el-button
-      >
-      <el-button
-        type="danger"
-        size="medium"
-        style="float: right"
-        @click="deleteTeamUser"
-        >删除成员</el-button
-      >
-      <el-button
-        type="success"
-        size="medium"
-        style="float: right;"
-        @click="addTeamUser"
-        >添加成员</el-button
-      >
-    </div>
+    <el-button type="primary" @click="submitTeamData">提交</el-button>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import { teamRegistration } from "@/api/user";
-import { mapState } from "vuex";
+import { useStore, mapState } from "vuex";
+import { reactive, ref, unref } from "vue";
+import { ElMessage } from "element-plus";
+import { getAddressList } from "@/api/address";
+import { getSchoolList } from "@/api/school";
+import { getUserList } from "@/api/user";
 
-export default {
-  computed: {
-    ...mapState("user", {
-      user_list: (state) => state.user_list,
-    }),
-    ...mapState("school", {
-      school_list: (state) => state.school_list,
-    }),
+let store = useStore();
+
+// 团队表单数据
+let teamData = reactive({
+  team_title: "",
+  team_introduce: "",
+  team_school: "",
+  team_teacher: "",
+});
+
+// 表单自定义效验
+let form_ref = ref();
+let check_teacher = async (rule: any, value: any, callback: any) => {
+  if (value) {
+    // console.log(value);
+    let back_data = await getUserList({
+      page: 1,
+      total: 1,
+      text: "",
+      user_id: value,
+    });
+    if (back_data.status) {
+      callback();
+    } else {
+      callback(back_data.message);
+    }
+  } else {
+    callback();
+  }
+};
+
+let team_data_rules = reactive({
+  team_title: [
+    { required: true, message: "团队名不可为空", trigger: "blur" },
+    { min: 4, max: 20, message: "团队名必须在4-20个字符之间", trigger: "blur" },
+  ],
+  team_school: [{ required: true, message: "请选择团队所在学校", trigger: "blur" }],
+  team_teacher: [{ validator: check_teacher, trigger: "blur" }],
+});
+
+// vuex数据获取懒加载
+let school_list = ref({
+  lazy: true,
+  lazyLoad(node: any, resolve: any) {
+    const { level, value } = node;
+    switch (level) {
+      case 0:
+        getAddress("", 0, "province", resolve);
+        break;
+      case 1:
+        getAddress("province", value, "municipality", resolve);
+        break;
+      case 2:
+        getSchool(value, resolve);
+        break;
+      default:
+        resolve([]);
+    }
   },
-  data() {
-    return {
-      teamData: {
-        team_title: "",
-        team_introduce: "",
-        team_school: "",
-        team_user_list: new Array({ user_id: "" }),
-        team_teacher: "",
-        team_type: "",
-      },
-    };
-  },
-  methods: {
-    async submitTeamData(val) {
-      let back_data = await teamRegistration(val);
+});
+
+// 相关数据获取
+let getAddress = async (
+  father: string,
+  father_id: number,
+  child: string,
+  resolve: any
+) => {
+  let back_data = await getAddressList(<any>{
+    father: father,
+    father_id: father_id,
+    child: child,
+    page: 1,
+    total: 100,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    resolve(formatAddress(back_data.message));
+  }
+};
+let getSchool = async (municipality_id: number, resolve: any) => {
+  let back_data = await getSchoolList(<any>{
+    page: 1,
+    total: 500,
+    text: "",
+    municipality_id: municipality_id,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    resolve(formatSchool(back_data.message));
+  }
+};
+
+// 相关数格式化
+let formatAddress = (val: any) => {
+  return val.map((item: any) => ({
+    value: item.id,
+    label: item.name,
+    leaf: item.deep >= 3,
+  }));
+};
+let formatSchool = (val: any) => {
+  return val.map((item: any) => ({
+    value: item.school_id,
+    label: item.school_name,
+    leaf: true,
+  }));
+};
+
+let emits = defineEmits(["reloadTeamData"]);
+
+// 数据提交
+let submitTeamData = () => {
+  let form_temp = unref(form_ref);
+  form_temp.validate(async (valid: any) => {
+    if (valid) {
+      let back_data = await teamRegistration({
+        team_nick: teamData.team_title,
+        team_introduce: teamData.team_introduce || "",
+        team_school: teamData.team_school,
+        team_teacher: teamData.team_teacher || "",
+      });
       if (back_data.status) {
-        this.$message({
+        ElMessage({
           type: "success",
           message: back_data.message,
         });
-        this.$store.dispatch("user/getTeamList");
+        emits("reloadTeamData");
       } else {
-        this.$message({
+        ElMessage({
           type: "error",
           message: back_data.message,
         });
       }
-    },
-    addTeamUser() {
-      this.teamData.team_user_list.push({ user_id: "" });
-    },
-    deleteTeamUser() {
-      this.teamData.team_user_list.pop();
-    },
-  },
+    } else {
+      ElMessage({
+        type: "error",
+        message: "请正确填写表单信息！！！",
+      });
+      return false;
+    }
+  });
 };
 </script>
+
+<style lang="scss" scoped>
+.team-registration {
+  width: 300px;
+}
+</style>

@@ -1,37 +1,21 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div class="app">
+    <el-config-provider :locale="zhCn">
+      <router-view />
+    </el-config-provider>
   </div>
 </template>
-
-<script>
-// import { ref, nextTick, provide } from "vue";
-// import BLank from "@/components/BLank.vue";
-import { loadData } from "@/utils/loadData";
-
-export default {
-  name: "App",
-  components: {
-    // BLank,
-  },
-  beforeCreate() {
-    loadData();
-  },
-  mounted() {},
-  data() {
-    return {
-      isRouterAlive: true,
-    };
-  },
-  computed: {},
-  methods: {},
-};
+<script setup lang="ts">
+import { ElConfigProvider } from "element-plus";
+import zhCn from "element-plus/lib/locale/lang/zh-cn";
+import { useStore } from "vuex";
+let store = useStore();
+store.dispatch("user/checkUserStatus");
 </script>
-
-<style>
+<style lang="scss">
 @import url("./assets/css/reset.css");
-
-#app {
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css");
+.app {
   position: relative;
   height: 100%;
 }

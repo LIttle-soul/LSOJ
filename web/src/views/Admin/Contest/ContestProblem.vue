@@ -2,12 +2,12 @@
   <div class="contest-problem">
     <el-card>
       <template #header>
-        <div class="header">
-          <div class="table-header">
-            <i class="el-icon-notebook-2"></i>
+        <div class="table-header">
+          <div class="header-left">
+            <el-icon :size="25" class="icon"><Notebook /></el-icon>
             竞赛问题
             <el-select
-              size="mini"
+              size="small"
               :filterable="true"
               v-model="cur_contest"
               placeholder="请选择你要管理的竞赛"
@@ -24,15 +24,30 @@
           </div>
           <el-input
             placeholder="请输入内容"
-            size="mini"
-            v-model="search_data"
+            size="small"
+            v-model="search_text"
             class="input-with-select"
+            @keydown.enter="search_all_data(search_text)"
           >
+            <template #prefix>
+              <el-icon
+                color="#AAAAAA"
+                style="font-size: 1.1rem; transform: translateY(7px)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1024 1024"
+                  data-v-394d1fd8=""
+                >
+                  <path
+                    fill="currentColor"
+                    d="m795.904 750.72 124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704 352 352 0 0 0 0 704z"
+                  ></path>
+                </svg>
+              </el-icon>
+            </template>
             <template #append>
-              <el-button
-                icon="el-icon-search"
-                @click="search_all_data"
-              ></el-button>
+              <el-button @click="search_all_data(search_text)">搜索</el-button>
             </template>
           </el-input>
         </div>
@@ -40,266 +55,270 @@
       <div>
         <ContestProblemList
           :Data="Data"
+          :page="page"
           :admin="true"
           @handleContestProblemUpClick="upButtonClick"
           @handleContestProblemDownClick="downButtonClick"
           @handleContestProblemDeleteClick="deleteButtonClick"
+          @handleSizeChange="handleSizeChange"
+          @handlePageChange="handlePageChange"
         />
       </div>
       <div class="bottom-button">
-        <el-button type="primary" size="mini" @click="addProblem"
-          >添加问题</el-button
-        >
-        <el-button type="success" size="mini" @click="submitProblem"
-          >提交</el-button
-        >
+        <el-button type="primary" size="mini" @click="addProblemData">添加问题</el-button>
+        <el-button type="success" size="mini" @click="submitProblem">提交</el-button>
       </div>
     </el-card>
   </div>
 </template>
 
-<script>
-import { defineAsyncComponent } from "@vue/runtime-core";
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
 import { mapGetters, mapState } from "vuex";
 import {
+  getContestList,
   getContestProblem,
   changeProblemList,
   deleteProblem,
   addProblem,
 } from "@/api/contest";
-import { ElLoading, ElMessageBox } from "element-plus";
+import { ElLoading, ElMessageBox, ElMessage } from "element-plus";
+import ContestProblemList from "@/components/Contest/ContestProblem.vue";
+import { Notebook } from "@element-plus/icons";
 
-export default {
-  components: {
-    ContestProblemList: defineAsyncComponent(() =>
-      import("@/components/Contest/ContestProblem.vue")
-    ),
-  },
-  computed: {
-    ...mapState("contest", {
-      temp_data: (state) => state.contest_list,
-    }),
-    ...mapGetters("contest", {
-      getContestList: "filterContestByTime",
-    }),
-  },
-  watch: {
-    temp_data() {
-      this.contest_list = this.formatContestList(this.getContestList());
-    },
-  },
-  created() {
-    this.contest_list = this.formatContestList(this.getContestList());
-  },
-  data() {
-    return {
-      search_data: "",
-      cur_contest: null,
-      contest_list: [
-        {
-          contest_id: 0,
-          contest_title: "竞赛一",
-        },
-        {
-          contest_id: 1,
-          contest_title: "竞赛二",
-        },
-        {
-          contest_id: 2,
-          contest_title: "竞赛三",
-        },
-      ],
-      problem_list: [],
-      Data: [
-        {
-          problem_num: "A",
-          problem_id: 1000,
-          problem_title: "Hello, World",
-          up_button: true,
-          down_button: true,
-        },
-      ],
-    };
-  },
-  methods: {
-    search_all_data(val) {
-      console.log(val);
-    },
-    addProblem() {
-      ElMessageBox.prompt("请输入你要添加的问题编号", "添加问题", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-      }).then(async ({ value }) => {
-        let back_data = await addProblem({
-          contest_id: this.cur_contest,
-          problem_id: value,
-        });
-        if (back_data.status) {
-          this.setContestProblem(this.cur_contest);
-          this.$message({
-            type: "success",
-            message: back_data.message,
-          });
-        } else {
-          this.$message({
-            type: "error",
-            message: back_data.message,
-          });
-        }
-      });
-    },
-    async submitProblem() {
-      let back_data = await changeProblemList({
-        contest_id: this.cur_contest,
-        problem_list: this.problem_list.join(","),
-      });
-      if (back_data.status) {
-        this.setContestProblem(this.cur_contest);
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    upButtonClick({ index }) {
-      if (index === 0) {
-        this.$message({
-          type: "error",
-          message: "抱歉，这是第一个",
-        });
-      } else {
-        [this.problem_list[index], this.problem_list[index - 1]] = [
-          this.problem_list[index - 1],
-          this.problem_list[index],
-        ];
-        [this.Data[index], this.Data[index - 1]] = [
-          this.Data[index - 1],
-          this.Data[index],
-        ];
-      }
-    },
-    downButtonClick({ index }) {
-      if (index === this.Data.length - 1) {
-        this.$message({
-          type: "error",
-          message: "抱歉，这是最后一个",
-        });
-      } else {
-        [this.problem_list[index], this.problem_list[index + 1]] = [
-          this.problem_list[index + 1],
-          this.problem_list[index],
-        ];
-        [this.Data[index], this.Data[index + 1]] = [
-          this.Data[index + 1],
-          this.Data[index],
-        ];
-      }
-    },
-    async deleteButtonClick(row) {
-      let back_data = await deleteProblem({
-        contest_id: this.cur_contest,
-        problem_id: row.problem_id,
-      });
-      if (back_data.status) {
-        this.setContestProblem(this.cur_contest);
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    async setContestProblem(val) {
-      const loading = ElLoading.service({
-        lock: true,
-        text: "Loading",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
-      let back_data = await getContestProblem({
-        contest_id: val,
-      });
-      if (back_data.status) {
-        this.Data = this.formatContestProblem(back_data.message);
-        this.problem_list = back_data.message.map((item) => {
-          return item.problem_id;
-        });
-        loading.close();
-      } else {
-        this.Data = [];
-        loading.close();
-      }
-    },
-    formatContestList(val) {
-      return val.map((item) => ({
-        contest_id: item.contest_id,
-        contest_title: item.contest_title,
-      }));
-    },
-    formatContestProblem(val) {
-      return val.map((item) => ({
-        problem_num: item.problem_num,
-        problem_id: item.problem_id,
-        problem_title: item.problem_title,
-      }));
-    },
-  },
+let search_text = ref("");
+let page = ref({
+  page: 1,
+  page_size: 50,
+  total: 0,
+  text: "",
+});
+let cur_contest = ref();
+let contest_list = ref(<any>[]);
+let problem_list = ref([]);
+let Data = ref([]);
+let search_all_data = (val: string) => {
+  page.value.text = val;
+  setContestProblem(cur_contest.value);
 };
+let handleSizeChange = (val: number) => {
+  page.value.page_size = val;
+  setContestProblem(cur_contest.value);
+};
+let handlePageChange = (val: number) => {
+  page.value.page = val;
+  setContestProblem(cur_contest.value);
+};
+let addProblemData = async () => {
+  ElMessageBox.prompt("请输入你要添加的问题编号", "添加问题", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+  })
+    .then(async ({ value }) => {
+      console.log(value);
+      let back_data = await addProblem({
+        contest_id: cur_contest.value,
+        problem_id: value,
+      });
+      if (back_data.status) {
+        setContestProblem(cur_contest.value);
+        ElMessage({
+          type: "success",
+          message: back_data.message,
+        });
+      } else {
+        ElMessage({
+          type: "error",
+          message: back_data.message,
+        });
+      }
+    })
+    .catch(() => {
+      console.log("取消输入");
+    });
+};
+let submitProblem = async () => {
+  let back_data = await changeProblemList({
+    contest_id: cur_contest.value,
+    problem_list: problem_list.value.join(","),
+  });
+  if (back_data.status) {
+    setContestProblem(cur_contest.value);
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+// 位置交换
+let upButtonClick = ({ index }: any) => {
+  if (index === 0) {
+    ElMessage({
+      type: "error",
+      message: "抱歉，这是第一个",
+    });
+  } else {
+    [problem_list.value[index], problem_list.value[index - 1]] = [
+      problem_list.value[index - 1],
+      problem_list.value[index],
+    ];
+    [Data.value[index], Data.value[index - 1]] = [
+      Data.value[index - 1],
+      Data.value[index],
+    ];
+  }
+};
+let downButtonClick = ({ index }: any) => {
+  if (index === Data.value.length - 1) {
+    ElMessage({
+      type: "error",
+      message: "抱歉，这是最后一个",
+    });
+  } else {
+    [problem_list.value[index], problem_list.value[index + 1]] = [
+      problem_list.value[index + 1],
+      problem_list.value[index],
+    ];
+    [Data.value[index], Data.value[index + 1]] = [
+      Data.value[index + 1],
+      Data.value[index],
+    ];
+  }
+};
+
+// 删除事件
+let deleteButtonClick = async (row: any) => {
+  let back_data = await deleteProblem({
+    contest_id: cur_contest.value,
+    problem_id: row.problem_id,
+  });
+  if (back_data.status) {
+    setContestProblem(cur_contest.value);
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+// 数据加载
+let setContestList = async () => {
+  let back_data = await getContestList({
+    page: 1,
+    total: 100,
+    status: "",
+    text: "",
+    contest_id: "",
+    me: "",
+    time: "True",
+  });
+  if (back_data.status) {
+    contest_list.value = formatContestList(back_data.message);
+  }
+};
+let setContestProblem = async (val: any) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: "Loading",
+    spinner: "el-icon-loading",
+    background: "rgba(0, 0, 0, 0.7)",
+  });
+  let back_data = await getContestProblem({
+    page: page.value.page,
+    total: page.value.page_size,
+    contest_id: val,
+    text: page.value.text || "",
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    Data.value = formatContestProblem(back_data.message);
+    problem_list.value = back_data.message.map((item: any) => {
+      return item.problem_id;
+    });
+    page.value.total = back_data.total;
+    loading.close();
+  } else {
+    Data.value = [];
+    loading.close();
+  }
+};
+// 数据格式化
+let formatContestList = (val: any) => {
+  return val.map((item: any) => ({
+    contest_id: item.contest_id,
+    contest_title: item.contest_title,
+  }));
+};
+let formatContestProblem = (val: any) => {
+  return val.map((item: any) => ({
+    problem_num: item.problem_num,
+    problem_id: item.problem_id,
+    problem_title: item.problem_title,
+  }));
+};
+// 数据挂载自动加载
+onMounted(() => {
+  setContestList();
+});
 </script>
 
-<style lang="css">
-.contest-problem .el-card__header {
-  height: 60px;
-}
-</style>
-
-<style scoped>
+<style lang="scss">
 .contest-problem {
-  width: 90%;
-  max-width: 1200px;
-  margin: 70px auto;
-}
-.contest-problem .header {
-  display: flex;
-  justify-content: space-between;
-}
-.contest-problem .contest-choice {
-  width: 180px;
-  margin-left: 20px;
-}
-.contest-problem .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-  height: 28px;
-  min-width: 210px;
-  display: flex;
-}
-.contest-problem .input-with-select {
-  width: 205px;
-  margin-right: 10px;
-}
-.contest-problem .bottom-button {
-  margin: 20px 40px;
-  float: right;
-}
-
-@media screen and (max-width: 1000px) {
-  .contest-problem {
-    width: 100%;
+  .el-card__header {
+    height: 60px;
+    padding: 10px;
   }
 }
-@media screen and (max-width: 600px) {
-  .contest-problem .input-with-select {
-    display: none;
+</style>
+<style scoped lang="scss">
+.contest-problem {
+  width: 95%;
+  max-width: 1200px;
+  margin: 70px auto;
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    min-width: 210px;
+    .header-left {
+      font: 1.2em "楷体";
+      letter-spacing: 3px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .contest-choice {
+        width: 180px;
+        margin-left: 20px;
+      }
+    }
+    .input-with-select {
+      width: 230px;
+      margin-right: 10px;
+      margin-top: 5px;
+    }
+    @media screen and (max-width: 600px) {
+      .input-with-select {
+        display: none;
+      }
+    }
+  }
+  .bottom-button {
+    margin: 20px 40px;
+    float: right;
+  }
+}
+@media screen and (max-width: 1000px) {
+  .contest-list {
+    width: 100%;
   }
 }
 </style>

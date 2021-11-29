@@ -1,15 +1,7 @@
 <template>
   <div class="team-list-child">
-    <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
-      size="mini"
-      :stripe="true"
-      :fit="true"
-      style="width: 100%;"
-    >
-      <el-table-column type="expand">
+    <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
+      <el-table-column type="expand" width="20px">
         <template #default="props">
           <div class="team-list-introduce">
             <p>团队编号: {{ props.row.team_id }}</p>
@@ -18,12 +10,11 @@
             <p>团队创建者: {{ props.row.team_creator }}</p>
             <p>所在学校: {{ props.row.team_school }}</p>
             <p>注册时间: {{ props.row.registration_time }}</p>
+            <p>指导老师: {{ props.row.team_teacher }}</p>
             <div>
               <p v-for="(item, index) in props.row.team_user_list" :key="item">
-                <span v-if="+item.user_type === 0"
-                  >团队成员{{ index + 1 }}: {{ item.user_nick }} ({{
-                    item.user_id
-                  }})
+                <span
+                  >团队成员{{ index + 1 }}: {{ item.user_nick }} ({{ item.user_id }})
                   <el-button
                     v-show="is_delete_power"
                     @click="deleteUser(props.row.team_id, item.user_id)"
@@ -32,7 +23,6 @@
                     >删除用户</el-button
                   ></span
                 >
-                <span v-else>指导老师: {{ item.user_nick }}</span>
               </p>
             </div>
           </div>
@@ -41,29 +31,31 @@
       <el-table-column prop="team_id" label="团队编号"> </el-table-column>
       <el-table-column prop="team_nick" label="团队名称"> </el-table-column>
       <el-table-column prop="team_creator" label="团队创建者"></el-table-column>
-      <el-table-column
-        prop="team_user_list.length"
-        label="团队人数"
-      ></el-table-column>
+      <el-table-column prop="team_user_list.length" label="团队人数"></el-table-column>
       <el-table-column prop="team_school" label="所在学校"></el-table-column>
-      <el-table-column
-        prop="registration_time"
-        label="注册时间"
-      ></el-table-column>
-      <el-table-column prop="team_type" label="团队类型">
+      <el-table-column prop="registration_time" label="注册时间"></el-table-column>
+      <el-table-column prop="invitation_code" label="邀请码"> </el-table-column>
+      <el-table-column fixed="right" width="80px" label="操作">
         <template #default="scope">
-          {{ team_type_list[+scope.row.team_type] }}
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" width="50px" label="操作">
-        <template #default="scope">
-          <el-button
-            size="mini"
-            type="danger"
-            circle
-            icon="el-icon-delete"
-            @click="handleDeleteClick(scope.row)"
-          ></el-button>
+          <div class="button-box">
+            <el-button
+              v-if="is_delete_power"
+              size="mini"
+              type="success"
+              circle
+              @click="handleShareClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-share"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              circle
+              @click="handleDeleteClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-trash"></i></el-icon>
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -71,11 +63,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -83,119 +75,159 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { deleteTeamData, deleteTeamUser } from "@/api/user";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { getInvitationCode } from "@/api/user";
+import dayJS from "dayjs";
 
-export default {
-  name: "UserListChild",
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
-    },
-    is_delete_power: {
-      type: Boolean,
-      default: false,
+let store = useStore();
+let router = useRouter();
+
+let props = defineProps({
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  is_delete_power: {
+    type: Boolean,
+    default: false,
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  data() {
-    return {
-      team_type_list: [
-        "行政班级",
-        "注册团队",
-        "课程班级",
-        "默认班级",
-        "临时团队",
-      ],
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    async handleDeleteClick(row) {
-      let back_data = this.is_delete_power
-        ? await deleteTeamData({
-            class_id: row.team_id,
-          })
-        : await deleteTeamUser({
-            class_id: row.team_id,
-          });
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("user/getTeamList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
+});
+
+// 向父组件传送事件
+let emit = defineEmits(["handleSizeChange", "handlePageChange", "reload"]);
+
+// 页面跳转
+let handleSizeChange = (val: number) => {
+  emit("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emit("handlePageChange", val);
+};
+
+// 事件操作函数
+let handleShareClick = async (row: any) => {
+  let back_data = await getInvitationCode({
+    team_id: row.team_id,
+  });
+  if (back_data.status) {
+    ElMessageBox.alert(
+      `<p style="color: #DD0000;"><span style="display: inline-block;width: 70px;color: #000000;">邀请码:</span>${
+        back_data.message.code
+      }</p>
+      <p style="color: #DD0000;"><span style="display: inline-block;width: 70px;color: #000000;">到期时间:</span>${dayJS(
+        back_data.message.time
+      ).format("YYYY-MM-DD HH:mm:ss")}</p>`,
+      "邀请码",
+      {
+        dangerouslyUseHTMLString: true,
       }
-    },
-    async deleteUser(team_id, user_id) {
-      let back_data = await deleteTeamUser({
-        class_id: team_id,
-        user_id: user_id,
+    )
+      .then()
+      .catch(() => {
+        console.log("close");
       });
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("user/getTeamList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-  },
+    emit("reload");
+  }
+};
+
+let handleDeleteClick = async (row: any) => {
+  let back_data = props.is_delete_power
+    ? await deleteTeamData({
+        team_id: row.team_id,
+      })
+    : await deleteTeamUser({
+        team_id: row.team_id,
+        user_id: "",
+      });
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    emit("reload");
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let deleteUser = async (team_id: any, user_id: any) => {
+  let back_data = await deleteTeamUser({
+    team_id: team_id,
+    user_id: user_id,
+  });
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    emit("reload");
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
 };
 </script>
 
-<style scoped>
-.team-list-child .pagination-2 {
-  display: none;
-}
-.team-list-child .team-list-introduce {
-  line-height: 23px;
-  font-size: 1.2em;
-  font-family: "宋体";
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-.team-list-child .delete-user-button {
-  width: 80px;
-  background-color: rgba(241, 103, 10, 0.521);
-  border-radius: 20px;
-  margin: 1px 0;
-  padding: 0;
-}
-@media screen and (max-width: 600px) {
-  .team-list-child .pagination-2 {
-    display: block;
+<style scoped lang="scss">
+.team-list-child {
+  .button-box {
+    display: flex;
+    justify-content: space-around;
   }
-  .team-list-child .pagination-1 {
+  .team-list-introduce {
+    line-height: 23px;
+    font-size: 1.2em;
+    font-family: "宋体";
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .delete-user-button {
+    width: 80px;
+    background-color: rgba(241, 103, 10, 0.521);
+    border-radius: 20px;
+    margin: 1px 0;
+    padding: 0;
+  }
+  .pagination-2 {
     display: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    .pagination-2 {
+      display: block;
+    }
+    .pagination-1 {
+      display: none;
+    }
   }
 }
 </style>

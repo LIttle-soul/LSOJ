@@ -13,55 +13,56 @@
     @copy-code-success="handleCopyCodeSuccess"
   ></v-md-editor>
 </template>
-<script>
+<script lang="ts" setup>
 import { upLoadImages } from "@/api/editor";
-export default {
-  props: {
-    mode: {
-      type: String,
-      default: "editable",
-    },
-    height: {
-      type: String,
-      default: "auto",
-    },
-    content: {
-      type: String,
-      default: "",
-    },
+import { ElMessage } from "element-plus";
+import { ref, watch } from "vue";
+
+let props = defineProps({
+  mode: {
+    type: String,
+    default: "editable",
   },
-  mounted() {
-    this.SetText();
+  height: {
+    type: String,
+    default: "auto",
   },
-  data() {
-    return {
-      text: "",
-    };
+  content: {
+    type: String,
+    default: "",
   },
-  methods: {
-    handleCopyCodeSuccess() {
-      this.$message({
-        type: "success",
-        message: "复制成功",
-      });
-    },
-    async handleUploadImage(event, insertImage, files) {
-      let data = await upLoadImages(files);
-      console.log(data);
-      insertImage({
-        url: '/api/files/' + data.message,
-        desc: undefined,
-        width: "auto",
-        height: "auto",
-      });
-    },
-    save(text) {
-      // console.log(text);
-      this.$emit("getContent", text);
-    },
-    SetText() {
-      this.text = this.content;
-    },
-  },
+});
+
+let emits = defineEmits(["getContent"]);
+
+let text = ref("");
+
+let handleCopyCodeSuccess = () => {
+  ElMessage({
+    type: "success",
+    message: "复制成功",
+  });
 };
+let handleUploadImage = async (event: any, insertImage: any, files: any) => {
+  let data = await upLoadImages(files);
+  // console.log(data);
+  insertImage({
+    url: "/api/files/" + data.message,
+    desc: undefined,
+    width: "auto",
+    height: "auto",
+  });
+};
+let save = (text: any) => {
+  emits("getContent", text);
+};
+watch(
+  props,
+  () => {
+    text.value = props.content;
+  },
+  {
+    immediate: true,
+  }
+);
 </script>

@@ -1,6 +1,19 @@
 <template>
   <div class="course">
-    <h2>课程推荐</h2>
+      <h2>课程推荐</h2>
+       <el-input
+        placeholder="请输入内容"
+        size="mini"
+        v-model="search_data"
+        class="input-with-select"
+      >
+        <template #append>
+          <el-button
+            icon="el-icon-search"
+            @click="search_all_data(search_data)"
+          ></el-button>
+        </template>
+      </el-input>
     <div class="header">
       <!-- 
         datas: 无缝滚动列表数据，组件内部使用列表长度。
@@ -12,7 +25,7 @@
         step: 步进速度
        -->
       <js-seamless-scroll
-        :datas="datas"
+        :datas="Data"
         :v-model="true"
         direction="right"
         :isWatch="true"
@@ -22,8 +35,8 @@
         class="scroll"
       >
         <div style="display: flex;">
-          <div v-for="item in 12" :key="item" class="scroll-item">
-            <course-card></course-card>
+          <div v-for="item in Data" :key="item" class="scroll-item">
+            <CourseCard :Data="item"></CourseCard>
           </div>
         </div>
       </js-seamless-scroll>
@@ -50,25 +63,52 @@
     </div>
     <h2>课程列表</h2>
     <ul class="content">
-      <li v-for="item in 12" :key="item" class="content-item">
-        <course-card></course-card>
+      <li v-for="item in Data" :key="item" class="content-item">
+        <CourseCard :Data="item"></CourseCard>
       </li>
     </ul>
   </div>
-</template>
+</template> 
 <script>
 import CourseCard from "@/components/Course/CourseCard.vue";
 import { DArrowLeft, DArrowRight } from "@element-plus/icons";
+import { mapGetters, mapState } from "vuex";
 export default {
   components: {
-    "course-card": CourseCard,
+    CourseCard: CourseCard,
     DArrowLeft,
     DArrowRight,
   },
+  computed: {
+    ...mapState({
+      temp_search_data: (state) => state.search_data,
+    }),
+    ...mapState("course", {
+      temp_data: (state) => state.course_list,
+    }),
+    ...mapGetters("course", {
+      filterCourseList: "filterCourseList",
+    })
+  },
+  watch: {
+    temp_search_data() {
+      this.search_data = this.temp_search_data;
+      this.search_all_data(this.search_data);
+    },
+    temp_data() {
+      this.Data = this.formatData(this.temp_data);
+    },
+  },
+
+  created() {
+    this.$store.dispatch('course/getCourseList');
+    this.Data = this.formatData(this.temp_data);
+  },
   data() {
     return {
+      search_data: "",
       scroll_step: 0.6,
-      datas: [
+      Data: [
         {
           title: "Vue3.0 无缝滚动组件展示数据第1条",
           date: Date.now(),
@@ -89,13 +129,51 @@ export default {
           title: "Vue3.0 无缝滚动组件展示数据第5条",
           date: Date.now(),
         },
+        {
+          title: "Vue3.0 无缝滚动组件展示数据第5条",
+          date: Date.now(),
+        },
+        {
+          title: "Vue3.0 无缝滚动组件展示数据第5条",
+          date: Date.now(),
+        },
       ],
     };
   },
+  methods: {
+    search_all_data(val) {
+      this.Data = this.formatData(this.filterCourseList(this.temp_data, val));
+    },
+    formatData(val) {
+      return val.map((item) => ({
+        course_id: item.course_id,
+        course_name: item.course_name,
+        course_creator: item.course_creator,
+        course_cover: item.course_cover,
+      }));
+    },
+  }
 };
 </script>
+<style  lang="css">
+.input-with-select {
+  width: 230px;
+  float: right;
+  margin-top: -5%;
+  transform: translateY(-1px);
+}
+</style>
 
 <style scoped>
+
+/* .course-list {
+  width: 85%;
+  max-width: 1400px;
+  margin: 70px auto;
+  position: relative;
+  float: right;
+} */
+
 .course {
   width: 80%;
   min-width: 800px;

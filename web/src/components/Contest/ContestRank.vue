@@ -1,13 +1,11 @@
 <template>
   <div class="contest-rank-child">
     <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
+      :data="Data"
       size="mini"
       :stripe="true"
       :fit="true"
-      style="width: 100% ;"
+      style="width: 100%"
       :default-sort="{ prop: 'rank_id', order: 'scending' }"
     >
       <el-table-column prop="rank_id" label="排名"> </el-table-column>
@@ -16,7 +14,7 @@
       <el-table-column prop="solve_number" label="解题数"> </el-table-column>
       <el-table-column prop="solution_time" label="时间"> </el-table-column>
       <el-table-column
-        v-for="(item, index) in problem"
+        v-for="(item, index) in props.problem"
         :key="index"
         :prop="item.problem_num"
         :label="item.problem_num"
@@ -28,11 +26,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -40,57 +38,59 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
-export default {
-  name: "ContestRank",
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
-    },
-    problem: {
-      type: undefined,
-      default: [],
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+
+let props = defineProps({
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  problem: {
+    type: undefined,
+    default: <any>[],
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  emits: ["onLoading"],
-  mounted() {
-    this.$emit("onLoading");
-  },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-    formatProblemTime(row, column, cellValue) {
-      // console.log(row, column, cellValue);
-      if (cellValue) return `${cellValue.time} (${cellValue.num})`;
-      else return "00:00:00 (0)";
-    },
-  },
+});
+
+let emits = defineEmits(["onLoading", "handleSizeChange", "handleCurrentChange"]);
+onMounted(() => {
+  emits("onLoading");
+});
+let handleSizeChange = (val: number) => {
+  emits("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emits("handleCurrentChange", val);
+};
+
+let formatProblemTime = (row: any, column: any, cellValue: any) => {
+  // console.log(row, column, cellValue);
+  if (cellValue) return `${cellValue.time} (${cellValue.num})`;
+  else return "00:00:00 (0)";
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .contest-rank-child .table-header .el-select .el-input {
   width: 70px;
 }

@@ -1,11 +1,11 @@
 {
-    "db_host": "81.70.218.179",
+    "db_host": "124.71.143.224",
     "db_port": 3306,
-    "db_user": "JHCOJ",
+    "db_user": "jhcoj",
     "db_password": "12345678",
     "db_database": "jhcoj",
     
-    "server_host": "192.168.137.1",
+    "server_host": "10.46.24.178",
     "server_port": 8805,
     "file_server_port": 8806,
 

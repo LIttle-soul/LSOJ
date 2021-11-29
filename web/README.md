@@ -1,24 +1,174 @@
-# web
+# 已调整文件记录
 
-## Project setup
-```
-npm install
-```
+- api
+  - [ ] address.ts
+  - [ ] contest.ts
+  - [ ] course.ts
+  - [x] editor.ts
+  - [ ] forum.ts
+  - [ ] level.ts
+  - [ ] news.ts
+  - [x] problem.ts
+  - [ ] public.ts
+  - [ ] rank.ts
+  - [ ] school.ts
+  - [ ] solution.ts
+  - [x] user.ts
+- components
+  - [x] Address
+    - [x] AddressList.vue
+  - [ ] Contest
+    - [ ] ContestCount.vue
+    - [ ] ContestJoin.vue
+    - [x] ContestList.vue
+    - [ ] ContestProblem.vue
+    - [ ] ContestRank.vue
+    - [ ] ContestUser.vue
+  - [ ] Course
+    - [ ] Course.vue
+    - [ ] CourseCard.vue
+    - [ ] CourseContent.vue
+    - [ ] CourseList.vue
+  - [x] Editor
+    - [x] CodeEditor.vue
+    - [x] CodeHeader.vue
+    - [x] MarkdownEditor.vue
+  - [x] Footer
+    - [x] Footer.vue
+  - [ ] Forum
+  - [x] Header
+    - [x] Header.vue
+    - [x] LeftNav.vue
+  - [x] Home
+    - [x] ContestCard.vue
+    - [x] JournalismCard.vue
+    - [x] RankingCard.vue
+    - [x] StatisticsCard.vue
+  - [ ] Judger
+    - [ ] JudgerList.vue
+  - [ ] Level
+    - [ ] AddLevel.vue
+    - [ ] LevelList.vue
+  - [ ] News
+    - [ ] NewsList.vue
+  - [x] Other
+    - [x] CountDown.vue
+    - [x] Verification.vue
+  - [x] Problem
+    - [x] ProblemDataList.vue
+    - [x] ProblemHeader.vue
+    - [x] ProblemList.vue
+    - [x] ProblemNav.vue
+  - [x] Rank
+    - [x] RankList.vue
+  - [ ] School
+    - [ ] ClassList.vue
+    - [ ] CollegeList.vue
+    - [x] SchoolList.vue
+  - [x] Solution
+    - [x] SolutionContent.vue
+    - [x] SolutionHeader.vue
+    - [x] SolutionList.vue
+  - [x] User
+    - [x] SignUp.vue
+    - [x] TeamList.vue
+    - [x] TeamRegistration.vue
+    - [x] UserInfoCard.vue
+    - [x] UserList.vue
+- config
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+  - [x] adminNav.ts
+  - [ ] adminSetting.ts
+  - [x] codeData.ts
+  - [x] userNav.ts
+  - [x] userSettings.ts
 
-### Compiles and minifies for production
-```
-npm run build
-```
+- layout
 
-### Lints and fixes files
-```
-npm run lint
-```
+  - [x] Admin.vue
+  - [x] User.vue
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- router
+
+  - modules
+    - [x] user.ts
+    - [x] admin.ts
+  - [x] index.ts
+
+- store
+
+  - modules
+    - [ ] address.ts
+    - [ ] admin.ts
+    - [x] code.ts
+    - [ ] contest.ts
+    - [ ] course.ts
+    - [ ] forum.ts
+    - [ ] level.ts
+    - [ ] news.ts
+    - [x] problem.ts
+    - [ ] rank.ts
+    - [ ] school.ts
+    - [ ] solution.ts
+    - [x] user.ts
+  - [x] index.ts
+
+- utils
+  - [x] http.ts
+  - [ ] loadData.ts
+  - [x] storage.ts
+- views
+
+  - Admin
+    - [x] Address
+    - [ ] Contest
+    - [ ] Course
+    - [ ] Forum
+    - [ ] Judger
+    - [ ] Level
+    - [ ] News
+    - [x] Problem
+    - [ ] School
+    - [x] User
+  - Teacher
+    - [ ] index.vue
+  - User
+    - [x] Contest
+      - [x] ContestData.vue
+      - [x] ContestList.vue
+      - [x] ContestShow.vue
+    - [ ] Course
+      - [ ] CourseList.vue
+      - [ ] CourseShow.vue
+    - [ ] Forum
+      - [ ] ForumList.vue
+      - [ ] ForumShow.vue
+    - [x] Home
+      - [x] Home.vue
+      - [x] About.vue
+    - [ ] Level
+      - [ ] LevelList.vue
+      - [ ] LevelShow.vue
+    - [x] News
+      - [x] NewsList.vue
+      - [x] NewsShow.vue
+    - [x] Problem
+      - [x] ProblemList.vue
+      - [x] ProblemShow.vue
+    - [x] Rank
+      - [x] RankList.vue
+    - [x] Solution
+      - [x] SolutionList.vue
+    - [x] User
+      - [x] PerfectUserInfo.vue
+      - [x] ShowUserInfo.vue
+      - [x] UserStatus.vue
+  - Public
+    - [x] 404.vue
+    - [x] ForgetPassword.vue
+    - [x] Login.vue
+    - [ ] LoginRegister.vue
+    - [x] Register.vue
+
+- [x] app.vue
+- [x] main.ts

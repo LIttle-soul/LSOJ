@@ -3,13 +3,11 @@
     <el-card class="user-info">
       <el-descriptions :column="1">
         <template #title>
-          <i class="el-icon-user-solid"></i>
+          <el-icon size="1.6rem"><user /></el-icon>
           用户信息
         </template>
         <template #extra>
-          <el-button type="text" size="mini" @click="ChangeUserInfo"
-            >修改信息</el-button
-          >
+          <el-button type="text" size="mini" @click="changeUserInfo">修改信息</el-button>
         </template>
         <el-descriptions-item label="我的账号:">{{
           user_data.user_id
@@ -27,10 +25,10 @@
           user_data.user_score
         }}</el-descriptions-item>
         <el-descriptions-item label="我的电话:">{{
-          user_data.user_telephone
+          user_data.user_telephone || "未绑定"
         }}</el-descriptions-item>
         <el-descriptions-item label="我的邮箱:"
-          >{{ user_data.user_email }}
+          >{{ user_data.user_email || "未绑定" }}
           <el-button size="mini" type="success" @click="dialogBingEmail = true"
             >绑定邮箱</el-button
           >
@@ -39,18 +37,16 @@
           user_data.user_sex == 0 ? "男" : "女"
         }}</el-descriptions-item>
         <el-descriptions-item label="我的生日:">{{
-          this.$dayJS(user_data.user_birthday).format("YYYY年MM月DD日")
+          dayJS(user_data.user_birthday).format("YYYY年MM月DD日")
         }}</el-descriptions-item>
         <el-descriptions-item label="我的注册时间:">{{
-          this.$dayJS(user_data.registration_time).format(
-            "YYYY年MM月DD日 HH:mm:ss"
-          )
+          dayJS(user_data.registration_time).format("YYYY年MM月DD日 HH:mm:ss")
         }}</el-descriptions-item>
         <el-descriptions-item label="我的地址:">{{
-          user_data.user_address ? user_data.user_address.address_name : ""
+          user_data.user_address?.address_name || ""
         }}</el-descriptions-item>
         <el-descriptions-item label="我的学校:">{{
-          user_data.user_school ? user_data.user_school.school_name : ""
+          user_data.user_school?.school_name || ""
         }}</el-descriptions-item>
         <el-descriptions-item label="我的学号:">{{
           user_data.student_id
@@ -67,18 +63,18 @@
       </el-descriptions>
     </el-card>
     <el-dialog title="绑定邮箱" v-model="dialogBingEmail" width="400px">
-      <el-form label-width="80px">
-        <el-form-item label="邮箱"
-          ><el-input v-model="user_data.user_email"></el-input
+      <el-form label-width="80px" :model="email_form" :rules="email_rules">
+        <el-form-item label="邮箱" prop="new_email"
+          ><el-input v-model="email_form.new_email"></el-input
         ></el-form-item>
         <el-form-item label="验证码"
-          ><el-input v-model="email_code">
+          ><el-input v-model="email_form.email_code">
             <template #append>
               <el-button
                 type="info"
-                @click="sendEmail(user_data.user_email)"
+                @click="sendEmail(email_form)"
                 :disabled="send_email_button.status"
-                style="width: 120px; padding: 0; font-size: 10px;"
+                style="width: 120px; padding: 0; font-size: 10px"
                 >{{ send_email_button.text }}</el-button
               >
             </template>
@@ -87,153 +83,217 @@
       </el-form>
       <template #footer>
         <el-button @click="dialogBingEmail = false">取消</el-button>
-        <el-button type="primary" @click="bindUserEmail(user_data.user_email)"
-          >确定</el-button
-        >
+        <el-button type="primary" @click="bindEmail(email_form)">确定</el-button>
       </template>
     </el-dialog>
     <el-dialog title="团队管理" v-model="dialogBingTeam" width="95%">
       <el-tabs type="border-card" class="team-admin">
         <el-tab-pane label="我创建的团队">
-          <TeamList :is_delete_power="true" :Data="my_create_team_list" />
+          <TeamList
+            :is_delete_power="true"
+            :Data="my_create_team_list"
+            @reload="getMyTeamList('create')"
+          />
         </el-tab-pane>
         <el-tab-pane label="我加入的团队">
-          <TeamList :Data="my_join_team_list" />
+          <TeamList :Data="my_join_team_list" @reload="getMyTeamList('join')" />
         </el-tab-pane>
       </el-tabs>
       <el-button type="primary" @click="team_reg = true">创建队伍</el-button>
-      <el-button type="primary" @click="joinTeam">加入队伍</el-button>
-      <el-dialog v-model="team_reg" title="团队注册" width="400px">
-        <TeamReg />
-      </el-dialog>
+      <el-button type="primary" @click="joinTeamBox">加入队伍</el-button>
+    </el-dialog>
+    <el-dialog v-model="team_reg" title="团队注册">
+      <teamReg
+        @reloadTeamData="
+          () => {
+            getMyTeamList('create');
+            getMyTeamList('join');
+            team_reg = false;
+          }
+        "
+      />
     </el-dialog>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex";
-import { defineAsyncComponent } from "@vue/runtime-core";
+<script lang="ts" setup>
+import { ref, computed, watchEffect, reactive, onMounted } from "vue";
+import { useStore, mapGetters, mapState } from "vuex";
+import { useRouter } from "vue-router";
 import { sendEmailCode, bindUserEmail } from "@/api/user";
-export default {
-  components: {
-    TeamReg: defineAsyncComponent(() =>
-      import("@/components/User/TeamRegistration")
-    ),
-    TeamList: defineAsyncComponent(() => import("@/components/User/TeamList")),
-  },
-  computed: {
-    ...mapState("user", {
-      user_data: (state) => state.user_info,
-      team_list: (state) => state.team_list,
-    }),
-    ...mapGetters("user", {
-      getMyCreateTeamList: "getMyCreateTeamList",
-      getMyJoinTeamList: "getMyJoinTeamList",
-    }),
-  },
-  watch: {
-    team_list() {
-      this.my_join_team_list = this.formatTeamData(this.getMyJoinTeamList());
-      this.my_create_team_list = this.formatTeamData(
-        this.getMyCreateTeamList()
-      );
-    },
-  },
-  created() {
-    this.my_join_team_list = this.formatTeamData(this.getMyJoinTeamList());
-    this.my_create_team_list = this.formatTeamData(this.getMyCreateTeamList());
-  },
-  data() {
-    return {
-      email_code: "",
-      send_email_button: {
-        status: false,
-        text: "获取验证码",
-      },
-      team_reg: false,
-      dialogBingEmail: false,
-      dialogBingTeam: false,
-      user_power_list: ["超级管理员", "管理员", "教师", "志愿者", "普通用户"],
-      my_join_team_list: [],
-      my_create_team_list: [],
-    };
-  },
-  methods: {
-    ChangeUserInfo() {
-      this.$router.push("/perfectuserinfo");
-    },
-    async sendEmail(user_email) {
-      this.send_email_button.status = true;
-      let back_data = await sendEmailCode({
-        email: user_email,
-      });
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        let time_out = 60;
-        let inter = setInterval(() => {
-          this.send_email_button.text = "请在" + time_out + "秒后再试";
-          time_out--;
-          if (time_out <= 0) {
-            this.send_email_button.status = false;
-            this.send_email_button.text = "获取验证码";
-            clearInterval(inter);
-          }
-        }, 1000);
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    async bindUserEmail(user_email) {
-      let back_data = await bindUserEmail({
-        email: user_email,
-        code: this.email_code,
-      });
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("user/getUserInfo");
-        this.dialogBingEmail = false;
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    joinTeam() {
-      console.log("join team");
-    },
-    deleteTeam() {
-      console.log("delete team");
-    },
-    formatTeamData(val) {
-      // console.log(val);
-      return val.map((item) => ({
-        team_id: item.class_id,
-        team_nick: item.class_name,
-        team_creator: item.class_creator,
-        team_user_list: item.user_list,
-        team_school: item.class_college,
-        team_type: item.class_type,
-        registration_time: this.$dayJS(item.create_time).format(
-          "YYYY-MM-DD HH:mm:ss"
-        ),
-        team_introduce: item.class_introduce,
-      }));
-    },
-  },
+import { ElMessage, ElMessageBox } from "element-plus";
+import { User } from "@element-plus/icons";
+import dayJS from "dayjs";
+
+import teamReg from "@/components/User/TeamRegistration.vue";
+import teamList from "@/components/User/TeamList.vue";
+import { getTeamList, joinTeamByCode } from "@/api/user";
+
+let store = useStore();
+let router = useRouter();
+
+// 数据绑定
+let send_email_button = ref({
+  status: false,
+  text: "获取验证码",
+});
+
+let team_reg = ref(false);
+let dialogBingEmail = ref(false);
+let dialogBingTeam = ref(false);
+
+let user_power_list = ["超级管理员", "管理员", "教师", "志愿者", "普通用户"];
+let my_join_team_list = ref([]);
+let my_create_team_list = ref([]);
+
+let email_form = ref({
+  new_email: "",
+  email_code: "",
+});
+
+let email_rules = reactive({
+  new_email: [
+    { required: true, message: "邮箱不能为空", trigger: "blur" },
+    { type: "email", message: "邮箱格式错误", trigger: ["blur", "change"] },
+  ],
+});
+
+// Vuex数据获取
+let user_data: any = computed(
+  mapState("user", ["user_info"]).user_info.bind({ $store: store })
+);
+
+// console.log(user_data);
+let team_list = ref("");
+
+// 事件绑定
+let changeUserInfo = () => {
+  router.push({ path: "/perfectuserinfo" });
 };
+
+let sendEmail = async (form: any) => {
+  if (!send_email_button.value.status) {
+    send_email_button.value.status = true;
+    let back_data = await sendEmailCode({
+      email: form.new_email,
+    });
+    if (back_data.status) {
+      ElMessage({
+        type: "success",
+        message: back_data.message,
+      });
+      let time_out = 60;
+      let inter = setInterval(() => {
+        if (time_out > 0) {
+          send_email_button.value.text = "请在" + time_out + "秒后再试";
+          time_out--;
+        } else {
+          send_email_button.value.status = false;
+          send_email_button.value.text = "获取验证码";
+          clearInterval(inter);
+        }
+      }, 1000);
+    } else {
+      ElMessage({
+        type: "error",
+        message: back_data.message,
+      });
+    }
+  }
+};
+
+let bindEmail = async (form: any) => {
+  // console.log(form);
+  let back_data = await bindUserEmail({
+    email: form.new_email,
+    code: form.email_code,
+  });
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    store.dispatch("user/getUserInfo");
+    dialogBingEmail.value = false;
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+let joinTeamBox = () => {
+  ElMessageBox.prompt("请输入你要加入的团队邀请码", "邀请码加入", {
+    confirmButtonText: "提交",
+    cancelButtonText: "取消",
+  })
+    .then(({ value }: any) => {
+      joinTeam(value);
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "取消加入",
+      });
+    });
+};
+
+let formatTeamData = (val: any) => {
+  return val.map((item: any) => ({
+    team_id: item.team_id,
+    team_nick: item.team_nick,
+    team_creator: item.team_creator,
+    team_user_list: item.user_list,
+    team_teacher: item.team_teacher,
+    team_school: item.school_name,
+    registration_time: dayJS(item.registration_time).format("YYYY-MM-DD HH:mm:ss"),
+    team_introduce: item.team_introduce,
+    invitation_code: item.invitation_code,
+  }));
+};
+
+let getMyTeamList = async (val: string) => {
+  let back_data = await getTeamList({
+    page: 1,
+    total: 500,
+    text: "",
+    mode: val,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    if (val === "join") {
+      my_join_team_list.value = formatTeamData(back_data.message);
+    } else if (val === "create") {
+      my_create_team_list.value = formatTeamData(back_data.message);
+    }
+  }
+};
+
+let joinTeam = async (val: string) => {
+  let back_data = await joinTeamByCode({
+    code: val,
+  });
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    getMyTeamList("join");
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+onMounted(() => {
+  getMyTeamList("join");
+  getMyTeamList("create");
+});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .user-info {
   border-radius: 20px;
   text-align: left;

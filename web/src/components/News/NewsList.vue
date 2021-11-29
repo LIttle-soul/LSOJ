@@ -1,36 +1,38 @@
 <template>
   <div class="news-list-child">
     <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
+      :data="Data"
       size="mini"
       @cell-click="showNews"
       :stripe="true"
       :fit="true"
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column prop="news_id" label="新闻编号"> </el-table-column>
       <el-table-column prop="news_title" label="新闻标题"> </el-table-column>
       <el-table-column prop="news_time" label="创建时间"> </el-table-column>
       <el-table-column prop="news_creator" label="创建者"> </el-table-column>
       <el-table-column prop="news_importance" label="优先级"> </el-table-column>
-      <el-table-column fixed="right" width="90px" label="操作" v-if="admin">
+      <el-table-column fixed="right" width="80px" label="操作" v-if="admin">
         <template #default="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            circle
-            icon="el-icon-edit"
-            @click="handleEditClick(scope.row)"
-          ></el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            circle
-            icon="el-icon-delete"
-            @click="handleDeleteClick(scope.row)"
-          ></el-button>
+          <div class="button-box">
+            <el-button
+              size="mini"
+              type="primary"
+              circle
+              @click="handleEditClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-pencil-square"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              circle
+              @click="handleDeleteClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-trash"></i></el-icon>
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -38,11 +40,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -50,72 +52,88 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref } from "vue";
 import { deleteNewsData } from "@/api/news";
-export default {
-  name: "UserNewsList",
-  props: {
-    admin: {
-      type: Boolean,
-      default: false,
-    },
-    Data: {
-      type: undefined,
-      default: [],
+import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+let store = useStore();
+let router = useRouter();
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: false,
+  },
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-    showNews(row) {
-      if (!this.admin) {
-        this.$router.push("/shownews/" + row.news_id);
-      }
-    },
-    handleEditClick(row) {
-      this.$router.push("/admin/addnews/" + row.news_id);
-    },
-    async handleDeleteClick(row) {
-      let back_data = await deleteNewsData(row.news_id);
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("news/getNewsList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-  },
+});
+
+let emit = defineEmits(["handleSizeChange", "handlePageChange", "reloadData"]);
+
+let handleSizeChange = (val: number) => {
+  emit("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emit("handlePageChange", val);
+};
+
+let showNews = (row: any) => {
+  if (!props.admin) {
+    router.push("/shownews/" + row.news_id);
+  }
+};
+let handleEditClick = (row: any) => {
+  router.push("/admin/addnews/" + row.news_id);
+};
+let handleDeleteClick = async (row: any) => {
+  let back_data = await deleteNewsData({
+    news_id: row.news_id,
+  });
+  if (back_data.status) {
+    emit("reloadData");
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.button-box {
+  display: flex;
+  justify-content: space-around;
+}
 .news-list-child .pagination-2 {
   display: none;
 }

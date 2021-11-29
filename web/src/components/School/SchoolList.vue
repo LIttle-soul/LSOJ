@@ -1,42 +1,33 @@
 <template>
   <div class="school-list-child">
-    <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
-      size="mini"
-      :stripe="true"
-      :fit="true"
-      style="width: 100%;"
-    >
+    <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
       <el-table-column prop="school_id" label="学校编号"> </el-table-column>
       <el-table-column prop="school_name" label="学校名称"> </el-table-column>
-      <el-table-column prop="school_describe" label="学校描述">
-      </el-table-column>
-      <el-table-column prop="school_department" label="主管部门">
-      </el-table-column>
+      <el-table-column prop="school_describe" label="学校描述"> </el-table-column>
+      <el-table-column prop="school_department" label="主管部门"> </el-table-column>
       <el-table-column prop="school_rank" label="办学层次"> </el-table-column>
       <el-table-column prop="school_remark" label="学校备注"> </el-table-column>
-      <el-table-column prop="school_municipality" label="学校所在城市">
-      </el-table-column>
-      <el-table-column fixed="right" width="125px" label="操作">
+      <el-table-column prop="school_municipality" label="学校所在城市"> </el-table-column>
+      <el-table-column fixed="right" width="80px" label="操作">
         <template #default="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            circle
-            icon="el-icon-edit"
-            @click="handleEditClick(scope.row)"
-          >
-          </el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            circle
-            icon="el-icon-delete"
-            @click="handleDeleteClick(scope.row)"
-          >
-          </el-button>
+          <div class="button-box">
+            <el-button
+              size="mini"
+              type="primary"
+              circle
+              @click="handleEditClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-pencil-square"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              circle
+              @click="handleDeleteClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-trash"></i></el-icon>
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -44,11 +35,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -56,55 +47,68 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
-export default {
-  name: "schoolListChild",
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
+<script lang="ts" setup>
+import { ref } from "vue";
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: false,
+  },
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    handleEditClick() {
-      this.$router.push({
-        name: "AdminAddschool",
-      });
-    },
-    handleCheckClick() {
-      console.log(this.Data);
-    },
-    handleDeleteClick(val) {
-      console.log(val);
-    },
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-  },
+});
+
+// 向父组件传送事件
+let emit = defineEmits(["handleSizeChange", "handlePageChange", "reload"]);
+
+// 页面跳转
+let handleSizeChange = (val: number) => {
+  emit("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emit("handlePageChange", val);
+};
+
+// 事件相关操作函数
+let handleEditClick = (val: any) => {
+  console.log(val);
+};
+let handleCheckClick = (val: any) => {
+  console.log(val);
+};
+let handleDeleteClick = (val: any) => {
+  console.log(val);
 };
 </script>
 
-<style scope>
+<style scope lang="scss">
+.button-box {
+  display: flex;
+  justify-content: space-around;
+}
 .school-list-child .pagination-2 {
   display: none;
 }

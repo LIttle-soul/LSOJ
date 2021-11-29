@@ -1,9 +1,3 @@
 <template>
-  <div>Hello,World</div>
+  <div class="page">Hello</div>
 </template>
-
-<script>
-export default {};
-</script>
-
-<style scoped></style>

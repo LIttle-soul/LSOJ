@@ -1,13 +1,5 @@
 <template>
-  <el-table
-    :data="
-      Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-    "
-    size="mini"
-    :stripe="true"
-    :fit="true"
-    style="width: 100%;"
-  >
+  <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
     <el-table-column prop="user_id" label="用户账号"></el-table-column>
     <el-table-column prop="user_name" label="真实姓名"></el-table-column>
     <el-table-column prop="user_school" label="用户学校"></el-table-column>
@@ -31,20 +23,22 @@
     </el-table-column>
     <el-table-column fixed="right" width="90px" label="操作" v-if="admin">
       <template #default="scope">
-        <el-button
-          size="mini"
-          type="success"
-          circle
-          icon="el-icon-check"
-          @click="handleCheckClick(scope.row)"
-        ></el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          circle
-          icon="el-icon-close"
-          @click="handleDeleteClick(scope.row)"
-        ></el-button>
+        <div class="button-box">
+          <el-button
+            size="mini"
+            type="success"
+            circle
+            @click="handleCheckClick(scope.row)"
+            ><el-icon :size="16"><i class="bi bi-check-lg"></i></el-icon
+          ></el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            circle
+            @click="handleDeleteClick(scope.row)"
+            ><el-icon :size="16"><i class="bi bi-trash"></i></el-icon
+          ></el-button>
+        </div>
       </template>
     </el-table-column>
   </el-table>
@@ -52,11 +46,11 @@
     class="pagination-1"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
-    :current-page="current_page"
+    :current-page="page.page"
     :page-sizes="[20, 50, 100, 200]"
-    :page-size="page_sizes"
+    :page-size="page.page_size"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="Data.length"
+    :total="page.total"
     :hide-on-single-page="true"
   >
   </el-pagination>
@@ -64,88 +58,95 @@
     class="pagination-2"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
-    :current-page="current_page"
+    :current-page="page.page"
     :page-sizes="[20, 50, 100, 200]"
-    :page-size="page_sizes"
+    :page-size="page.page_size"
     layout="prev, pager, next"
-    :total="Data.length"
+    :total="page.total"
     :hide-on-single-page="true"
   >
   </el-pagination>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref } from "vue";
+import { ElMessage } from "element-plus";
 import { agreeContestUser, deleteContestUser } from "@/api/contest";
-export default {
-  props: {
-    admin: {
-      type: Boolean,
-      default: true,
-    },
-    Data: {
-      type: undefined,
-      default: [],
-    },
-    contest_id: {
-      type: Number,
-      default: null,
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: true,
+  },
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  contest_id: {
+    type: Number,
+    default: null,
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  emits: ["success"],
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-    async handleCheckClick(row) {
-      let back_data = await agreeContestUser({
-        contest_id: this.contest_id,
-        user_id: row.user_id,
-      });
-      if (back_data.status) {
-        this.$emit("success");
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    async handleDeleteClick(row) {
-      let back_data = await deleteContestUser({
-        contest_id: this.contest_id,
-        user_id: row.user_id,
-      });
-      if (back_data.status) {
-        this.$emit("success");
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-  },
+});
+
+let emits = defineEmits(["success", "handleSizeChange", "handlePageChange"]);
+
+let handleSizeChange = (val: number) => {
+  emits("handleSizeChange", val);
+};
+let handleCurrentChange = (val: number) => {
+  emits("handlePageChange", val);
+};
+let handleCheckClick = async (row: any) => {
+  let back_data = await agreeContestUser({
+    contest_id: props.contest_id,
+    user_id: row.user_id,
+  });
+  if (back_data.status) {
+    emits("success");
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let handleDeleteClick = async (row: any) => {
+  let back_data = await deleteContestUser({
+    contest_id: props.contest_id,
+    user_id: row.user_id,
+  });
+  if (back_data.status) {
+    emits("success");
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.button-box {
+  display: flex;
+  justify-content: space-around;
+}
 .pagination-2 {
   display: none;
 }

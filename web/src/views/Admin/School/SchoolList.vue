@@ -1,141 +1,201 @@
 <template>
   <div class="school-list">
-    <div class="echart">
-      <!-- 此处用于添加图表信息 -->
-    </div>
-    <div class="list">
-      <el-card>
-        <template #header>
-          <div class="table-header">
-            <i class="el-icon-notebook-2"></i>
+    <el-card>
+      <template #header>
+        <div class="table-header">
+          <div class="header-left">
+            <el-icon :size="25" class="icon"><i class="bi bi-building"></i></el-icon>
             学校管理
           </div>
           <el-input
             placeholder="请输入内容"
-            size="mini"
-            v-model="search_data"
+            size="small"
+            v-model="search_text"
             class="input-with-select"
+            @keydown.enter="search_all_data(search_text)"
           >
+            <template #prefix>
+              <el-icon
+                color="#AAAAAA"
+                style="font-size: 1.1rem; transform: translateY(7px)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1024 1024"
+                  data-v-394d1fd8=""
+                >
+                  <path
+                    fill="currentColor"
+                    d="m795.904 750.72 124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704 352 352 0 0 0 0 704z"
+                  ></path>
+                </svg>
+              </el-icon>
+            </template>
             <template #append>
-              <el-button
-                icon="el-icon-search"
-                @click="search_all_data"
-              ></el-button>
+              <el-button @click="search_all_data(search_text)">搜索</el-button>
             </template>
           </el-input>
-        </template>
-        <div>
-          <SchoolList :Data="Data" />
         </div>
-      </el-card>
-    </div>
+      </template>
+      <div>
+        <SchoolList
+          :admin="true"
+          :Data="Data"
+          :page="page"
+          @handleSizeChange="handleSizeChange"
+          @handlePageChange="handlePageChange"
+          @reload="getData"
+        />
+      </div>
+    </el-card>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import SchoolList from "@/components/School/SchoolList.vue";
-import { mapState } from "vuex";
+import { useStore, mapState } from "vuex";
+import { ref, computed, watch, onMounted } from "vue";
+import { ElLoading, ElMessage } from "element-plus";
+import { getSchoolList } from "@/api/school";
 
-export default {
-  computed: {
-    ...mapState({
-      temp_search_data: (state) => state.search_data,
-    }),
-    ...mapState("school", {
-      temp_data: (state) => state.school_list,
-    }),
+let store = useStore();
+let temp_search_data = computed(
+  mapState(["search_data"]).search_data.bind({ $store: store })
+);
+watch(temp_search_data, (new_val: string) => {
+  console.log(new_val);
+});
+let search_text = ref("");
+let Data = ref([
+  {
+    school_id: "4265051060",
+    school_name: "新疆工业职业技术学院",
+    school_describe: null,
+    school_department: "",
+    school_rank: "专科",
+    school_remark: "",
+    school_municipality: "新疆维吾尔自治区",
   },
-  watch: {
-    temp_search_data() {
-      this.search_data = this.temp_search_data;
-      this.search_all_data();
-    },
-    temp_data() {
-      this.Data = this.formatData(this.temp_data);
-    },
+  {
+    school_id: "4262051378",
+    school_name: "甘肃财贸职业学院",
+    school_describe: null,
+    school_department: "",
+    school_rank: "专科",
+    school_remark: "",
+    school_municipality: "甘肃省",
   },
-  created() {
-    this.Data = this.formatData(this.temp_data);
-  },
-  components: {
-    SchoolList: SchoolList,
-  },
-  data() {
-    return {
-      search_data: "",
-      Data: [
-        {
-          school_id: "4265051060",
-          school_name: "新疆工业职业技术学院",
-          school_describe: null,
-          school_department: "",
-          school_rank: "专科",
-          school_remark: "",
-          school_municipality: "新疆维吾尔自治区",
-        },
-        {
-          school_id: "4262051378",
-          school_name: "甘肃财贸职业学院",
-          school_describe: null,
-          school_department: "",
-          school_rank: "专科",
-          school_remark: "",
-          school_municipality: "甘肃省",
-        },
-      ],
-    };
-  },
-  methods: {
-    search_all_data() {
-      console.log("Hello");
-    },
-    formatData(val) {
-      return val.map((item) => ({
-        school_id: item.school_id,
-        school_name: item.school_name,
-        school_describe: item.school_describe,
-        school_department: item.school_department,
-        school_rank: item.school_rank,
-        school_remark: item.school_remark,
-        school_municipality: item.school_municipality.municipality_name,
-      }));
-    },
-  },
+]);
+let page = ref({
+  page: 1,
+  page_size: 50,
+  total: 0,
+  text: "",
+});
+
+// 事件处理函数
+let search_all_data = (val: string) => {
+  page.value.text = val;
+  getData();
 };
+
+let handleSizeChange = (val: number) => {
+  page.value.page_size = val;
+  getData();
+};
+
+let handlePageChange = (val: number) => {
+  page.value.page = val;
+  getData();
+};
+
+// 数据格式化
+let formatData = (val: any) => {
+  return val.map((item: any) => ({
+    school_id: item.school_id,
+    school_name: item.school_name,
+    school_describe: item.school_describe,
+    school_department: item.school_department,
+    school_rank: item.school_rank,
+    school_remark: item.school_remark,
+    school_municipality: item.school_municipality.municipality_name,
+  }));
+};
+
+// 数据获取
+let getData = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中......",
+    background: "rgba(0,0,0,0.7)",
+  });
+  let back_data = await getSchoolList({
+    page: page.value.page,
+    total: page.value.page_size,
+    text: page.value.text,
+    municipality_id: "",
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    Data.value = formatData(back_data.message);
+    page.value.total = back_data.total;
+    loading.close();
+  } else {
+    loading.close();
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+// 自动加载数据
+onMounted(() => {
+  getData();
+});
 </script>
-<style>
-.school-list .el-card__header {
-  height: 60px;
+<style lang="scss">
+.school-list {
+  .el-card__header {
+    height: 60px;
+    padding: 10px;
+  }
 }
 </style>
-<style scoped>
-.school-list .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-  height: 30px;
-  width: 50%;
-  min-width: 210px;
-  float: left;
-}
-.school-list .input-with-select {
-  width: 205px;
-  float: right;
-  margin-right: 10px;
-  transform: translateY(-1px);
-}
+
+<style scoped lang="scss">
 .school-list {
   width: 95%;
   max-width: 1200px;
   margin: 70px auto;
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 3px;
+    height: 30px;
+    min-width: 210px;
+    .header-left {
+      font: 1.2em "楷体";
+      letter-spacing: 3px;
+      .icon {
+        transform: translateY(5px);
+      }
+    }
+    .input-with-select {
+      width: 230px;
+      margin-right: 10px;
+      margin-top: 5px;
+    }
+    @media screen and (max-width: 600px) {
+      .input-with-select {
+        display: none;
+      }
+    }
+  }
 }
 @media screen and (max-width: 1000px) {
   .school-list {
     width: 100%;
-  }
-}
-@media screen and (max-width: 600px) {
-  .school-list .input-with-select {
-    display: none;
   }
 }
 </style>

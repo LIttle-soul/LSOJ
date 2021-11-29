@@ -2,29 +2,31 @@
   <div class="perfect">
     <!-- 基础信息修改完善 -->
     <el-card class="box-card">
-      <h1 style="margin-bottom: 20px;">
-        <i class="el-icon-s-tools"></i> {{ form_title }}
+      <h1 style="margin-bottom: 20px">
+        <el-icon size="1.4em"><setting /></el-icon> {{ form_title }}
       </h1>
-      <el-form ref="form" :model="user_form" label-width="80px" size="mini">
-        <el-form-item label="真实姓名">
+      <el-form
+        ref="form_ref"
+        :model="user_form"
+        :rules="user_form_rules"
+        label-width="80px"
+        size="mini"
+      >
+        <el-form-item label="真实姓名" prop="user_name">
           <el-input
             placeholder="好汉，留名不杀"
             v-model="user_form.user_name"
             :disabled="activate"
           ></el-input>
         </el-form-item>
-        <el-form-item label="个人昵称">
+        <el-form-item label="个人昵称" prop="user_nick">
           <el-input
             placeholder="有趣的灵魂总能相遇"
             v-model="user_form.user_nick"
           ></el-input>
         </el-form-item>
         <el-form-item label="我的性别">
-          <el-radio-group
-            v-model="user_form.user_sex"
-            size="medium"
-            :disabled="activate"
-          >
+          <el-radio-group v-model="user_form.user_sex" size="medium" :disabled="activate">
             <el-radio :label="0">男</el-radio>
             <el-radio :label="1">女</el-radio>
           </el-radio-group>
@@ -37,13 +39,13 @@
             v-model="user_form.user_introduce"
           ></el-input>
         </el-form-item>
-        <el-form-item label="我的电话">
+        <el-form-item label="我的电话" prop="user_telephone">
           <el-input
             placeholder="怕我找你？切！懒得理你"
             v-model="user_form.user_telephone"
           ></el-input>
         </el-form-item>
-        <el-form-item label="我的生日">
+        <el-form-item label="我的生日" prop="user_birthday">
           <el-date-picker
             v-model="user_form.user_birthday"
             type="date"
@@ -58,8 +60,7 @@
           <el-cascader
             placeholder="别怕，这是你学校的地址"
             v-model="user_form.user_address"
-            :options="city_list"
-            :filterable="true"
+            :props="address_list"
             :clearable="true"
           >
           </el-cascader>
@@ -68,8 +69,7 @@
           <el-cascader
             placeholder="想知道你的校友有谁吗？"
             v-model="user_form.user_school"
-            :options="school_list"
-            :filterable="true"
+            :props="school_list"
             :clearable="true"
           >
           </el-cascader>
@@ -79,8 +79,7 @@
             placeholder="想知道和你同班的有谁吗？"
             v-model="user_form.user_class"
             :disabled="user_form.user_school == ''"
-            :options="class_list"
-            :filterable="true"
+            :props="class_list"
             :clearable="true"
           >
           </el-cascader>
@@ -93,119 +92,233 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script lang="ts" setup>
+import { computed, reactive, ref, unref } from "vue";
+import { useStore, mapState } from "vuex";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { Setting } from "@element-plus/icons";
 import { submitUserInfoForm } from "@/api/user";
+import dayJS from "dayjs";
+import { getAddressList } from "@/api/address";
+import { getSchoolList } from "@/api/school";
 
-export default {
-  computed: {
-    ...mapState("address", {
-      city_list: (state) =>
-        state.address_list.map((item) => ({
-          value: item.id,
-          label: item.name,
-          children: item.children.map((item2) => ({
-            value: item2.id,
-            label: item2.name,
-          })),
-        })),
-    }),
-    ...mapState("school", {
-      school_list: (state) =>
-        state.school_list.map((item) => ({
-          value: item.school_id,
-          label: item.school_name,
-        })),
-    }),
-    ...mapState("user", {
-      user_info: (state) => state.user_info,
-    }),
-  },
-  watch: {
-    user_info() {
-      this.inputUserInfo(this.user_info);
+let store = useStore();
+let router = useRouter();
+
+// Vuex 数据获取
+let store_user_info = computed(
+  mapState("user", ["user_info"]).user_info.bind({ $store: store })
+);
+
+// 相关信息填充
+let form_title = "基础信息完善";
+let activate = ref(false);
+let school_status = ref(false);
+
+// console.log(store_user_info.value);
+
+let user_form = ref({
+  user_name: store_user_info.value?.user_name || "",
+  user_nick: store_user_info.value?.user_nick || "",
+  user_introduce: store_user_info.value?.user_introduce || "",
+  user_telephone: store_user_info.value?.user_telephone || "",
+  user_birthday: dayJS(store_user_info.value?.user_birthday || "2000-01-01").format(
+    "YYYY-MM-DD"
+  ),
+  user_school: store_user_info.value?.user_school.school_id.split(",") || "",
+  user_class: store_user_info.value?.user_class?.class_id.split(",") || "",
+  user_address: store_user_info.value?.user_address?.address_id.split(",") || "",
+  user_sex: store_user_info.value?.user_sex || 0,
+});
+
+// 数据验证
+let form_ref = ref();
+let user_form_rules = reactive({
+  user_name: [
+    { required: true, message: "姓名不能为空", trigger: "blur" },
+    { min: 1, max: 20, message: "姓名必须在2-20个字符之间", trigger: "blur" },
+  ],
+  user_nick: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
+  user_telephone: [
+    {
+      type: "string",
+      required: false,
+      pattern: /^[1]([3-9])[0-9]{9}$/,
+      message: "请输入正确的电话号码",
+      trigger: "blur",
     },
+  ],
+  user_birthday: [{ required: true, message: "生日不允许为空", trigger: "blur" }],
+});
+
+// 懒加载数据请求
+let address_list = ref({
+  lazy: true,
+  lazyLoad(node: any, resolve: any) {
+    const { level, value } = node;
+    // console.log(level, value);
+    switch (level) {
+      case 0:
+        getAddress("", 0, "province", resolve);
+        break;
+      case 1:
+        getAddress("province", value, "municipality", resolve);
+        break;
+      case 2:
+        getAddress("municipality", value, "district", resolve);
+        break;
+      case 3:
+        getAddress("district", value, "township", resolve);
+        break;
+      case 4:
+        getAddress("township", value, "village", resolve);
+        break;
+      default:
+        resolve([]);
+    }
   },
-  mounted() {
-    this.inputUserInfo(this.user_info);
+});
+let school_list = ref({
+  lazy: true,
+  lazyLoad(node: any, resolve: any) {
+    const { level, value } = node;
+    switch (level) {
+      case 0:
+        getAddress("", 0, "province", resolve);
+        break;
+      case 1:
+        getAddress("province", value, "municipality", resolve);
+        break;
+      case 2:
+        getSchool(value, resolve);
+        break;
+      default:
+        resolve([]);
+    }
   },
-  data() {
-    return {
-      form_title: "基础信息完善",
-      activate: false,
-      school_status: true,
-      class_list: [],
-      user_form: {
-        user_name: "",
-        user_nick: "",
-        user_introduce: "",
-        user_telephone: "",
-        user_birthday: "2000-01-01",
-        user_school: null,
-        user_class: "",
-        user_address: null,
-        user_sex: 0,
-      },
-    };
+});
+let class_list = ref({
+  lazy: true,
+  lazyLoad(node: any, resolve: any) {
+    const { level } = node;
+    setTimeout(() => {
+      const nodes = Array.from({ length: level + 1 }).map((item, index) => ({
+        value: index,
+        label: `Option - ${index}`,
+        leaf: level >= 2,
+      }));
+      // Invoke `resolve` callback to return the child nodes data and indicate the loading is finished.
+      resolve(nodes);
+    }, 1000);
   },
-  methods: {
-    inputUserInfo(val) {
-      if (val != null && val != undefined) {
-        this.user_form = {
-          user_name: val.user_name,
-          user_nick: val.user_nick,
-          user_introduce: val.user_introduce,
-          user_telephone: val.user_telephone,
-          user_birthday: this.$dayJS(val.user_birthday).format("YYYY-MM-DD"),
-          user_school: val.user_school ? val.user_school.school_id : null,
-          user_class: val.user_class,
-          user_address: val.user_address
-            ? [
-                Math.floor(val.user_address.address_id / 100),
-                val.user_address.address_id,
-              ]
-            : null,
-          user_sex: val.user_sex,
-        };
-      }
-    },
-    async onSubmit() {
-      let back_data = await submitUserInfoForm(this.user_form);
+});
+
+// 相关数据获取
+let getAddress = async (
+  father: string,
+  father_id: number,
+  child: string,
+  resolve: any
+) => {
+  let back_data = await getAddressList(<any>{
+    father: father,
+    father_id: father_id,
+    child: child,
+    page: 1,
+    total: 100,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    resolve(formatAddress(back_data.message));
+  }
+};
+
+let getSchool = async (municipality_id: number, resolve: any) => {
+  let back_data = await getSchoolList(<any>{
+    page: 1,
+    total: 500,
+    text: "",
+    municipality_id: municipality_id,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    resolve(formatSchool(back_data.message));
+  }
+};
+
+// 相关数格式化
+let formatAddress = (val: any) => {
+  return val.map((item: any) => ({
+    value: item.id,
+    label: item.name,
+    leaf: item.deep >= 3,
+  }));
+};
+let formatSchool = (val: any) => {
+  return val.map((item: any) => ({
+    value: item.school_id,
+    label: item.school_name,
+    leaf: true,
+  }));
+};
+
+// 数据提交
+let onSubmit = async () => {
+  let form_temp = unref(form_ref);
+  form_temp.validate(async (valid: any) => {
+    if (valid) {
+      let back_data = await submitUserInfoForm({
+        user_name: user_form.value.user_name || "",
+        user_nick: user_form.value.user_nick || "",
+        user_introduce: user_form.value.user_introduce || "",
+        user_telephone: user_form.value.user_telephone || "",
+        user_birthday: user_form.value.user_birthday || "",
+        user_school: user_form.value.user_school || "",
+        user_class: user_form.value.user_class || "",
+        user_address: user_form.value.user_address || "",
+        user_sex: user_form.value.user_sex || 0,
+      });
       // console.log(back_data);
       if (back_data.status) {
-        this.$message({
+        ElMessage({
           type: "success",
           message: back_data.message,
         });
-        this.$store.dispatch("user/getUserInfo");
+        store.dispatch("user/getUserInfo");
+        setTimeout(() => {
+          router.push({ path: "/showuserinfo" });
+        }, 1000);
       } else {
-        this.$message({
+        ElMessage({
           type: "success",
           message: back_data.message,
         });
       }
-    },
-  },
+    } else {
+      ElMessage({
+        type: "error",
+        message: "请正确填写表单信息！！！",
+      });
+      return false;
+    }
+  });
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .perfect {
   max-width: 500px;
   min-width: 350px;
   margin: 0 auto;
-}
-.box-card {
-  margin: 40px auto;
-}
-.box-card:last-child {
-  margin-top: 20px;
-}
-.box-card .el-input {
-  max-width: 300px;
-}
-
-.box-card .input-width {
-  width: 300px;
+  .box-card {
+    margin: 40px auto;
+    .el-input {
+      max-width: 300px;
+    }
+    .input-width {
+      width: 300px;
+    }
+  }
 }
 </style>

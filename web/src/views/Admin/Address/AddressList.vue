@@ -3,110 +3,209 @@
     <el-card>
       <template #header>
         <div class="table-header">
-          <i class="el-icon-date"></i>
-          地址列表
+          <div class="header-left">
+            <el-icon :size="25" class="icon"><i class="bi bi-pin-map"></i></el-icon>
+            地址管理
+          </div>
+          <el-input
+            placeholder="请输入内容"
+            size="small"
+            v-model="search_text"
+            class="input-with-select"
+            @keydown.enter="search_all_data(search_text)"
+            :disabled="true"
+          >
+            <template #prefix>
+              <el-icon
+                color="#AAAAAA"
+                style="font-size: 1.1rem; transform: translateY(7px)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1024 1024"
+                  data-v-394d1fd8=""
+                >
+                  <path
+                    fill="currentColor"
+                    d="m795.904 750.72 124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704 352 352 0 0 0 0 704z"
+                  ></path>
+                </svg>
+              </el-icon>
+            </template>
+            <template #append>
+              <el-button @click="search_all_data(search_text)">搜索</el-button>
+            </template>
+          </el-input>
         </div>
-        <el-input
-          placeholder="请输入内容"
-          size="mini"
-          v-model="search_data"
-          class="input-with-select"
-        >
-          <template #append>
-            <el-button
-              icon="el-icon-search"
-              @click="search_all_data"
-            ></el-button>
-          </template>
-        </el-input>
       </template>
       <div>
-        <AddressList :admin="true" :Data="Data" />
+        <AddressList
+          :admin="true"
+          :Data="Data"
+          :page="page"
+          @handleSizeChange="handleSizeChange"
+          @handlePageChange="handlePageChange"
+          @loadData="loadData"
+        />
       </div>
     </el-card>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import AddressList from "@/components/Address/AddressList.vue";
-import { mapState, mapGetters } from "vuex";
+import { useStore, mapState } from "vuex";
+import { ref, computed, watch, onMounted } from "vue";
+import { ElLoading, ElMessage } from "element-plus";
+import { getAddressList } from "@/api/address";
 
-export default {
-  components: {
-    AddressList: AddressList,
-  },
-  computed: {
-    ...mapState({
-      temp_search_data: (state) => state.search_data,
-    }),
-    ...mapState("address", {
-      temp_data: (state) => state.address_list,
-    }),
-    ...mapGetters("address", {
-      filterProvince: "filterProvinceData",
-    }),
-  },
-  watch: {
-    temp_search_data() {
-      this.search_data = this.temp_search_data;
-      this.search_all_data();
-    },
-    temp_data() {
-      this.Data = this.temp_data;
-    },
-  },
-  created() {
-    this.Data = this.temp_data;
-  },
-  data() {
-    return {
-      search_data: "",
-      Data: [],
-    };
-  },
-  methods: {
-    search_all_data() {
-      this.Data = this.filterProvince(this.search_data);
-    },
-  },
+let store = useStore();
+let temp_search_data = computed(
+  mapState(["search_data"]).search_data.bind({ $store: store })
+);
+watch(temp_search_data, (new_val: string) => {
+  console.log(new_val);
+});
+let search_text = ref("");
+let Data = ref([]);
+let page = ref({
+  page: 1,
+  page_size: 50,
+  total: 0,
+  text: "",
+});
+
+// 事件处理函数
+let search_all_data = (val: string) => {
+  page.value.text = val;
+  // getData();
 };
+
+let handleSizeChange = (val: number) => {
+  page.value.page_size = val;
+  // getData();
+};
+
+let handlePageChange = (val: number) => {
+  page.value.page = val;
+  // getData();
+};
+
+// 数据格式化
+let formatData = (val: any) => {
+  return val.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    deep: item.deep,
+    hasChildren: item.deep < 3,
+  }));
+};
+
+// 数据获取
+let getData = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中......",
+    background: "rgba(0,0,0,0.7)",
+  });
+  let back_data = await getAddressList({
+    father: "",
+    father_id: "",
+    child: "province",
+    page: 0,
+    total: 50,
+  });
+  console.log(back_data);
+  if (back_data.status) {
+    Data.value = formatData(back_data.message);
+    page.value.total = back_data.total;
+    loading.close();
+  } else {
+    loading.close();
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+let requestDataType = [
+  { father: "", child: "province" },
+  { father: "province", child: "municipality" },
+  { father: "municipality", child: "district" },
+  { father: "district", child: "township" },
+  { father: "township", child: "village" },
+];
+
+let loadData = async (tree: any, resolve: any) => {
+  // console.log(tree, resolve);
+  let back_data = await getAddressList({
+    father: requestDataType[Number(tree.deep)].father,
+    father_id: tree.id,
+    child: requestDataType[Number(tree.deep)].child,
+    page: 0,
+    total: 50,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    let temp = formatData(back_data.message);
+    resolve(temp);
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+// 挂载自动执行函数
+onMounted(() => {
+  getData();
+});
 </script>
 
-<style>
-.address-list .el-card__header {
-  height: 60px;
+<style lang="scss">
+.address-list {
+  .el-card__header {
+    height: 60px;
+    padding: 10px;
+  }
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .address-list {
   width: 95%;
   max-width: 1200px;
   margin: 70px auto;
-}
-.address-list .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-  height: 30px;
-  width: 50%;
-  min-width: 210px;
-  float: left;
-}
-
-.address-list .input-with-select {
-  width: 205px;
-  float: right;
-  margin-right: 10px;
-  transform: translateY(-1px);
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 3px;
+    height: 30px;
+    min-width: 210px;
+    .header-left {
+      font: 1.2em "楷体";
+      letter-spacing: 3px;
+      .icon {
+        transform: translateY(5px);
+      }
+    }
+    .input-with-select {
+      width: 230px;
+      margin-right: 10px;
+      margin-top: 5px;
+    }
+    @media screen and (max-width: 600px) {
+      .input-with-select {
+        display: none;
+      }
+    }
+  }
 }
 @media screen and (max-width: 1000px) {
   .address-list {
     width: 100%;
-  }
-}
-@media screen and (max-width: 600px) {
-  .address-list .input-with-select {
-    display: none;
   }
 }
 </style>

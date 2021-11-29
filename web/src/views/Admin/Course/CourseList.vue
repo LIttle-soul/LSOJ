@@ -14,7 +14,7 @@ import CourseList from '@/components/Course/CourseList.vue'
 
 export default {
   components: {
-      CourseList: CourseList
+    CourseList: CourseList
   },
     
 }

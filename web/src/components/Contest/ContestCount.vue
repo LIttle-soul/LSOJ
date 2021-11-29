@@ -1,13 +1,11 @@
 <template>
   <div class="contest-count-child">
     <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
+      :data="Data"
       size="mini"
       :stripe="true"
       :fit="true"
-      style="width: 100% ;"
+      style="width: 100%"
       :default-sort="{ prop: 'problem_id', order: 'scending' }"
     >
       <el-table-column prop="problem_id" label="问题"> </el-table-column>
@@ -26,11 +24,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -38,48 +36,47 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
-export default {
-  name: "ContestCount",
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+let prop = defineProps({
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
     },
   },
-  emits: ["onLoading"],
-  mounted() {
-    this.$emit("onLoading");
-  },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
-  },
-  methods: {
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-  },
+});
+let emits = defineEmits(["onLoading", "handleSizeChange", "handleCurrentChange"]);
+onMounted(() => {
+  emits("onLoading");
+});
+let handleSizeChange = (val: number) => {
+  emits("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emits("handleCurrentChange", val);
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .contest-count-child .pagination-2 {
   display: none;
 }

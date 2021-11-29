@@ -1,23 +1,20 @@
 <template>
   <div class="problem-list-child">
     <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
+      :data="Data"
       size="mini"
       @cell-click="show_problem"
-      @filter-change="filterProblemBYDegree"
+      @filter-change="handleFilterChange"
       :row-class-name="tableRowClassName"
       :default-sort="{ prop: 'problem_id', order: 'aescending' }"
     >
-      <el-table-column v-if="contest" prop="problem_num" label="编号">
-      </el-table-column>
+      <el-table-column v-if="contest" prop="problem_num" label="编号"> </el-table-column>
       <el-table-column v-else prop="problem_id" label="编号"> </el-table-column>
       <el-table-column prop="problem_title" label="题目"> </el-table-column>
       <el-table-column
         prop="problem_tag"
         label="类型"
-        v-if="!admin && !contest"
+        v-if="!props.admin && !props.contest"
       >
         <template #default="scope">
           <el-tag
@@ -35,13 +32,16 @@
         label="难度"
         filter-placement="bottom-end"
         :filters="filter_degree_data"
+        :filter-multiple="false"
         :column-key="'sStatus'"
-        v-if="!contest"
+        v-if="!props.contest"
       >
         <template #default="scope">
+          <!-- {{ scope.row.problem_degree }} -->
           <el-rate
             v-model="scope.row.problem_degree"
-            :disabled="!admin"
+            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
+            :disabled="!props.admin"
           ></el-rate>
         </template>
       </el-table-column>
@@ -49,16 +49,16 @@
       </el-table-column>
       <el-table-column prop="problem_submit" sortable width="70" label="提交">
       </el-table-column>
-      <el-table-column prop="problem_source" label="题目来源" v-if="!contest">
+      <el-table-column prop="problem_source" label="题目来源" v-if="!props.contest">
       </el-table-column>
-      <el-table-column prop="creation_time" label="创建时间" v-if="admin">
+      <el-table-column prop="creation_time" label="创建时间" v-if="props.admin">
       </el-table-column>
       <el-table-column
         prop="problem_status"
         fixed="right"
         width="50px"
         label="状态"
-        v-if="admin"
+        v-if="props.admin"
       >
         <template #default="scope">
           <el-switch
@@ -68,44 +68,50 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" width="165px" label="操作" v-if="admin">
+      <el-table-column fixed="right" width="165px" label="操作" v-if="props.admin">
         <template #default="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            circle
-            icon="el-icon-edit"
-            @click="handleEditClick(scope.row)"
-          ></el-button>
-          <el-button
-            size="mini"
-            type="success"
-            circle
-            icon="el-icon-check"
-            @click="handleCheckClick(scope.row)"
-          ></el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            circle
-            icon="el-icon-delete"
-            @click="handleDeleteClick(scope.row)"
-          ></el-button>
-          <el-button
-            size="mini"
-            type="warning"
-            circle
-            icon="el-icon-box"
-            @click="handleDataClick(scope.row)"
-          ></el-button>
-          <el-dialog
-            title="测试数据"
-            v-model="scope.row.centerDialogVisible"
-            width="90%"
-            :destroy-on-close="true"
-          >
-            <ProblemDataList :problem_id="scope.row.problem_id" />
-          </el-dialog>
+          <div class="button-box">
+            <el-button
+              size="mini"
+              type="primary"
+              circle
+              @click="handleEditClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-pencil-square"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="success"
+              circle
+              @click="handleCheckClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-check-lg"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              circle
+              @click="handleDeleteClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-trash"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="warning"
+              circle
+              @click="handleDataClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-archive"></i></el-icon>
+            </el-button>
+            <el-dialog
+              title="测试数据"
+              v-model="scope.row.centerDialogVisible"
+              width="90%"
+              :destroy-on-close="true"
+            >
+              <ProblemDataList :problem_id="scope.row.problem_id" />
+            </el-dialog>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -113,11 +119,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
-      :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :current-page="page.page"
+      :page-sizes="[30, 50, 100, 200]"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -125,157 +131,180 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
-      :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :current-page="page.page"
+      :page-sizes="[30, 50, 100, 200]"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import ProblemDataList from "@/components/Problem/ProblemDataList.vue";
 import { changeProblemData, deleteProblemData } from "@/api/problem";
+import { ref, reactive, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
 
-export default {
-  name: "ProblemList",
-  components: {
-    ProblemDataList: ProblemDataList,
+let router = useRouter();
+let store = useStore();
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    admin: {
-      type: Boolean,
-      default: false,
-    },
-    contest: {
-      type: Boolean,
-      default: false,
-    },
-    contest_id: {
-      type: Number,
-      default: -1,
-    },
-    Data: {
-      type: undefined,
-      default: [],
+  contest: {
+    type: Boolean,
+    default: false,
+  },
+  contest_id: {
+    type: Number,
+    default: -1,
+  },
+  Data: {
+    type: undefined,
+    default: [],
+  },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      total: 0,
+      page_size: 30,
     },
   },
-  emits: ["onLoading"],
-  mounted() {
-    this.$emit("onLoading");
-  },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-      filter_degree_data: [
-        { text: "一星", value: 1 },
-        { text: "二星", value: 2 },
-        { text: "三星", value: 3 },
-        { text: "四星", value: 4 },
-        { text: "五星", value: 5 },
-      ],
-    };
-  },
-  methods: {
-    tableRowClassName({ row }) {
-      if (this.admin) {
-        return "";
-      }
-      if (+row.submit_status === 1) {
-        return "success-row";
-      } else if (+row.submit_status === -1) {
-        return "warning-row";
-      } else {
-        return "";
-      }
-    },
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-    filterProblemBYDegree(value) {
-      // console.log(value.sStatus);
-      this.$emit("filterProblemByDegree", value.sStatus);
-    },
-    show_problem(row) {
-      // console.log(row, this.contest_id);
-      if (!this.admin) {
-        this.$router.push({
-          path: "/showproblem",
-          query: {
-            problem_id: row.problem_id,
-            contest_id: this.contest_id,
-            problem_title: escape(row.problem_title),
-            problem_description: escape(row.problem_description),
-            time_limit: row.time_limit,
-            memory_limit: row.memory_limit,
-          },
-        });
-      }
-    },
-    handleEditClick(row) {
-      this.$router.push("/admin/addproblem/" + row.problem_id);
-    },
-    async handleCheckClick(row) {
-      // console.log(row);
-      let data = {
+});
+
+let emits = defineEmits([
+  "onLoading",
+  "filterProblemByDegree",
+  "handleSizeChange",
+  "handleCurrentChange",
+  "reloadData",
+]);
+
+onMounted(() => {
+  emits("onLoading");
+});
+
+let handleFilterChange = (val: any) => {
+  emits("filterProblemByDegree", val);
+};
+let handleSizeChange = (val: number) => {
+  emits("handleSizeChange", val);
+};
+let handleCurrentChange = (val: number) => {
+  emits("handleCurrentChange", val);
+};
+
+let filter_degree_data = ref([
+  { text: "零星", value: 0 },
+  { text: "一星", value: 1 },
+  { text: "二星", value: 2 },
+  { text: "三星", value: 3 },
+  { text: "四星", value: 4 },
+  { text: "五星", value: 5 },
+]);
+
+let tableRowClassName = ({ row }: any) => {
+  if (props.admin) {
+    return "";
+  }
+  if (+row.submit_status === 1) {
+    return "success-row";
+  } else if (+row.submit_status === -1) {
+    return "warning-row";
+  } else {
+    return "";
+  }
+};
+let filterProblemBYDegree = (value: any) => {
+  emits("filterProblemByDegree", value.sStatus);
+};
+let show_problem = (row: any) => {
+  if (!props.admin) {
+    router.push({
+      path: "/showproblem",
+      query: {
         problem_id: row.problem_id,
-        probelm_difficult: row.problem_degree,
-        problem_status: row.problem_status,
-      };
-      let back_data = await changeProblemData(data);
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("problem/getProblemDataList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    async handleDeleteClick(row) {
-      let back_data = await deleteProblemData(row.problem_id);
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("problem/getProblemDataList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    handleDataClick(val) {
-      // console.log(val);
-      val.centerDialogVisible = true;
-    },
-    color16() {
-      var r = Math.floor(Math.random() * 256);
-      var g = Math.floor(Math.random() * 256);
-      var b = Math.floor(Math.random() * 256);
-      var a = Math.floor(Math.random() * 50);
-      var color =
-        "#" + r.toString(16) + g.toString(16) + b.toString(16) + a.toString(16);
-      return color;
-    },
-  },
+        contest_id: props.contest_id,
+        problem_title: escape(row.problem_title),
+        problem_description: escape(row.problem_description),
+        time_limit: row.time_limit,
+        memory_limit: row.memory_limit,
+      },
+    });
+  }
+};
+let handleEditClick = (row: any) => {
+  router.push("/admin/addproblem/" + row.problem_id);
+};
+let handleCheckClick = async (row: any) => {
+  let back_data = await changeProblemData({
+    problem_id: row.problem_id,
+    problem_title: "",
+    problem_description: "",
+    problem_spj: "",
+    problem_course: "",
+    time_limit: "",
+    memory_limit: "",
+    problem_tag: "",
+    problem_difficult: row.problem_degree,
+    problem_status: row.problem_status,
+  });
+  if (back_data.status) {
+    emits("reloadData");
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let handleDeleteClick = async (row: any) => {
+  let back_data = await deleteProblemData({
+    problem_id: row.problem_id,
+  });
+  if (back_data.status) {
+    emits("reloadData");
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let handleDataClick = (val: any) => {
+  val.centerDialogVisible = true;
+};
+let color16 = () => {
+  var r = Math.floor(Math.random() * 256);
+  var g = Math.floor(Math.random() * 256);
+  var b = Math.floor(Math.random() * 256);
+  var a = Math.floor(Math.random() * 50);
+  var color = "#" + r.toString(16) + g.toString(16) + b.toString(16) + a.toString(16);
+  return color;
 };
 </script>
 
-<style>
+<style lang="scss">
+.button-box {
+  display: flex;
+  justify-content: space-around;
+}
 .problem-list-child .warning-row {
   background: rgba(245, 127, 127, 0.5);
 }
@@ -284,7 +313,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .problem-list-child .pagination-2 {
   display: none;
 }

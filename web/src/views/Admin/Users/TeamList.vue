@@ -3,147 +3,184 @@
     <el-card>
       <template #header>
         <div class="table-header">
-          <i class="el-icon-notebook-2"></i>
-          团队管理
+          <div class="header-left">
+            <el-icon :size="25" class="icon"><i class="bi bi-people"></i></el-icon>
+            团队管理
+          </div>
+          <el-input
+            placeholder="请输入内容"
+            size="small"
+            v-model="search_text"
+            class="input-with-select"
+            @keydown.enter="search_all_data(search_text)"
+          >
+            <template #prefix>
+              <el-icon
+                color="#AAAAAA"
+                style="font-size: 1.1rem; transform: translateY(7px)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1024 1024"
+                  data-v-394d1fd8=""
+                >
+                  <path
+                    fill="currentColor"
+                    d="m795.904 750.72 124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704 352 352 0 0 0 0 704z"
+                  ></path>
+                </svg>
+              </el-icon>
+            </template>
+            <template #append>
+              <el-button @click="search_all_data(search_text)">搜索</el-button>
+            </template>
+          </el-input>
         </div>
-        <el-input
-          placeholder="请输入内容"
-          size="mini"
-          v-model="search_data"
-          class="input-with-select"
-        >
-          <template #append>
-            <el-button
-              icon="el-icon-search"
-              @click="search_all_data"
-            ></el-button>
-          </template>
-        </el-input>
       </template>
       <div>
-        <TeamList :Data="Data" :is_delete_power="true" />
+        <TeamList
+          :Data="Data"
+          :is_delete_power="true"
+          :page="page"
+          @handleSizeChange="handleSizeChange"
+          @handlePageChange="handlePageChange"
+          @reload="getData"
+        />
       </div>
     </el-card>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import TeamList from "@/components/User/TeamList.vue";
-import { mapState } from "vuex";
+import { useStore, mapState } from "vuex";
+import { ref, computed, watch, onMounted } from "vue";
+import { ElLoading, ElMessage } from "element-plus";
+import dayJS from "dayjs";
+import { getTeamList } from "@/api/user";
 
-export default {
-  components: {
-    TeamList: TeamList,
-  },
-  computed: {
-    ...mapState({
-      temp_search_data: (state) => state.search_data,
-    }),
-    ...mapState("user", {
-      temp_data: (state) => state.team_list,
-    }),
-  },
-  watch: {
-    temp_search_data() {
-      this.search_data = this.temp_search_data;
-      this.search_all_data();
-    },
-    temp_data() {
-      this.Data = this.formatData(this.temp_data);
-    },
-  },
-  created() {
-    this.Data = this.formatData(this.temp_data);
-  },
-  data() {
-    return {
-      search_data: "",
-      Data: [
-        {
-          team_id: 1,
-          team_nick: "nick_1",
-          team_creator: "201910101600040",
-          team_user_list: [
-            {
-              add_time: "2021-08-16T13:47:57Z",
-              user_id: "201910101600063",
-              user_nick: "sdsa",
-              user_status: true,
-              user_type: 0,
-            },
-            {
-              add_time: "1900-01-20T08:05:43Z",
-              user_id: "201910101600068",
-              user_nick: "201910101600068",
-              user_status: true,
-              user_type: 1,
-            },
-          ],
-          team_school: "金华职业技术学院",
-          team_type: "临时团队",
-          team_status: true,
-          registration_time: "2020-02-03 12:00:00",
-          team_introduce: "Hello Team",
-        },
-      ],
-    };
-  },
-  methods: {
-    search_all_data() {
-      console.log(this.search_data);
-    },
-    formatData(val) {
-      return val.map((item) => ({
-        team_id: item.class_id,
-        team_nick: item.class_name,
-        team_creator: item.class_creator,
-        team_user_list: item.user_list,
-        team_school: item.class_college,
-        team_type: item.class_type,
-        registration_time: this.$dayJS(item.create_time).format(
-          "YYYY-MM-DD HH:mm:ss"
-        ),
-        team_introduce: item.class_introduce,
-      }));
-    },
-  },
+let store = useStore();
+let temp_search_data = computed(
+  mapState(["search_data"]).search_data.bind({ $store: store })
+);
+watch(temp_search_data, (new_val: string) => {
+  console.log(new_val);
+});
+let search_text = ref("");
+
+let Data = ref([]);
+let page = ref({
+  page: 1,
+  page_size: 50,
+  total: 0,
+  text: "",
+});
+// 事件处理函数
+let search_all_data = (val: string) => {
+  page.value.text = val;
+  getData();
 };
+
+let handleSizeChange = (val: number) => {
+  page.value.page_size = val;
+  getData();
+};
+
+let handlePageChange = (val: number) => {
+  page.value.page = val;
+  getData();
+};
+
+// 数据格式化
+let formatData = (val: any) => {
+  return val.map((item: any) => ({
+    team_id: item.team_id,
+    team_nick: item.team_nick,
+    team_creator: item.team_creator,
+    team_user_list: item.user_list,
+    team_teacher: item.team_teacher,
+    team_school: item.school_name,
+    registration_time: dayJS(item.registration_time).format("YYYY-MM-DD HH:mm:ss"),
+    team_introduce: item.team_introduce,
+    invitation_code: item.invitation_code,
+  }));
+};
+
+// 数据获取
+let getData = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中......",
+    background: "rgba(0,0,0,0.7)",
+  });
+  let back_data = await getTeamList({
+    page: page.value.page,
+    total: page.value.page_size,
+    text: page.value.text,
+    mode: "join",
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    Data.value = formatData(back_data.message);
+    page.value.total = back_data.total;
+    loading.close();
+  } else {
+    loading.close();
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+
+// 自动加载数据
+onMounted(() => {
+  getData();
+});
 </script>
 
-<style>
-.team-list .el-card__header {
-  height: 60px;
+<style lang="scss">
+.team-list {
+  .el-card__header {
+    height: 60px;
+    padding: 10px;
+  }
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .team-list {
   width: 95%;
   max-width: 1200px;
   margin: 70px auto;
-}
-.team-list .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-  height: 30px;
-  width: 50%;
-  min-width: 210px;
-  float: left;
-}
-.team-list .input-with-select {
-  width: 205px;
-  float: right;
-  margin-right: 10px;
-  transform: translateY(-1px);
-}
-@media screen and (max-width: 1000px) {
-  .solution-list {
-    width: 100%;
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 3px;
+    height: 30px;
+    min-width: 210px;
+    .header-left {
+      font: 1.2em "楷体";
+      letter-spacing: 3px;
+      .icon {
+        transform: translateY(5px);
+      }
+    }
+    .input-with-select {
+      width: 230px;
+      margin-right: 10px;
+      margin-top: 5px;
+    }
+    @media screen and (max-width: 600px) {
+      .input-with-select {
+        display: none;
+      }
+    }
   }
 }
-@media screen and (max-width: 600px) {
-  .team-list-child .input-with-select {
-    display: none;
+@media screen and (max-width: 1000px) {
+  .team-list {
+    width: 100%;
   }
 }
 </style>

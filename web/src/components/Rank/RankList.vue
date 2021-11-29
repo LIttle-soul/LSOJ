@@ -1,34 +1,22 @@
 <template>
   <div class="rank-list-child">
-    <el-table
-      :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
-      "
-      size="mini"
-      :stripe="true"
-      :fit="true"
-      style="width: 100%;"
-    >
-      <el-table-column prop="user_rank" sortable label="名次">
-      </el-table-column>
+    <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
+      <el-table-column prop="user_rank" sortable label="名次"> </el-table-column>
       <el-table-column prop="user_id" label="用户"> </el-table-column>
       <el-table-column prop="user_nick" label="昵称"> </el-table-column>
-      <el-table-column prop="true_submit" sortable label="正确">
-      </el-table-column>
-      <el-table-column prop="all_submit" sortable label="提交">
-      </el-table-column>
-      <el-table-column prop="percentage" sortable label="比率">
-      </el-table-column>
+      <el-table-column prop="true_submit" sortable label="正确"> </el-table-column>
+      <el-table-column prop="all_submit" sortable label="提交"> </el-table-column>
+      <el-table-column prop="percentage" sortable label="比率"> </el-table-column>
     </el-table>
     <el-pagination
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -36,44 +24,45 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
   </div>
 </template>
 
-<script>
-export default {
-  name: "UserRankList",
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
-    },
+<script lang="ts" setup>
+import { ref } from "vue";
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: false,
   },
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-    };
+  Data: {
+    type: undefined,
+    default: [],
   },
-  methods: {
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
+  page: {
+    type: undefined,
+    default: { page: 1, page_size: 50, total: 0 },
   },
+});
+let emits = defineEmits(["handleSizeChange", "handleCurrentChange"]);
+let handleSizeChange = (val: number) => {
+  emits("handleSizeChange", val);
+};
+
+let handleCurrentChange = (val: number) => {
+  emits("handleCurrentChange", val);
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pagination-2 {
   display: none;
 }

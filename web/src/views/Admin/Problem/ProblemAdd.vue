@@ -6,6 +6,7 @@
           <el-input-number
             v-model="problem_form.problem_id"
             controls-position="right"
+            :disabled="change_problem_id"
           ></el-input-number>
         </el-form-item>
         <el-form-item label="题目标题">
@@ -62,10 +63,7 @@
           ></el-switch>
         </el-form-item>
       </el-form>
-      <el-button
-        type="primary"
-        style="float: right; margin-bottom: 15px;"
-        @click="submit"
+      <el-button type="primary" style="float: right; margin-bottom: 15px" @click="submit"
         >提交</el-button
       >
     </el-card>
@@ -73,10 +71,7 @@
       <template #header>
         <div class="card-header">
           <span class="title">题目内容</span>
-          <el-button
-            class="button"
-            type="text"
-            @click="changeProblem = !changeProblem"
+          <el-button class="button" type="text" @click="changeProblem = !changeProblem"
             >修改内容</el-button
           >
         </div>
@@ -87,13 +82,7 @@
         :key="new Date().getTime()"
       />
     </el-card>
-    <el-dialog
-      title="内容编辑"
-      v-model="changeProblem"
-      width="90%"
-      top="60px"
-      center
-    >
+    <el-dialog title="内容编辑" v-model="changeProblem" width="90%" top="60px" center>
       <ProblemChild
         height="800px"
         :content="problem_form.problem_content"
@@ -103,142 +92,165 @@
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts" setup>
 import ProblemChild from "@/components/Editor/MarkdownEditor.vue";
 import { submitProblemData, changeProblemData } from "@/api/problem";
-import { mapState, mapGetters } from "vuex";
+import { useStore, mapState } from "vuex";
+import { useRoute, useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { ElLoading, ElMessage } from "element-plus";
+import problem_mode from "@/assets/markdown/问题模板.md?raw";
+import { getProblemDataList } from "../../../api/problem";
 
-export default {
-  components: {
-    ProblemChild,
-  },
-  created() {
-    this.setData(this.$route.params.problem_id);
-  },
-  computed: {
-    ...mapState("problem", {
-      problem_tag_list: state => state.problem_tag_list,
-    }),
-    ...mapGetters("problem", {
-      getProblemData: "getProblemData",
-    }),
-  },
-  data() {
-    return {
-      changeProblem: false,
-      iconClasses: ["icon-rate-face-1", "icon-rate-face-2", "icon-rate-face-3"],
-      problem_form: {
-        problem_id: 9999,
-        problem_title: "",
-        problem_content: require("@/assets/markdown/问题模板.md"),
-        problem_spj: false,
-        problem_course: "",
-        time_limit: 1000,
-        memory_limit: 128,
-        problem_tag: [],
-        problem_difficult: 1,
-        problem_status: true
-      },
-    };
-  },
-  methods: {
-    getContent(text) {
-      this.problem_form.problem_content = text;
-    },
-    async submit() {
-      let back_data =
-        this.$route.params.problem_id == ""
-          ? await submitProblemData(this.problem_form)
-          : await changeProblemData(this.problem_form);
-        // console.log(back_data);
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("problem/getProblemDataList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    setData(data) {
-      // console.log(data)
-      if (data != "") {
-        let val = this.getProblemData(data);
-        // console.log(val.problem_tag)
-        this.problem_form = {
-          problem_id: val.problem_id,
-          problem_title: val.problem_title,
-          problem_content: val.problem_description,
-          problem_spj: val.problem_spj,
-          problem_course: val.problem_course.join(' '),
-          time_limit: val.time_limit,
-          memory_limit: val.memory_limit,
-          problem_tag: val.problem_tag,
-          problem_difficult: val.problem_difficult,
-          problem_status: val.problem_status
-        };
-      }
-    },
-  },
+let store = useStore();
+let route = useRoute();
+let router = useRouter();
+
+let problem_tag_list = computed(
+  mapState("problem", ["problem_tag_list"]).problem_tag_list.bind({
+    $store: store,
+  })
+);
+
+let changeProblem = ref(false);
+let change_problem_id = ref(false);
+let problem_form = ref({
+  problem_id: 9999,
+  problem_title: "",
+  problem_content: problem_mode,
+  problem_spj: false,
+  problem_course: "",
+  time_limit: 1000,
+  memory_limit: 128,
+  problem_tag: [],
+  problem_difficult: 0,
+  problem_status: true,
+});
+let getContent = (text: string) => {
+  problem_form.value.problem_content = text;
 };
+let submit = async () => {
+  let back_data =
+    route.params.problem_id == ""
+      ? await submitProblemData({
+          problem_id: problem_form.value.problem_id,
+          problem_title: problem_form.value.problem_title,
+          problem_description: problem_form.value.problem_content,
+          problem_spj: problem_form.value.problem_spj,
+          problem_course: problem_form.value.problem_course,
+          time_limit: problem_form.value.time_limit,
+          memory_limit: problem_form.value.memory_limit,
+          problem_tag: problem_form.value.problem_tag,
+          problem_difficult: problem_form.value.problem_difficult,
+          problem_status: problem_form.value.problem_status,
+        })
+      : await changeProblemData({
+          problem_id: problem_form.value.problem_id,
+          problem_title: problem_form.value.problem_title,
+          problem_description: problem_form.value.problem_content,
+          problem_spj: problem_form.value.problem_spj,
+          problem_course: problem_form.value.problem_course,
+          time_limit: problem_form.value.time_limit,
+          memory_limit: problem_form.value.memory_limit,
+          problem_tag: problem_form.value.problem_tag.join(","),
+          problem_difficult: problem_form.value.problem_difficult,
+          problem_status: problem_form.value.problem_status,
+        });
+  // console.log(back_data);
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    setTimeout(() => {
+      router.push("/admin/problemlist");
+    }, 2000);
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let formatData = (val: any) => {
+  return {
+    problem_id: val.problem_id,
+    problem_title: val.problem_title,
+    problem_content: val.problem_description,
+    problem_spj: val.problem_spj,
+    problem_course: val.problem_course || "",
+    time_limit: val.time_limit,
+    memory_limit: val.memory_limit,
+    problem_tag: val.problem_tag.split(","),
+    problem_difficult: val.problem_difficult,
+    problem_status: val.problem_status,
+  };
+};
+let getProblemData = async (val: string) => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中....",
+    background: "rgba(0,0,0,0.7)",
+  });
+  let back_data = await getProblemDataList({
+    page: 1,
+    total: 50,
+    key: "id",
+    text: val,
+  });
+  if (back_data.status) {
+    problem_form.value = formatData(back_data.message[0]);
+    loading.close();
+  } else {
+    loading.close();
+  }
+};
+onMounted(() => {
+  if (route.params.problem_id) {
+    change_problem_id.value = true;
+    getProblemData(<string>route.params.problem_id[0]);
+  }
+});
 </script>
 
-<style>
+<style scoped lang="scss">
 .problem-add {
-  width: 90%;
+  width: 95%;
   margin: 40px auto;
-}
-.problem-add .el-input {
-  max-width: 500px;
-}
-.problem-add .el-card {
-  margin: 20px 0;
-}
-.problem-add .el-card .el-form-item:nth-child(2) .el-input-number__decrease,
-.problem-add .el-card .el-form-item:nth-child(2) .el-input-number__increase {
-  transform: translateY(1px);
-}
-.problem-add .el-card .el-form-item:nth-child(3) .el-input-number__decrease,
-.problem-add .el-card .el-form-item:nth-child(3) .el-input-number__increase {
-  transform: translateY(1px);
-}
-.problem-span {
-  font-size: 18px;
-  font-weight: 800;
-  margin-left: 20px;
-}
-.problem-add .el-card__header {
-  height: 60px;
-  padding: 0 40px;
-}
-.problem-add .el-rate {
-  height: 100%;
-  line-height: 100%;
-}
-.problem-add .el-rate i {
-  margin-top: 11px;
-}
-.problem-add .card-header {
-  justify-content: space-between;
-  align-items: center;
-}
-.problem-add .title {
-  float: left;
-  /* background-color: rgba(15, 105, 214, 0.2); */
-  width: 100px;
-  height: 60px;
-  line-height: 60px;
-  font-size: 20px;
-  font-weight: 800;
-  font-family: "宋体";
-}
-.problem-add .button {
-  float: right;
-  width: 60px;
-  height: 60px;
+  .card {
+    margin: 30px 0;
+    border-radius: 20px;
+    .el-input {
+      max-width: 400px;
+    }
+    .problem-span {
+      font-size: 18px;
+      font-weight: 800;
+      margin-left: 20px;
+    }
+    .el-rate {
+      height: 40px;
+      line-height: 40px;
+      transform: translateY(5px);
+      // background-color: #555666;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        width: 100px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 20px;
+        font-weight: 800;
+        font-family: "宋体";
+      }
+      .button {
+        width: 60px;
+        height: 20px;
+      }
+    }
+  }
 }
 </style>

@@ -1,68 +1,43 @@
 <template>
-  <div class="user">
-    <div class="home-header">
+  <div class="page">
+    <div class="header">
       <Header />
     </div>
-    <div class="top-margin"></div>
-    <el-container class="home-main">
+    <el-container class="main">
       <router-view />
       <el-backtop></el-backtop>
     </el-container>
-    <div class="home-footer">
+
+    <div class="footer">
       <Footer />
     </div>
   </div>
 </template>
 
-<script>
-import { defineAsyncComponent } from "vue";
-
-export default {
-  name: "User",
-  components: {
-    Header: defineAsyncComponent(() =>
-      import("@/components/Header/Header.vue")
-    ),
-    Footer: defineAsyncComponent(() =>
-      import("@/components/Footer/Footer.vue")
-    ),
-  },
-};
+<script setup lang="ts">
+import Header from "@/components/Header/Header.vue";
+import Footer from "@/components/Footer/Footer.vue";
 </script>
 
-<style scoped>
-.user {
+<style scoped lang="scss">
+.page {
   min-height: 100%;
   position: relative;
-}
-.home-header {
-  width: 100%;
-  min-width: 360px;
-  position: fixed;
-  /* top: 10px; */
-  z-index: 100;
-}
-.top-margin {
-  width: 100%;
-  height: 70px;
-  /* 代替头部空间 */
-}
-.home-main {
-  width: 100%;
-  min-width: 360px;
-  min-height: calc(100vh - 197px);
-  position: relative;
-}
-.home-footer {
-  width: 100%;
-  min-width: 360;
-}
-.router-link-active {
-  text-decoration: none;
-}
-@media screen and (max-height: 400px) {
-  .top-margin {
-    height: 0;
+  .header {
+    width: 100%;
+    min-width: 360px;
+    height: 60px;
+    z-index: 100;
+  }
+  .main {
+    width: 100%;
+    min-width: 360px;
+    min-height: calc(100vh - 187px);
+    position: relative;
+  }
+  .footer {
+    width: 100%;
+    min-width: 360px;
   }
 }
 </style>

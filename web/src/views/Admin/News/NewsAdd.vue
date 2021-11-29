@@ -24,15 +24,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="优先级">
-          <el-input-number
-            v-model="news_form.news_importance"
-          ></el-input-number>
+          <el-input-number v-model="news_form.news_importance"></el-input-number>
         </el-form-item>
       </el-form>
-      <el-button
-        type="primary"
-        style="float: right; margin-bottom: 15px;"
-        @click="submit"
+      <el-button type="primary" style="float: right; margin-bottom: 15px" @click="submit"
         >提交</el-button
       >
     </el-card>
@@ -40,10 +35,7 @@
       <template #header>
         <div class="card-header">
           <span class="title">新闻内容</span>
-          <el-button
-            class="button"
-            type="text"
-            @click="changeNews = !changeNews"
+          <el-button class="button" type="text" @click="changeNews = !changeNews"
             >修改内容</el-button
           >
         </div>
@@ -54,13 +46,7 @@
         :key="new Date().getTime()"
       />
     </el-card>
-    <el-dialog
-      title="内容编辑"
-      v-model="changeNews"
-      width="90%"
-      top="60px"
-      center
-    >
+    <el-dialog title="内容编辑" v-model="changeNews" width="90%" top="60px" center>
       <NewsChild
         height="800px"
         :content="news_form.news_content"
@@ -70,123 +56,119 @@
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts" setup>
 import NewsChild from "@/components/Editor/MarkdownEditor.vue";
-import { submitNewsData, changeNewsData } from "@/api/news";
-import { mapGetters } from "vuex";
+import { submitNewsData, changeNewsData, getNewsList } from "@/api/news";
+import { useRoute, useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import news_mode from "@/assets/markdown/新闻模板.md?raw";
 
-export default {
-  components: {
-    NewsChild,
-  },
-  created() {
-    this.setData(this.$route.params.news_id);
-  },
-  computed: {
-    ...mapGetters("news", {
-      getNewsData: "getNewsData",
-    }),
-  },
-  data() {
-    return {
-      changeNews: false,
-      options: [
-        { value: 0, title: "普通" },
-        { value: 1, title: "竞赛新闻" },
-        { value: 2, title: "课程新闻" },
-      ],
-      news_form: {
-        news_id: 0,
-        news_title: "",
-        news_content: require("@/assets/markdown/新闻模板.md"),
-        news_type: 0,
-        news_importance: 0,
-      },
-    };
-  },
-  methods: {
-    getContent(text) {
-      this.news_form.news_content = text;
-    },
-    async submit() {
-      let back_data =
-        this.$route.params.news_id == ""
-          ? await submitNewsData(this.news_form)
-          : await changeNewsData(this.news_form);
-      if (back_data.status) {
-        this.$message({
-          type: "success",
-          message: back_data.message,
-        });
-        this.$store.dispatch("news/getNewsList");
-      } else {
-        this.$message({
-          type: "error",
-          message: back_data.message,
-        });
-      }
-    },
-    setData(data) {
-      if (data != "") {
-        let val = this.getNewsData(data);
-        this.news_form = {
-          news_id: val.news_id,
-          news_title: val.news_title,
-          news_content: val.news_introduce == null ? "" : val.news_introduce,
-          news_type: val.news_type,
-          news_importance: val.news_importance,
-        };
-      }
-    },
-  },
+let route = useRoute();
+let router = useRouter();
+
+let changeNews = ref(false);
+let options = [
+  { value: 0, title: "普通" },
+  { value: 1, title: "竞赛新闻" },
+  { value: 2, title: "课程新闻" },
+];
+let news_form = ref({
+  news_id: 0,
+  news_title: "",
+  news_content: news_mode,
+  news_type: 0,
+  news_importance: 0,
+});
+let getContent = (text: string) => {
+  news_form.value.news_content = text;
 };
+let submit = async () => {
+  let back_data =
+    route.params.news_id == ""
+      ? await submitNewsData({
+          news_title: news_form.value.news_title,
+          news_introduce: news_form.value.news_content,
+          news_type: news_form.value.news_type,
+          news_importance: news_form.value.news_importance,
+        })
+      : await changeNewsData({
+          news_id: news_form.value.news_id,
+          news_title: news_form.value.news_title,
+          news_introduce: news_form.value.news_content,
+          news_type: news_form.value.news_type,
+          news_importance: news_form.value.news_importance,
+        });
+  if (back_data.status) {
+    ElMessage({
+      type: "success",
+      message: back_data.message,
+    });
+    setTimeout(() => {
+      router.push("/admin/newslist");
+    }, 2000);
+  } else {
+    ElMessage({
+      type: "error",
+      message: back_data.message,
+    });
+  }
+};
+let formatData = (val: any) => {
+  return {
+    news_id: val.news_id,
+    news_title: val.news_title,
+    news_content: val.news_introduce == null ? "" : val.news_introduce,
+    news_type: val.news_type,
+    news_importance: val.news_importance,
+  };
+};
+let getNewsData = async (val: any) => {
+  let back_data = await getNewsList({
+    page: 1,
+    total: 1,
+    text: "",
+    news_id: val,
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    news_form.value = formatData(back_data.message);
+  }
+};
+onMounted(() => {
+  if (route.params.news_id) {
+    getNewsData(route.params.news_id[0]);
+  }
+});
 </script>
 
-<style>
+<style lang="scss" scoped>
 .news-add {
-  width: 90%;
+  width: 95%;
   margin: 40px auto;
-}
-.news-add .el-input {
-  max-width: 500px;
-}
-.news-add .el-card {
-  margin: 20px 0;
-}
-.news-span {
-  font-size: 18px;
-  font-weight: 800;
-  margin-left: 20px;
-}
-.news-add .el-card__header {
-  height: 60px;
-  padding: 0 40px;
-}
-.news-add .card-header {
-  justify-content: space-between;
-  align-items: center;
-}
-.news-add .title {
-  float: left;
-  /* background-color: rgba(15, 105, 214, 0.2); */
-  width: 100px;
-  height: 60px;
-  line-height: 60px;
-  font-size: 20px;
-  font-weight: 800;
-  font-family: "宋体";
-}
-.news-add .button {
-  float: right;
-  width: 60px;
-  height: 60px;
-}
-.news-add .el-card .el-form-item:nth-child(2) .el-input-number__decrease,
-.news-add .el-card .el-form-item:nth-child(2) .el-input-number__increase {
-  transform: translateY(1px);
-}
-.news-add .el-card .el-form-item:nth-child(3) .el-input-number__decrease,
-.news-add .el-card .el-form-item:nth-child(3) .el-input-number__increase {
-  transform: translateY(1px);
+  .card {
+    margin: 30px 0;
+    border-radius: 20px;
+    .el-input {
+      max-width: 400px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        width: 100px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 20px;
+        font-weight: 800;
+        font-family: "宋体";
+      }
+      .button {
+        width: 60px;
+        height: 20px;
+      }
+    }
+  }
 }
 </style>

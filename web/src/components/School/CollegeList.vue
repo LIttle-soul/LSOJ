@@ -2,12 +2,12 @@
   <div class="college-list-child">
     <el-table
       :data="
-        Data.slice((current_page - 1) * page_sizes, current_page * page_sizes)
+        Data.slice((page.cur - 1) * page.page_size, page.cur * page.page_size)
       "
       size="mini"
       :stripe="true"
       :fit="true"
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column prop="college_id" label="学院编号"> </el-table-column>
       <el-table-column prop="college_name" label="学院名称"> </el-table-column>
@@ -20,7 +20,7 @@
             type="primary"
             circle
             icon="el-icon-edit"
-            @click="handleEditClick()"
+            @click="handleEditClick(scope.row)"
           >
           </el-button>
           <el-button
@@ -38,9 +38,9 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.cur"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
       :total="Data.length"
       :hide-on-single-page="true"
@@ -50,9 +50,9 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="current_page"
+      :current-page="page.cur"
       :page-sizes="[20, 50, 100, 200]"
-      :page-size="page_sizes"
+      :page-size="page.page_size"
       layout="prev, pager, next"
       :total="Data.length"
       :hide-on-single-page="true"
@@ -61,57 +61,90 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "collegeListChild",
-  data() {
-    return {
-      current_page: 1,
-      page_sizes: 50,
-      edit: true,
-    };
+<script lang="ts" setup>
+import { ref } from "vue";
+
+let props = defineProps({
+  admin: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    handleEditClick() {
-      this.$router.push({
-        name: "AdminAddCollege",
-      });
-    },
-    handleCheckClick() {
-      console.log(this.Data);
-    },
-    handleDeleteClick(val) {
-      console.log(val);
-    },
-    handleSizeChange(val) {
-      this.page_sizes = val;
-    },
-    handleCurrentChange(val) {
-      this.current_page = val;
-    },
-    search_all_data() {
-      this.Data = this.$store.getters
-        .filtercollegeData(this.search_data)
-        .map((item) => ({
-          college_id: item.college_id,
-          user_nick: item.user_nick,
-          user_name: item.user_name,
-          user_college: item.user_college
-            ? item.user_college.college_name
-            : null,
-          college_municipality: item.college_municipality,
-          user_status: true,
-          registration_time: this.$dayJS(item.registration_time).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          centerDialogVisible: false,
-        }));
-    },
+  Data: {
+    type: undefined,
+    default: [],
   },
+});
+let page = ref({
+  cur: 1,
+  page_size: 50,
+});
+let handleSizeChange = (val: number) => {
+  page.value.page_size = val;
 };
+
+let handleCurrentChange = (val: number) => {
+  page.value.cur = val;
+};
+let handleEditClick = (val: any) => {
+  console.log(val);
+};
+let handleCheckClick = (val: any) => {
+  console.log(val);
+};
+let handleDeleteClick = (val: any) => {
+  console.log(val);
+};
+
+// export default {
+//   name: "collegeListChild",
+//   data() {
+//     return {
+//       current_page: 1,
+//       page_sizes: 50,
+//       edit: true,
+//     };
+//   },
+//   methods: {
+//     handleEditClick() {
+//       this.$router.push({
+//         name: "AdminAddCollege",
+//       });
+//     },
+//     handleCheckClick() {
+//       console.log(this.Data);
+//     },
+//     handleDeleteClick(val) {
+//       console.log(val);
+//     },
+//     handleSizeChange(val) {
+//       this.page_sizes = val;
+//     },
+//     handleCurrentChange(val) {
+//       this.current_page = val;
+//     },
+//     search_all_data() {
+//       this.Data = this.$store.getters
+//         .filtercollegeData(this.search_data)
+//         .map((item) => ({
+//           college_id: item.college_id,
+//           user_nick: item.user_nick,
+//           user_name: item.user_name,
+//           user_college: item.user_college
+//             ? item.user_college.college_name
+//             : null,
+//           college_municipality: item.college_municipality,
+//           user_status: true,
+//           registration_time: this.$dayJS(item.registration_time).format(
+//             "YYYY-MM-DD HH:mm:ss"
+//           ),
+//           centerDialogVisible: false,
+//         }));
+//     },
+//   },
+// };
 </script>
 
-<style scope>
+<style scope lang="scss">
 .college-list-child .table-header {
   font: 1.2em "楷体";
   letter-spacing: 3px;

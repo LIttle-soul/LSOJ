@@ -1,8 +1,4 @@
-import store from "@/store";
-
-// export const loadData = () => {
-
-// };
+import store from "/src/store";
 
 export const loadData = () => {
   if (sessionStorage.getItem(store)) {
