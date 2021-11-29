@@ -5,6 +5,7 @@ from django.core.cache import cache
 from app.models import *
 from datetime import datetime
 from django.utils import timezone
+from django.db.models import Q
 
 publicMethod = PublicMethod()
 
@@ -65,33 +66,6 @@ class ProblemSubmission(View):
                 # run_result=run_result,
                 # run_error=run_error
             )
-            if level_id is not None:
-                solution_id = solution.solution_id
-                s_result = solution.run_result
-                s_result = 1 if s_result == 4 else 2
-                lps = LevelProblemSubmit.objects.filter(level_id=level_id, problem_id=problem_id, user_id=user_id).first()
-                if not lps.exit():
-                    LevelProblemSubmit.objects.create(
-                        level_id=level_id,
-                        problem_id=problem_id,
-                        user_id=user_id,
-                        status=s_result,
-                        solution_id=solution_id
-                    )
-                elif lps.status == 2:
-                    LevelProblemSubmit.objects.filter(level_id=level_id, problem_id=problem_id, user_id=user_id).update(
-                        status=s_result,
-                        solution_id=solution_id,
-                        submit_time=datetime.now()
-                    )
-                level_submit = LevelProblemSubmit.objects.filter(level_id=level_id, status=1).count()
-                if level_submit == Level.objects.filter(level_id=level_id).first().pass_num:
-                    lp = LevelPass.objects.filter(user_id=user_id, level_id=level_id)
-                    if not lp.exit():
-                        LevelPass.objects.create(
-                            level_id=level_id,
-                            user_id=user_id,
-                        )
             return JsonResponse({'status': True, 'message': '提交成功', 'solution_id': solution.solution_id})
         else:
             return JsonResponse({'status': False, 'message': '消息不全'})
@@ -111,10 +85,37 @@ class StatusSubmit(View):
             result:rank_date【状态列表】
     """
     def get(self, request):
+        token = request.COOKIES.get('token')
+        user_id = cache.get(token)
+        page = request.GET.get("page")
+        total = request.GET.get("total")
+        key = request.GET.get("key")
+        text = request.GET.get("text")
+        run_result = request.GET.get("run_result")
+        language = request.GET.get("language")
         contest_id = request.GET.get('contest_id')
+        me = request.GET.get('me')
+        print(page, total, key, text, run_result, language, contest_id, me)
+        solution = Solution.objects.all().order_by('-solution_id')
+        if key:
+            if key == 'solution_id':
+                solution = solution.filter(Q(solution_id__contains=text))
+            elif key == 'user':
+                solution = solution.filter(Q(user_id__contains=text))
+            elif key == 'problem_id':
+                solution = solution.filter(Q(problem_id__contains=text))
+            else:
+                return JsonResponse({'status': False, 'message': 'key值出错'})
+        if run_result:
+            solution = solution.filter(run_result=run_result)
+        if language:
+            solution = solution.filter(solution_language=language)
+        if me == 'true' and user_id:
+            solution = solution.filter(user_id=user_id)
+
         message = []
-        if contest_id is not None:
-            solution = Solution.objects.filter(contest_id=contest_id)
+        if contest_id != '-1':
+            solution = solution.filter(contest_id=contest_id)
             problems = ContestProblem.objects.filter(contest_id=contest_id)
             problem_num = dict()
             for problem in problems:
@@ -139,7 +140,7 @@ class StatusSubmit(View):
                     'run_all_rate': data.run_all_rate
                 })
         else:
-            solution = Solution.objects.filter(contest_id='-1')
+            solution = solution.filter(contest_id='-1')
             for data in solution:
                 message.append({
                     'solution_id': data.solution_id,
@@ -158,7 +159,12 @@ class StatusSubmit(View):
                     'run_pass_rate': data.run_pass_rate,
                     'run_all_rate': data.run_all_rate
                 })
-        return JsonResponse({'status': True, 'message': message})
+        solution_num = solution.count()
+        if total == '0':
+            message = message[int(page) - 1:]
+        else:
+            message = message[(int(page) - 1) * int(total): int(page) * int(total)]
+        return JsonResponse({'status': True, 'message': message, 'total': solution_num})
 
 
 class OneSolutionStatus(View):

@@ -3,7 +3,7 @@ from app.view.forum_view import *
 
 urlpatterns = [
     path('createforum/', CreateForum.as_view(), name='create_forum'),
-    path('getforumlist', GetForumList.as_view(), name='get_forum_list'),
+    path('getforumlist/', GetForumList.as_view(), name='get_forum_list'),
     path('getforumpage/', GetForumPage.as_view(), name='get_forum_page'),
     path('getmyforum/', GetMyForum.as_view(), name='get_my_forum'),
     path('deleteforum/', DeleteForum.as_view(), name='delete_forum'),

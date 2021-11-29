@@ -24,20 +24,62 @@ class ContestList(View):
             None
     """
     def get(self, request):
-        contest = Contest.objects.filter().all().order_by('-contest_id')
-        contest_data = []
-        for data in contest:
-            # problems = ContestProblem.objects.filter(contest_id=data.contest_id).order_by('problem_num')
-            # problem_list = []
-            # for problem in problems:
-            #     question = Problem.objects.filter(problem_id=problem.problem_id).first()
-            #     if not question:
-            #         continue
-            #     problem_list.append({
-            #         'problem_id': problem.problem_id,
-            #         'problem_title': question.problem_title,
-            #     })
-            users = ContestUser.objects.filter(contest_id=data.contest_id)
+        token = request.COOKIES.get('token')
+        user_id = cache.get(token)
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        status = request.GET.get('status')
+        text = request.GET.get('text')
+        contest_id = request.GET.get('contest_id')
+        time = request.GET.get('time')
+        me = request.GET.get('me')
+        print(page, total, status, text, me)
+        if not contest_id:
+            contest = Contest.objects.all().order_by('-contest_id')
+            if me:
+                if not user_id:
+                    return JsonResponse({'status': False, 'message': '未登入'})
+                contests = ContestUser.objects.filter(contest_user=user_id).values_list("contest_id")
+                contests_temp = [item[0] for item in contests]
+                print(contests_temp)
+                contest = contest.filter(contest_id__in=contests_temp)
+            if time:
+                contest = contest.filter(end_time__gte=timezone.now())
+            if text:
+                contest = contest.filter(Q(contest_id__contains=text) | Q(contest_title__contains=text) | Q(contest_creator__contains=text))
+            if status:
+                contest = contest.filter(contest_province=status)
+            contest_num = contest.count()
+            if total != '0':
+                contest = contest[(int(page) - 1) * int(total): int(page) * int(total)]
+            contest_data = []
+            for data in contest:
+                users = ContestUser.objects.filter(contest_id=data.contest_id)
+                user_list = []
+                for user in users:
+                    user_list.append({
+                        'user_id': user.contest_user,
+                        'contest_id': user.contest_id,
+                        'contest_class': user.contest_class,
+                        'contest_account': user.contest_account
+                    })
+                contest_data.append({
+                    'contest_id': data.contest_id,
+                    'contest_title': data.contest_title,
+                    'contest_introduce': data.contest_introduce,
+                    'contest_province': data.contest_province,
+                    'contest_language': [] if data.contest_language is None else [int(item) for item in data.contest_language.split(',')],
+                    'contest_creator': data.contest_creator,
+                    'start_time': data.start_time,
+                    'end_time': data.end_time,
+                    'contest_password': data.contest_password,
+                    'contest_defunct': data.contest_defunct,
+                    'problem_list': [],
+                    'user_list': user_list
+                })
+        else:
+            contest = Contest.objects.filter(contest_id=contest_id).first()
+            users = ContestUser.objects.filter(contest_id=contest_id)
             user_list = []
             for user in users:
                 user_list.append({
@@ -46,21 +88,23 @@ class ContestList(View):
                     'contest_class': user.contest_class,
                     'contest_account': user.contest_account
                 })
-            contest_data.append({
-                'contest_id': data.contest_id,
-                'contest_title': data.contest_title,
-                'contest_introduce': data.contest_introduce,
-                'contest_province': data.contest_province,
-                'contest_language': [] if data.contest_language is None else [int(item) for item in data.contest_language.split(',')],
-                'contest_creator': data.contest_creator,
-                'start_time': data.start_time,
-                'end_time': data.end_time,
-                'contest_password': data.contest_password,
-                'contest_defunct': data.contest_defunct,
+            contest_data = {
+                'contest_id': contest.contest_id,
+                'contest_title': contest.contest_title,
+                'contest_introduce': contest.contest_introduce,
+                'contest_province': contest.contest_province,
+                'contest_language': [] if contest.contest_language is None else [int(item) for item in
+                                                                              contest.contest_language.split(',')],
+                'contest_creator': contest.contest_creator,
+                'start_time': contest.start_time,
+                'end_time': contest.end_time,
+                'contest_password': contest.contest_password,
+                'contest_defunct': contest.contest_defunct,
                 'problem_list': [],
                 'user_list': user_list
-            })
-        return JsonResponse({'status': 'Ture', 'message': contest_data})
+            }
+            contest_num = 0
+        return JsonResponse({'status': True, 'message': contest_data, 'total': contest_num})
 
     def post(self, request):
         token = request.COOKIES.get('token')
@@ -159,6 +203,7 @@ class ContestList(View):
         if identity > 2:
             return JsonResponse({'status': False, 'message': '权限不足'})
         contest_id = request.GET.get('contest_id')
+        print(contest_id)
         contest = Contest.objects.filter(contest_id=contest_id).first()
         if not contest:
             return JsonResponse({'status': False, 'message': '竞赛不存在'})
@@ -173,8 +218,16 @@ class ContestProblemList(View):
     def get(self, request):
         token = request.COOKIES.get('token')
         user_id = cache.get(token)
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        text = request.GET.get('text')
         contest_id = request.GET.get('contest_id')
         problems = ContestProblem.objects.filter(contest_id=contest_id).order_by('problem_num')
+        problem_num = problems.count()
+        if text:
+            problems = problems.filter(Q(problem_id__contains=text) | Q(problem_title__contains=text))
+        if total != '0':
+            problems = problems[(int(page) - 1) * int(total): int(page) * int(total)]
         problem_list = []
         for problem in problems:
             question = Problem.objects.filter(problem_id=problem.problem_id).first()
@@ -204,11 +257,9 @@ class ContestProblemList(View):
                 'problem_title': question.problem_title,
                 'problem_description': question.problem_description,
                 'problem_spj': question.problem_spj,
-                'problem_course': question.problem_course.split(','),
                 'creation_time': question.creation_time,
                 'time_limit': question.time_limit,
                 'memory_limit': question.memory_limit,
-                'problem_tag': question.problem_tag,
                 'problem_difficult': question.problem_difficult,
                 'problem_creator': question.problem_creator,
                 'creator_name': creator_name.split(','),
@@ -217,7 +268,7 @@ class ContestProblemList(View):
                 'problem_accepted': Solution.objects.filter(contest_id=contest_id, problem_id=problem.problem_id, run_result=4).count(),
                 'pass_status': result
             })
-        return JsonResponse({'status': True, 'message': problem_list})
+        return JsonResponse({'status': True, 'message': problem_list, 'total': problem_num})
 
     def post(self, request):
         token = request.COOKIES.get('token')
@@ -229,7 +280,7 @@ class ContestProblemList(View):
             return JsonResponse({'status': False, 'message': '权限不足'})
         contest_id = request.POST.get('contest_id')
         problem_id = request.POST.get('problem_id')
-        print(problem_id)
+        print(contest_id, problem_id)
         problem = Problem.objects.filter(problem_id=problem_id).first()
         if not problem:
             return JsonResponse({'status': False, 'message': '没有这个问题'})
@@ -357,8 +408,13 @@ class RankList(View):
         return the_time
 
     def get(self, request):
+        page = request.GET.get('page')
+        total = request.GET.get('total')
         contest_id = request.GET.get('contest_id')
         contest_rank = ContestRank.objects.filter(contest_id=contest_id).order_by('-contest_sum', 'contest_time')
+        rank_num = contest_rank.count()
+        if total != '0':
+            contest_rank = contest_rank[(int(page) - 1) * int(total): int(page) * int(total)]
         rank_list = []
         for rank in contest_rank:
             score_list = dict()
@@ -383,11 +439,13 @@ class RankList(View):
                 'contest_time': self.getTime(int(rank.contest_time) / 1000),
                 'contest_score': score_list,
             })
-        return JsonResponse({'status': True, 'message': rank_list})
+        return JsonResponse({'status': True, 'message': rank_list, 'total': rank_num})
 
 
 class ContestStats(View):
     def get(self, request):
+        page = request.GET.get('page')
+        total = request.GET.get('total')
         contest_id = request.GET.get('contest_id')
         contest_problem = ContestProblem.objects.filter(contest_id=contest_id).order_by('problem_num')
         solutions = Solution.objects.filter(contest_id=contest_id)
@@ -418,26 +476,36 @@ class ContestStats(View):
                 'tr': stats_list[i][12],
                 'total': stats_list[i][13]
             })
-        return JsonResponse({'status': True, 'message': message})
+        status_num = len(message)
+        if total != '0':
+            message = message[(int(page) - 1) * int(total): int(page) * int(total)]
+        return JsonResponse({'status': True, 'message': message, 'total': status_num})
 
 
 class ContestUserList(View):
     def get(self, request):
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        text = request.GET.get('text')
         contest_id = request.GET.get('contest_id')
         contest = Contest.objects.filter(contest_id=contest_id)
         if not contest:
             return JsonResponse({'status': False, 'message': '不存在这个竞赛'})
         contest_user = ContestUser.objects.filter(contest_id=contest_id)
+        if text:
+            contest_user = contest_user.filter(Q(contest_user__contains=text))
+        user_num = contest_user.count()
+        if total != '0':
+            contest_user = contest_user[(int(page) - 1) * int(total): int(page) * int(total)]
         user_list = []
         for users in contest_user:
             user = User.objects.filter(user_id=users.contest_user).first()
             if not user:
                 continue
-            school = School.objects.filter(school_id=user.user_school).first()
-            if not school:
-                school_name = user.user_school
-            else:
-                school_name = school.school_name
+            school_name = ''
+            if user.user_school:
+                user_school = user.user_school.split(',')[-1]
+                school_name = School.objects.filter(school_id=user_school).first().school_name
             user_list.append({
                 'contest_id': users.contest_id,
                 'contest_user': users.contest_user,
@@ -450,7 +518,7 @@ class ContestUserList(View):
                 'contest_auditing': users.contest_auditing,
                 'apply_time': users.apply_time,
             })
-        return JsonResponse({'status': True, 'message': user_list})
+        return JsonResponse({'status': True, 'message': user_list, 'total': user_num})
 
     def post(self, request):
         token = request.COOKIES.get('token')

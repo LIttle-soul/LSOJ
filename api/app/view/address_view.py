@@ -163,3 +163,88 @@ class GetAddressList(View):
             })
         message = {'status': True, 'data': data}
         return JsonResponse(message)
+
+
+class GetAddressMessage(View):
+    """
+    模块：查询地区信息
+    接口信息：
+        GET：
+        省：province,市：municipality,区/县：district,乡/镇：township,村：village
+    """
+    def get(self, request):
+        father = request.GET.get('father')
+        father_id = request.GET.get('father_id')
+        child = request.GET.get('child')
+        address_num = 0
+        address_list = []
+        if child == 'province':
+            province = Province.objects.all()
+            address_num = province.count()
+            for item in province:
+                address_list.append({
+                    'id': item.province_id,
+                    'name': item.province_name,
+                    'deep': 1,
+                })
+        elif child == 'municipality':
+            municipality = Municipality.objects.filter(municipality_province=father_id)
+            address_num = municipality.count()
+            for item in municipality:
+                address_list.append({
+                    'id': item.municipality_id,
+                    'name': item.municipality_name,
+                    'deep': 2,
+                })
+        elif child == 'district':
+            if father == 'province':
+                district = District.objects.filter(district_province=father_id)
+            elif father == 'municipality':
+                district = District.objects.filter(district_municipality=father_id)
+            else:
+                district = District.objects.all()
+            address_num = district.count()
+            for item in district:
+                address_list.append({
+                    'id': item.district_id,
+                    'name': item.district_name,
+                    'deep': 3,
+                })
+        elif child == 'township':
+            if father == 'province':
+                township = Township.objects.filter(township_province=father_id)
+            elif father == 'municipality':
+                township = Township.objects.filter(township_municipality=father_id)
+            elif father == 'district':
+                township = Township.objects.filter(township_area=father_id)
+            else:
+                township = Township.objects.all()
+            address_num = township.count()
+            for item in township:
+                address_list.append({
+                    'id': item.township_id,
+                    'name': item.township_name,
+                    'deep': 4,
+                })
+        elif child == 'village':
+            if father == 'province':
+                village = Village.objects.filter(village_province=father_id)
+            elif father == 'municipality':
+                village = Village.objects.filter(village_municipality=father_id)
+            elif father == 'district':
+                village = Village.objects.filter(village_area=father_id)
+            elif father == 'township':
+                village = Village.objects.filter(village_township=father_id)
+            else:
+                village = Village.objects.all()
+            address_num = village.count()
+            for item in village:
+                address_list.append({
+                    'id': item.village_id,
+                    'name': item.village_name,
+                    'deep': 5,
+                })
+        return JsonResponse({'status': True, 'message': address_list, 'total': address_num})
+
+
+

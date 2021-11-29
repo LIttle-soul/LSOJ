@@ -1,6 +1,8 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import View
 from app.RoleMethod import get_school
+# from openpyxl import load_workbook
+from django.db.models import Q
 from app.models import *
 
 
@@ -52,23 +54,23 @@ class GetSchool(View):
     """
 
     def get(self, request):
-        # municipality_id = request.GET.get('municipality_id')
-        # if municipality_id:
-        #     obj = School.objects.filter(school_municipality=municipality_id)
-        # else:
-        #     obj = School.objects.all()
-        # if obj.exists():
-        #     data = list(obj.values())
-        #     for data_child in data:
-        #         temp_data = Municipality.objects.filter(municipality_id=int(data_child['school_municipality'])).first()
-        #         data_child["school_municipality"] = {'municipality_id': temp_data.municipality_id, 'municipality_name': temp_data.municipality_name}
-        # else:
-        #     data = []
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        text = request.GET.get('text')
+        municipality_id = request.GET.get('municipality_id')
+        print(page, total, text, municipality_id)
         municipality_list = dict()
         municipality = Municipality.objects.all()
         for municipality_child in municipality:
             municipality_list[municipality_child.municipality_id] = municipality_child.municipality_name
         school = School.objects.all()
+        if municipality_id:
+            school = school.filter(school_municipality=municipality_id)
+        if text:
+            school = school.filter(Q(school_name__contains=text))
+        school_num = school.count()
+        if total != '0':
+            school = school[(int(page) - 1) * int(total): int(page) * int(total)]
         school_list = []
         for school_child in school:
             school_list.append({
@@ -81,7 +83,7 @@ class GetSchool(View):
                 'school_rank': school_child.school_rank,
                 'school_remark': school_child.school_remark,
             })
-        return JsonResponse({'status': True, 'data': school_list})
+        return JsonResponse({'status': True, 'message': school_list, 'total': school_num})
 
     def post(self, request):
         school_id = request.POST.get('school_id')
@@ -111,3 +113,30 @@ class GetSchool(View):
             school_new_name = obj.first().school_name
             message = {'status': False, 'info': f'当前编号下已有学校{school_new_name}, 请输入正确的学校统一编号'}
         return JsonResponse(message)
+
+# class PutSchool(View):
+#     def get(self,request):
+#         wb = load_workbook('D:/xiazai/address_bak.xlsx')
+#         ws = wb['municipality']
+#         cList = ws['C'][1:]
+#         aList = ws['A'][1:]
+#         school_list = []
+#         municipality_list = dict()
+#         for it in cList:
+#             a = it.value
+#             b, c = a.split('/')
+#             e, f = c.split('.')
+#             school_list.append(e)
+#
+#         g = 0
+#         for it in aList:
+#             municipality_list[school_list[g]] = it.value
+#             municipality_list[it.value] = it.value
+#             g += 1
+#
+#         schools = School.objects.all()
+#
+#         for school in schools:
+#             school.school_municipality = municipality_list[school.school_municipality]
+#             school.save()
+

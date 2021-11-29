@@ -28,19 +28,42 @@ class GetNewList(View):
 
     """
     def get(self, request):
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        text = request.GET.get('text')
+        news_id = request.GET.get('news_id')
+
         news = News.objects.all()
-        info = []
-        for new in news:
-            info.append({
-                "news_id": new.news_id,
-                "news_title": new.news_title,
-                "news_introduce": new.news_introduce,
-                "news_creator": new.news_creator,
-                "create_time": new.creator_time,
-                "news_type": new.news_type,
-                "news_importance": new.news_importance,
-            })
-        return JsonResponse({'status': True, "message": info})
+        if not news_id:
+            if text:
+                news = news.filter(Q(news_creator__contains=text) | Q(news_title__contains=text))
+            news = news.order_by('-news_importance')
+            news_num = news.count()
+            news = news[(int(page) - 1) * int(total): int(page) * int(total)]
+            info = []
+            for new in news:
+                info.append({
+                    "news_id": new.news_id,
+                    "news_title": new.news_title,
+                    "news_introduce": new.news_introduce,
+                    "news_creator": new.news_creator,
+                    "create_time": new.creator_time,
+                    "news_type": new.news_type,
+                    "news_importance": new.news_importance,
+                })
+        else:
+            news = news.filter(news_id=news_id).first()
+            info = {
+                "news_id": news.news_id,
+                "news_title": news.news_title,
+                "news_introduce": news.news_introduce,
+                "news_creator": news.news_creator,
+                "create_time": news.creator_time,
+                "news_type": news.news_type,
+                "news_importance": news.news_importance,
+            }
+            news_num = 1
+        return JsonResponse({'status': True, "message": info, 'total': news_num})
 
 
 class AddNews(View):

@@ -1646,8 +1646,7 @@ class ViewAllCourse(View):
                     'course_browse': item.course_browse
                 }
             )
-        massage = {'massage': rank_data}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': rank_data})
 
 
     def post(self, request):

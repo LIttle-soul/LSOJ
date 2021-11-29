@@ -28,7 +28,7 @@ from django.core.cache import cache
 
 # ----------------------------------报名系统 谢继业--------------------------------------- #
 
-class signUpPage(View):
+class signUp(View):
     """
         模块：报名入口
         接口信息：
@@ -55,8 +55,24 @@ class signUpPage(View):
         return JsonResponse({"info":info})
 
     def post(self, request):
-        contest = request.POST.get("contest")
-        information = request.POST.get("contestInfo")
+        token = request.COOKIES.get("token")
+        user_id = cache.get(token)
+        contest_id = request.POST.get("contest_id")
+        if not user_id:
+            return JsonResponse({'status': False, 'message': '未登录'})
+        contest = Contest.objects.filter(contest_id=contest_id).first()
+        if not contest:
+            return JsonResponse({'status': False, 'message': '竞赛不存在'})
+        users = ContestUser.objects.filter(contest_id=contest_id).values_list('contest_user')
+        if user_id in users:
+            return JsonResponse({'status': False, 'message': '已报名'})
+        ContestUser.objects.create(
+            contest_id=contest_id,
+            contest_user=user_id,
+            contest_auditing=True,
+            apply_time=timezone.now()
+        )
+        return JsonResponse({'status': True, 'message': '添加成功'})
 
 
 class singleCancel(View):
@@ -105,21 +121,24 @@ class SingleSignUp(View):
         token = request.COOKIES.get("token")
         user_id = cache.get(token)
         contest_id = request.POST.get("contest_id")
+        password = request.POST.get('password')
         if not user_id:
             return JsonResponse({'status': False, 'message': '未登录'})
         contest = Contest.objects.filter(contest_id=contest_id).first()
         users = ContestUser.objects.filter(contest_id=contest_id).values_list('contest_user')
         if user_id in users:
             return JsonResponse({'status': False, 'message': '已报名'})
-        if contest.contest_province == 3:
-            contest_auditing = 0
+        if contest.contest_password != password:
+            return JsonResponse({'status': False, 'message': '密码错误'})
+        if contest.contest_province == 0:
+            contest_auditing = True
         else:
-            contest_auditing = 1
+            contest_auditing = False
         ContestUser.objects.create(
             contest_id=contest_id,
             contest_user=user_id,
+            apply_time=timezone.now(),
             contest_auditing=contest_auditing,
-            apply_time=timezone.now()
         )
         return JsonResponse({'status': True, 'message': '添加成功'})
 
@@ -186,29 +205,30 @@ class TeamSignUp(View):
         user_id = cache.get(token)
         if not user_id:
             return JsonResponse({'status': False, 'message': '未登录'})
-        class_id = request.POST.get('class_id')
+        team_id = request.POST.get('team_id')
         contest_id = request.POST.get('contest_id')
-        team = Class.objects.filter(class_id=class_id)
-        if team.exists():
+        team = Team.objects.filter(team_id=team_id).first()
+        if not team:
             return JsonResponse({'status': False, 'message': '没有这个团队'})
         contest = Contest.objects.filter(contest_id=contest_id).first()
+        if contest.contest_province == 0:
+            contest_auditing = True
+        else:
+            contest_auditing = False
         if not contest:
             return JsonResponse({'status': False, 'message': '没有这个竞赛'})
-        if contest.contest_province == 3:
-            contest_auditing = 0
-        else:
-            contest_auditing = 1
-        users = ClassUser.objects.filter(class_id=class_id)
+        users = TeamUser.objects.filter(team_id=team_id)
         for user in users:
-            the_user = ContestUser.objects.filter(contest_id=contest_id, user_id=user.user_id).first()
-            if the_user:
-                the_user.contest_class = class_id
-                the_user.save()
+            contest_user = ContestUser.objects.filter(contest_id=contest_id, contest_user=user.team_user).first()
+            if contest_user:
+                contest_user.contest_class = team_id
+                contest_user.save()
                 continue
             ContestUser.objects.create(
                 contest_id=contest_id,
-                contest_user=user.user_id,
-                contest_class=class_id,
+                contest_user=user.team_user,
+                contest_class=team_id,
+                apply_time=timezone.now(),
                 contest_auditing=contest_auditing,
             )
         return JsonResponse({'status': True, 'message': '报名成功'})

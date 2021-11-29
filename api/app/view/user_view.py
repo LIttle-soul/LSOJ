@@ -35,6 +35,9 @@ class Login(View):
                     login_time=timezone.now(),
                     login_way='JHCOJ'
                 )
+                user = User.objects.filter(user_id=user_id).first()
+                if user and user.user_status == 0:
+                    return JsonResponse({'status': False, 'message': '你被封号了！想再登入请联系管理员或老师！'})
                 token = uuid.uuid4().hex
                 cache.set(token, user_id, 7200)  # 将token存入缓存有效期120分钟
                 message = {'status': True, 'message': '登录成功', 'token': token}
@@ -174,6 +177,7 @@ class SendEmail(View):
         email = request.POST.get('email')
         email_code = request.POST.get('code')
         user_id = cache.get(token)
+        print(email, email_code)
         if publicMethod.check_email_code(email, email_code):
             message = {'status': True, 'message': '邮箱绑定成功'}
             obj = User.objects.get(user_id=user_id)
@@ -221,14 +225,41 @@ class PerfectInfo(View):
         obj = User.objects.filter(user_id=user_id)
         if obj.exists():
             user = obj.first()
+            if user.user_address is None:
+                address_name = ''
+            else:
+                address_num = len(user.user_address.split(','))
+                user_address = user.user_address.split(',')[-1]
+                if address_num == 1 and user.user_address:
+                    address = Province.objects.filter(province_id=user_address).first()
+                    address_name = address.province_name
+                elif address_num == 2:
+                    address = Municipality.objects.filter(municipality_id=user_address).first()
+                    address_name = address.municipality_name
+                elif address_num == 3:
+                    address = District.objects.filter(district_id=user_address).first()
+                    address_name = address.district_name
+                elif address_num == 4:
+                    address = Township.objects.filter(township_id=user_address).first()
+                    address_name = address.township_name
+                elif address_num == 5:
+                    address = Village.objects.filter(village_id=user_address).first()
+                    address_name = address.village_name
+                else:
+                    address_name = ''
+            user_school = user.user_school.split(',')[-1]
+            school = School.objects.filter(school_id=user_school).first()
+            if school:
+                school_name = school.school_name
+            else:
+                school_name = ''
             data = {
                 'student_id': user.student_id,
-                'user_address': None if user.user_address is None else {
+                'user_address': None if user.user_address is None or user.user_address == '' else {
                     'address_id': user.user_address,
-                    'address_name': Municipality.objects.filter(municipality_id=user.user_address).first().municipality_name
+                    'address_name': address_name,
                 },
                 'user_birthday': user.user_birthday,
-                'user_class': user.user_class,
                 'user_email': user.user_email,
                 'user_id': user.user_id,
                 'user_introduce': user.user_introduce,
@@ -237,11 +268,10 @@ class PerfectInfo(View):
                 'user_power': user.user_power,
                 'user_school': None if user.user_school is None else {
                     'school_id': user.user_school,
-                    'school_name': School.objects.filter(school_id=user.user_school).first().school_name
+                    'school_name': school_name,
                 },
                 'user_score': user.user_score,
                 'user_sex': user.user_sex,
-                'user_team': user.user_team,
                 'user_telephone': user.user_telephone,
                 'registration_time': Password.objects.filter(user_id=user_id).first().registration_time,
                 'user_icon': user.user_icon
@@ -254,63 +284,44 @@ class PerfectInfo(View):
     def post(self, request):
         token = request.COOKIES.get('token')
         user_id = cache.get(token)
+        print(token, user_id)
         if not user_id:
-            return JsonResponse({'err': "用户认证失败"})
+            return JsonResponse({'status': False, 'message': "登录已失效"})
         user_name = request.POST.get('user_name')
-        if user_name == 'null':
-            user_name = None
         user_nick = request.POST.get('user_nick')
-        if user_nick == 'null':
-            user_nick = None
         user_introduce = request.POST.get('user_introduce')
-        if user_introduce == 'null':
-            user_introduce = None
         user_telephone = request.POST.get('user_telephone')
-        if user_telephone == 'null':
-            user_telephone = None
-        user_birthday = request.POST.get('user_birthday')
-        if user_birthday == 'null':
-            user_birthday = None
-        user_school = request.POST.get('user_school')
-        if user_school == 'null':
-            user_school = None
-        user_class = request.POST.get('user_class')
-        if user_class == 'null':
-            user_class = None
-        user_address = request.POST.get('user_address')
-        if user_address != 'null':
-            user_address = user_address.split(',')
-            user_address = user_address[1]
-        else:
-            user_address = None
         user_sex = request.POST.get('user_sex')
+        user_birthday = request.POST.get('user_birthday')
+        user_school = request.POST.get('user_school')
+        user_address = request.POST.get('user_address')
+        print(user_name, user_nick, user_introduce, user_telephone, user_sex, user_birthday, user_school, user_address)
         obj = User.objects.filter(user_id=user_id)
         if obj.exists():
             obj = obj.first()
             obj.user_nick = user_nick
             obj.user_name = user_name
             obj.user_sex = user_sex
-            obj.user_birthday = user_birthday
             obj.user_introduce = user_introduce
             obj.user_telephone = user_telephone
-            obj.user_address = user_address
+            obj.user_birthday = user_birthday
             obj.user_school = user_school
+            obj.user_address = user_address
             obj.save()
             message = {'status': True, 'message': '信息修改成功'}
         else:
             User.objects.create(
-                user_id=user_id if user_id else None,
-                user_name=user_name if user_name else None,
-                user_nick=user_nick if user_nick else None,
-                user_introduce=user_introduce if user_introduce else None,
+                user_id=user_id,
+                user_name=user_name,
+                user_nick=user_nick,
+                user_introduce=user_introduce,
                 user_power=4,
                 user_score=0,
-                user_sex=user_sex if user_sex else None,
-                user_telephone=user_telephone if user_telephone else None,
-                user_birthday=user_birthday if user_birthday else None,
-                user_school=user_school if user_school else None,
-                user_class=user_class if user_class else None,
-                user_address=user_address if user_address else None
+                user_birthday=user_birthday,
+                user_sex=user_sex,
+                user_telephone=user_telephone,
+                user_school=user_school,
+                user_address=user_address,
             )
             message = {'status': True, 'message': '信息完善成功'}
         return JsonResponse(message)
@@ -342,17 +353,27 @@ class GetUserList(View):
             message: 提示信息
     """
     def get(self, request):
-        # obj = User.objects.all().extra(
-        #     select={'registration_time': 'password.registration_time', 'user_school_name': 'school.school_name'},
-        #     tables=['password', 'school'],
-        #     where=['user.user_id=password.user_id', 'user.user_school=school.school_id']
-        # ).values()
-        obj = User.objects.all()
+        page = request.GET.get('page')
+        total = request.GET.get('total')
+        text = request.GET.get('text')
+        user_id = request.GET.get('user_id')
+        user = User.objects.all()
+        if not user_id:
+            if text:
+                user = user.filter(Q(user_id__contains=text) | Q(user_nick__contains=text) | Q(user_name__contains=text))
+        else:
+            user = user.filter(user_id=user_id)
+            if not user:
+                return JsonResponse({'status': False, 'message': '用户不存在'})
+        user_num = user.count()
+        if total != '0':
+            user = user[(int(page) - 1) * int(total): int(page) * int(total)]
         message = []
-        for data in obj:
+        for data in user:
             school_name = ''
             if data.user_school:
-                school_name = School.objects.filter(school_id=data.user_school).first().school_name
+                user_school = data.user_school.split(',')[-1]
+                school_name = School.objects.filter(school_id=user_school).first().school_name
             message.append({
                 'user_id': data.user_id,
                 'student_id': data.student_id,
@@ -368,12 +389,10 @@ class GetUserList(View):
                     'school_id': data.user_school,
                     'school_name': school_name
                 },
-                'user_class': data.user_class,
-                'user_team': data.user_team,
                 'user_status': data.user_status,
                 'user_registration_time': Password.objects.filter(user_id=data.user_id).first().registration_time
             })
-        return JsonResponse({'status': True, 'message': message})
+        return JsonResponse({'status': True, 'message': message, 'total': user_num})
 
     def put(self, request):
         token = request.COOKIES.get('token')
@@ -385,20 +404,21 @@ class GetUserList(View):
         user_power = request.GET.get('user_power')
         user_status = request.GET.get('user_status')
         user_password = request.GET.get('user_password')
+        print(put_user, user_power, user_status, user_password)
         user = User.objects.filter(user_id=put_user).first()
         if not user:
             return JsonResponse({'status': False, 'message': '此用户不存在'})
         if capacity > 2 or (capacity != 0 and user.user_power <= capacity) or (user_power is not None and capacity != 0 and int(user_power) <= capacity):
             return JsonResponse({'status': False, 'message': '权限不足'})
-        if user_power is not None:
+        if user_power:
             user.user_power = user_power
-        if user_status is not None:
+        if user_status:
             if user_status in ['false', 'FALSE']:
                 user_status = False
             elif user_status in ['true', 'TRUE']:
                 user_status = True
             user.user_status = user_status
-        if user_password is not None:
+        if user_password:
             password = Password.objects.filter(user_id=put_user).first()
             password.password = publicMethod.reg_pass(user_password)
             password.save()
@@ -408,10 +428,15 @@ class GetUserList(View):
     def delete(self, request):
         token = request.COOKIES.get('token')
         user_id = cache.get(token)
+        print(user_id)
         if not user_id:
             return JsonResponse(({'status': False, 'message': '未登录'}))
-        capacity = User.objects.filter(user_id=user_id).first().user_power
+        me = User.objects.filter(user_id=user_id).first()
+        if not me:
+            return JsonResponse({'status': False, 'message': '未完善信息'})
+        capacity = me.user_power
         delete_user = request.GET.get('user_id')
+        print(user_id, delete_user)
         user = User.objects.filter(user_id=delete_user).first()
         if not user:
             return JsonResponse({'status': False, 'message': '此用户不存在'})
@@ -479,7 +504,7 @@ class UserStatus(View):
     def get(self, request):
         token = request.COOKIES.get('token')
         user_id = request.GET.get('user_id')
-        if user_id is None:
+        if not user_id:
             user_id = cache.get(token)
         user = User.objects.filter(user_id=user_id).first()
         if not user:
@@ -554,14 +579,22 @@ class GetRankList(View):
         return begin_time
 
     def get(self, request):
+        page = request.GET.get("page")
+        total = request.GET.get("total")
         sort_by = request.GET.get('sort_by')
+        text = request.GET.get("text")
+        print(page, total)
         if sort_by:
             obj = publicMethod.get_rank_list_by_time(self.getTime(sort_by))
         else:
             obj = publicMethod.get_all_rank_list()
         message = []
+        rank = 1
         for i in obj:
+            if text and text not in i[0] and text not in i[2]:
+                continue
             message.append({
+                'rank': rank,
                 'user_id': i[0],
                 'user_name': i[1],
                 'user_nick': i[2],
@@ -569,9 +602,14 @@ class GetRankList(View):
                 'solved': i[4],
                 'school_name': i[5],
                 'user_sex': i[6],
-                'success': i[7]
             })
-        return JsonResponse({'status': True, "message": message})
+            rank = rank + 1
+        user_num = len(obj)
+        if total == '0':
+            message = message[int(page) - 1:]
+        else:
+            message = message[(int(page) - 1) * int(total): int(page) * int(total)]
+        return JsonResponse({'status': True, "message": message, 'total': user_num})
 
 
 class MyContest(View):
@@ -851,3 +889,35 @@ class createTestToken(View):
     def post(self, request):
         return JsonResponse({'token': ''})
         pass
+
+
+class CountMessage(View):
+    def get(self, request):
+        end_time = timezone.now()
+        year = end_time.year
+        month = end_time.month
+        day = end_time.day
+        begin_time = f'{year}-{month}-{day} 00:00:00'
+        solution_total = Solution.objects.all().count()
+        solution_today = Solution.objects.filter(Q(solution_time__gt=begin_time)).count()
+        problem_total = Problem.objects.all().count()
+        user_total = User.objects.all().count()
+        message = {
+            'solution_total': solution_total,
+            'solution_today': solution_today,
+            'problem_total': problem_total,
+            'user_total': user_total,
+        }
+        return JsonResponse({'status': True, 'message': message})
+
+
+class ExtendTokenTime(View):
+    def get(self, request):
+        token = request.COOKIES.get('token')
+        user_id = cache.get(token)
+
+        if not user_id:
+            return JsonResponse({'status': False})
+        else:
+            cache.touch(token, 7200)
+            return JsonResponse({'status': True})

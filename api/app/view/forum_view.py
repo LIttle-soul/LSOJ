@@ -24,11 +24,6 @@ class CreateForum(View):
             forum_section: 板块类型
             section_id: 板块编号
     """
-
-    def get(self, request):
-        massage = {'err': '错误的访问方式'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
         token = request.COOKIES.get('token')
         user_id = cache.get(token)
@@ -76,47 +71,39 @@ class GetForumList(View):
     模块: 用户获取论坛
     接口信息: 
     """
-    
     def get(self, request):
-        content = []
         forums = Forum.objects.all()
+        users = User.objects.all()
+        replies = Reply.objects.all()
+        collects = Collection.objects.all()
+        likes = ForumUser.objects.all()
+        forum_data = []
         for forum in forums:
-            forum_data = []
             if forum.forum_section != 3 and forum.forum_section != 4:
-                forum_like = ForumUser.objects.filter(forum_id=forum.forum_id, is_like='1').count()
-                forum_collect = Collection.objects.filter(collection_forget_key=forum.forum_id, collection_type='2').count()
-                replies = Reply.objects.filter(forum_id=forum.forum_id)
+                user = users.filter(user_id=forum.forum_creator).first()
+                if not user:
+                    user_name = ''
+                    user_icon = ''
+                else:
+                    user_nick = user.user_nick
+                    user_icon = user.user_icon
                 forum_data.append({
                     'forum_id': forum.forum_id,
                     'forum_title': forum.forum_title,
                     'forum_content': forum.forum_content,
                     'forum_creator': forum.forum_creator,
+                    'user_nick': user_nick,
+                    'user_icon': user_icon,
                     'create_time': forum.create_time,
                     'forum_section': forum.forum_section,
                     'section_id': forum.section_id,
                     'forum_priority': forum.forum_priority,
                     'forum_visits': forum.forum_visits,
-                    'like_num': forum_like,
-                    'collect_num': forum_collect,
-                    'reply_num': replies.count(),
+                    'like_num': likes.filter(forum_id=forum.forum_id, is_like='1').count(),
+                    'collect_num': collects.filter(collection_forget_key=forum.forum_id, collection_type='2').count(),
+                    'reply_num': replies.filter(forum_id=forum.forum_id).count(),
                 })
-                reply_data = []
-                for reply in replies:
-                    reply_like = ReplyUser.objects.filter(reply_id=reply.reply_id, is_like='1').count()
-                    reply_data.append({
-                        'reply_id': reply.reply_id,
-                        'reply_content': reply.reply_content,
-                        'reply_creator': reply.reply_creator,
-                        'pre_reply': reply.pre_reply,
-                        'reply_priority': reply.reply_priority,
-                        'create_time': reply.create_time,
-                        'reply_like': reply_like,
-                    })
-                content.append({'forum': forum_data, 'reply': reply_data})
-        return JsonResponse({'content': content})
-
-    def post(self, request):
-        return JsonResponse({'err': '无POST接口'})
+        return JsonResponse({'status': True, 'message': forum_data})
 
 
 class GetForumPage(View):
@@ -131,7 +118,6 @@ class GetForumPage(View):
         forum_id: 论坛ID
         forum_status: 论坛状态
     """
-
     def get(self, request):
         section = request.GET.get('section')
         section_id = request.GET.get('section_id')
@@ -140,8 +126,7 @@ class GetForumPage(View):
         if not section or section == '0':
             forum = Forum.objects.filter(forum_section='0')
         elif not section_id:
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '信息不完全'})
         else:
             if section in ['1', '2', '3']:
                 forum = Forum.objects.filter(forum_section=section, section_id=section_id)
@@ -179,8 +164,7 @@ class GetForumPage(View):
                 course_id = CourseUser.objects.filter(course_class=section_id).values('course_id').first()
                 forum = Forum.objects.filter(forum_section='3', section_id=course_id)
             else:
-                massage = {'err': '没有这个板块'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '没有这个板块'})
         
         
         for data in forum:
@@ -211,56 +195,43 @@ class GetForumPage(View):
                     'collect_num': forum_collect,
                     'reply_num': forum_reply,
                 })
-        
-        massage = {'content': forum_data}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': False, 'message': forum_data})
             
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
+        user_id = cache.get(token)
         forum_id = request.POST.get('forum_id')
         forum_status = request.POST.get('forum_status')
 
-        if not (token and forum_id and forum_status):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
-
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        if not (forum_id and forum_status):
+            return JsonResponse({'status': False, 'message': '信息不完全'})
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
-        
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
-            massage = {'err': '论坛不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
-        if identity not in [0, 1]:
+        if user.user_power not in [0, 1]:
             if forum.forum_creator == '2':
                 contest = Contest.objects.filter(contest_id=forum.section_id).first()
                 if user_id != contest.contest_creator:
-                    massage = {'err': '用户无权限'}
-                    return JsonResponse(massage, safe=False)
+                    return JsonResponse({'status': False, 'message': '用户无权限'})
             elif forum.forum_creator == '3' or forum.forum_creator == '4':
                 users = CourseUser.objects.filter(course_id=forum.section_id).values('course_user')
                 for data in users:
                     if data.values == user_id:
-                        massage = {'err': '用户无权限'}
-                        return JsonResponse(massage, safe=False)
+                        return JsonResponse({'status': False, 'message': '用户无权限'})
             else:
-                massage = {'err': '用户无权限'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户无权限'})
         
         forum.forum_status = forum_status
         forum.save()
-        
-        massage = {'massage': '已审核过'}
-        return JsonResponse(massage, safe=False)
+
+        return JsonResponse({'status': True, 'message': '审核成功'})
 
 
 class GetMyForum(View):
@@ -276,30 +247,25 @@ class GetMyForum(View):
     """
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
         forum_status = request.GET.get('forum_status')
         is_admin = request.GET.get('is_admin')
 
-        if not (token and forum_status):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not forum_status:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
         
         if not is_admin:
             is_admin = '0'
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
-        if is_admin == '1' and identity not in [0, 1]:
-            massage = {'err': '身份不正确'}
-            return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
+        if is_admin == '1' and user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '身份不正确'})
 
         forum_data = []
 
@@ -326,13 +292,7 @@ class GetMyForum(View):
                 'forum_priority': data.forum_priority,
                 'forum_visits': data.forum_visits,
             })
-
-        massage = {'content': forum_data}
-        return JsonResponse(massage, safe=False)
-
-    def post(self, request):
-        massage = {'err': '访问方式错误'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': forum_data})
 
 
 class DeleteForum(View):
@@ -345,55 +305,40 @@ class DeleteForum(View):
         token: token认证
         forum_id: 帖子ID
     """
-
-    def get(self, request):
-        massage = {'err': '访问方式错误'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         forum_id = request.POST.get('forum_id')
 
-        if not (token and forum_id):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not forum_id:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
-            massage = {'err': '论坛不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
-        if user_id != forum.forum_creator and identity not in [0, 1]:
+        if user_id != forum.forum_creator and user.user_power not in [0, 1]:
             if forum.forum_section == 2:
                 contest = Contest.objects.filter(contest_id=forum.section_id).first()
                 if user_id != contest.contest_creator:
-                    massage = {'err': '用户无权限'}
-                    return JsonResponse(massage, safe=False)
+                    return JsonResponse({'status': False, 'message': '用户无权限'})
             elif forum.forum_section == 3 or forum.forum_section == 4:
                 users = CourseUser.objects.filter(course_id=forum.section_id).values('course_user')
                 if user_id not in users:
-                    massage = {'err': '用户无权限'}
-                    return JsonResponse(massage, safe=False)
+                    return JsonResponse({'status': False, 'message': '用户无权限'})
             else:
-                massage = {'err': '用户无权限'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户无权限'})
 
         forum.forum_status = '3'
         forum.save()
-
-        content = {'content': '删除成功'}
-        return JsonResponse(content, safe=False)
+        return JsonResponse({'status': True, 'message': '删除成功'})
 
 
 class UndeleteForum(View):
@@ -406,44 +351,31 @@ class UndeleteForum(View):
         token: token认证
         forum_id: 帖子ID
     """
-
-    def get(self, request):
-        massage = {'err': '访问方式错误'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         forum_id = request.POST.get('post_id')
 
-        if not (token and forum_id):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not forum_id:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         forum = Forum.objects.filter(forum_id=int(forum_id)).first()
         if not forum:
-            massage = {'err': '帖子不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
-        if forum.forum_creator != user_id and identity not in [0, 1]:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
+        if forum.forum_creator != user_id and user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         forum.forum_status = '0'
         forum.save()
-
-        massage = {'message': '修改成功'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': '修改成功'})
 
 
 class ModifyForum(View):
@@ -461,74 +393,60 @@ class ModifyForum(View):
     """
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
         forum_id = request.GET.get('forum_id')
 
-        if not (token and forum_id):
-            massage = {'err': 'Incomplete information'}
-            return JsonResponse(massage, safe=False)
+        if not forum_id:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
-            massage = {'err': '帖子不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
         if forum.fourm_creator != user_id:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         content = {
             'forum_id': forum.forum_id,
             'forum_title': forum.forum_title,
             'forum_content': forum.forum_content,
         }
-
-        massage = {'content': content}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': content})
 
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         forum_id = request.POST.get('forum_id')
         forum_title = request.POST.get('forum_title')
         forum_content = request.POST.get('forum_content')
 
-        if not (token and forum_id and forum_title and forum_content):
-            massage = {'err': '访问方式错误'}
-            return JsonResponse(massage, safe=False)
+        if not (forum_id and forum_title and forum_content):
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
-            massage = {'err': '帖子不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
-        if forum.creator != user_id and identity not in [0, 1]:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
+        if forum.creator != user_id and user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         if forum.forum_title == forum_title and forum.forum_content == forum_content:
-            massage = {'massage': '信息未修改'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '信息未修改'})
 
         forum.forum_title = forum_title
         forum.forum_content = forum_content
@@ -540,9 +458,7 @@ class ModifyForum(View):
             'forum_title': forum.forum_title,
             'forum_content': forum.forum_content,
         }
-
-        content = {'content': '修改成功', 'forum': content_date}
-        return JsonResponse(content, safe=False)
+        return JsonResponse({'status': True, 'message': '修改成功', 'forum': content_date})
 
 
 class GetReplyPage(View):
@@ -558,13 +474,11 @@ class GetReplyPage(View):
         forum_id = request.GET.get('forum_id')
 
         if not forum_id:
-            massage = {'err': '信息不完善'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '信息不完全'})
         
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
-            massage = {'err': '论坛不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
 
         users = User.objects.filter(user_id=forum.forum_creator).first()
         if not users:
@@ -612,11 +526,7 @@ class GetReplyPage(View):
         forum.save()
 
         result = {'forum': forum_data, 'reply': reply_data}
-        return JsonResponse(result, safe=False)
-
-    def post(self, request):
-        massage = {'err': '访问方式错误'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': result})
 
 
 class AddReply(View):
@@ -631,13 +541,8 @@ class AddReply(View):
         reply_id: 回复ID
         reply_content: 内容
     """
-
-    def get(self, request):
-        massage = {'err': '访问方式错误'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         forum_id = request.POST.get('forum_id')
         reply_id = request.POST.get('reply_id')
         reply_content = request.POST.get('reply_content')
@@ -645,24 +550,19 @@ class AddReply(View):
         if not reply_id:
             reply_id = '-1'
 
-        if not (token and forum_id and reply_content):
-            massage = {'err': '信息不完善'}
-            return JsonResponse(massage, safe=False)
+        if not (forum_id and reply_content):
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
         if sensitiveWordCheck.search(reply_content):
-            massage = {'err': '用词不文明'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '用词不文明'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         forum = Forum.objects.filter(forum_id=forum_id).first()
         if not forum:
@@ -679,9 +579,7 @@ class AddReply(View):
             reply_priority='0'
         )
         
-        reply_data = []
-
-        reply_data.append({
+        reply_data = [{
             'reply_id': reply.reply_id,
             'forum_id': reply.forum_id,
             'reply_content': reply.reply_content,
@@ -690,10 +588,8 @@ class AddReply(View):
             'create_time': reply.create_time,
             'reply_status': reply.reply_status,
             'reply_priority': reply.reply_priority,
-        })
-
-        massage = {'content': '添加成功', 'reply': reply_data}
-        return JsonResponse(massage, safe=False)
+        }]
+        return JsonResponse({'status': True, 'message': '添加成功', 'reply': reply_data})
 
 
 class ModifyReply(View):
@@ -710,74 +606,55 @@ class ModifyReply(View):
     """
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
         reply_id = request.GET.get('reply_id')
 
-        if not (token and reply_id):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not reply_id:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         reply = Reply.objects.filter(reply_id=reply_id).first()
         if not reply:
-            massage = {'err': '没有这个回复'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '没有这个回复'})
 
-        if reply.creator != user_id and identity not in [0, 1]:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
-
-        content = {
-            'content': reply.content,
-        }
-
-        massage = {'content': content}
-        return JsonResponse(massage, safe=False)
+        if reply.creator != user_id and user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
+        return JsonResponse({'status': True, 'message': reply.content})
 
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         reply_id = request.POST.get('reply_id')
         reply_content = request.POST.get('reply_content')
 
-        if not (token and reply_id and reply_content):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not (reply_id and reply_content):
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         reply = Reply.objects.filter(reply_id=reply_id).first()
         if not reply:
-            massage = {'err': '没有这个回复'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '没有这个回复'})
 
-        if reply.creator != user_id and identity not in [0, 1]:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
+        if reply.creator != user_id and user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         reply.reply_content = reply_content
         reply.save()
 
-        massage = {'massage': '修改成功'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': '修改成功'})
 
 
 class DeleteReply(View):
@@ -790,39 +667,29 @@ class DeleteReply(View):
         token: token认证
         reply_id: 回复ID
     """
-
-    def get(self, request):
-        massage = {'err': 'Wrong request method'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         reply_id = request.POST.get('reply_id')
 
-        if not (token and reply_id):
+        if not reply_id:
             massage = {'err': '信息不完全'}
             return JsonResponse(massage, safe=False)
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         reply = Reply.objects.filter(reply_id=reply_id).first()
         if not reply:
-            massage = {'err': '回复不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '回复不存在'})
 
         forum = Forum.objects.filter(forum_id=reply.forum_id).first()
         if not forum:
-            massage = {'err': '论坛不存在'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '论坛不存在'})
         
         creator = []
 
@@ -831,15 +698,13 @@ class DeleteReply(View):
             for data in course_user:
                 creator.append(data.course_user)
 
-        if reply.reply_creator != user_id and identity not in [0, 1] and reply.reply_creator not in creator:
-            massage = {'err': '用户无权限'}
-            return JsonResponse(massage, safe=False)
+        if reply.reply_creator != user_id and user.user_power not in [0, 1] and reply.reply_creator not in creator:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         reply.reply_status = '1'
         reply.save()
 
-        massage = {'massage': '删除成功'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': '删除成功'})
 
 
 class GetMyReply(View):
@@ -853,22 +718,15 @@ class GetMyReply(View):
     """
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
 
-        if not token:
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
-
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         reply_data = []
         replies = Reply.objects.filter(reply_creator=user_id)
@@ -883,12 +741,7 @@ class GetMyReply(View):
                 'reply_status': data.reply_status,
             })
 
-        message = {'content': reply_data}
-        return JsonResponse(message, safe=False)
-
-    def post(self, request):
-        massage = {'err': 'Wrong request method'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': reply_data})
 
 
 class LikeCollection(View):
@@ -903,35 +756,25 @@ class LikeCollection(View):
         section_type: 点赞类型 0帖子 1回复
         do_type: 点击类型 0点赞 1收藏
     """
-
-    def get(self, request):
-        massage = {'err': 'Wrong request method'}
-        return JsonResponse(massage, safe=False)
-
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         section_id = request.POST.get('post_id')
         section_type = request.POST.get('section_type')
         do_type = request.POST.get('do_type')
 
-        if not (token and section_id and section_type and do_type):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not (section_id and section_type and do_type):
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
         if section_type == '1' and do_type == '1':
-            massage = {'err': '回复不能收藏'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '回复不能收藏'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         if section_type == '0':
             forum_user = ForumUser.objects.filter(forum_id=section_id, forum_user=user_id).first()
@@ -974,8 +817,7 @@ class LikeCollection(View):
                 reply_user.is_like = '0'
             reply_user.save()
 
-        message = {'message': 'Like or Bookmark Success'}
-        return JsonResponse(message, safe=False)
+        return JsonResponse({'status': True, 'message': '点赞或收藏成功'})
 
 
 class GetForumCollect(View):
@@ -990,21 +832,15 @@ class GetForumCollect(View):
     """
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
 
-        if not token:
-            massage = {'err': 'Incomplete information'}
-            return JsonResponse(massage, safe=False)
-
-        user_id = publicMethod.check_user_login(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': 'No login'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
-            user = User.objects.get(user_id__user_id=user_id)
+            user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': 'No such user'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         collection = Collection.objects.filter(user_id=user_id, collection_type='2')
 
@@ -1018,37 +854,30 @@ class GetForumCollect(View):
                 'forum_content': forum.forum_content, 
             })
 
-        result = {'content': content_data}
-        return JsonResponse(result, safe=False)
+        return JsonResponse({'status': False, 'message': content_data})
 
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         collection_id = request.POST.get('collection_id')
 
-        if not (token and collection_id):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not collection_id:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
 
         collection = Collection.objects.filter(collection_id=collection_id).first()
         if not collection:
-            massage = {'err': '无此收藏'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未收藏'})
         
         collection.delete()
 
-        massage = {'massage': 'Modified successfully'}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': '删除成功'})
 
 
 class AddWord(View):
@@ -1072,57 +901,42 @@ class AddWord(View):
                 self.getWord(level[str], char + str)
 
     def get(self, request):
-        token = request.GET.get('token')
+        token = request.COOKIES.get('token')
 
-        if not token:
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
-
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
-        if identity not in [0, 1]:
-            massage = {'err': '身份不正确'}
-            return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
+        if user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
 
         self.getWord(sensitiveWordCheck.keyword_chains, "")
 
-        massage = {"word": self.keyword_chains}
-        return JsonResponse(massage, safe=False)
+        return JsonResponse({'status': True, 'message': self.keyword_chains })
     
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         word = request.POST.get('word')
 
-        if not (token and word):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not word:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
-        if identity not in [0, 1]:
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
+        if user.user_power not in [0, 1]:
             massage = {'err': '身份不正确'}
             return JsonResponse(massage, safe=False)
-        
-        sensitiveWordCheck.add(word)
 
-        massage = {'massage': '添加成功'}
-        return JsonResponse(massage, safe=False)
+        sensitiveWordCheck.add(word)
+        return JsonResponse({'status': True, 'message': '添加成功'})
 
 
 class DeleteWord(View):
@@ -1135,35 +949,24 @@ class DeleteWord(View):
         token: token认证
         word: 敏感词 
     """
-    def get(self, request):
-        massage = {'err': 'Wrong request method'}
-        return JsonResponse(massage, safe=False)
-    
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.COOKIES.get('token')
         word = request.POST.get('word')
 
-        if not (token and word):
-            massage = {'err': '信息不完全'}
-            return JsonResponse(massage, safe=False)
+        if not word:
+            return JsonResponse({'status': False, 'message': '信息不完全'})
 
-        user_id = publicMethod.check_user_login(token)
-        identity = publicMethod.get_user_capacity(token)
+        user_id = cache.get(token)
         if not user_id:
-            massage = {'err': '未登录'}
-            return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': False, 'message': '未登录'})
         else:
             user = User.objects.filter(user_id=user_id).first()
             if not user:
-                massage = {'err': '用户不存在or用户信息未完善'}
-                return JsonResponse(massage, safe=False)
-        if identity not in [0, 1]:
-            massage = {'err': '身份不正确'}
-            return JsonResponse(massage, safe=False)
+                return JsonResponse({'status': False, 'message': '用户不存在or用户信息未完善'})
+        if user.user_power not in [0, 1]:
+            return JsonResponse({'status': False, 'message': '用户无权限'})
         
         if sensitiveWordCheck.delete(word):
-            massage = {'massage': '添加成功'}
+            return JsonResponse({'status': True, 'message': '删除成功'})
         else:
-            massage = {'massage': '没有这个单词'}
-
-        return JsonResponse(massage, safe=False)
+            return JsonResponse({'status': True, 'message': '没有这个单词'})

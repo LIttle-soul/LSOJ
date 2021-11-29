@@ -20,4 +20,6 @@ urlpatterns = [
     path('createtesttoken/', createTestToken.as_view(), name='create_test_token'),
     path('userstatus/', UserStatus.as_view(), name='user_status'),
     path('mycontest/', MyContest.as_view(), name='my_contest'),
+    path('countmessage/', CountMessage.as_view(), name='count_message'),
+    path('extendtokentime/', ExtendTokenTime.as_view(), name='extend_token_time'),
 ]

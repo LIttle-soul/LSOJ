@@ -40,5 +40,6 @@ urlpatterns = [
     path('user/', include('app.urls.user_url')),
     path('manage/', include('app.urls.manage_url')),
     path('news/', include('app.urls.news_url')),
+    path('team/', include('app.urls.team_url')),
     url(r'files/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT})
 ]

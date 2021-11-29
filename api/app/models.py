@@ -4,7 +4,7 @@ import uuid
 
 # ---------------------------地址管理------------------------------
 class Province(models.Model):
-    province_id = models.AutoField(primary_key=True)
+    province_id = models.CharField(max_length=12, primary_key=True)
     province_name = models.CharField(max_length=25, verbose_name='省份')
 
     class Meta:
@@ -14,14 +14,53 @@ class Province(models.Model):
 
 
 class Municipality(models.Model):
-    municipality_id = models.AutoField(primary_key=True)
+    municipality_id = models.CharField(max_length=12, primary_key=True)
     municipality_name = models.CharField(max_length=50, verbose_name='市级城市')
-    municipality_province = models.IntegerField(null=True, blank=True, verbose_name='城市所在省份')
+    municipality_province = models.CharField(max_length=12, null=True, blank=True, verbose_name='城市所在省份')
 
     class Meta:
         verbose_name = '城市管理'
         managed = True
         db_table = 'municipality'
+
+
+class District(models.Model):
+    district_id = models.CharField(max_length=12, primary_key=True)
+    district_name = models.CharField(max_length=50, verbose_name='区/县')
+    district_province = models.CharField(max_length=12, null=True, blank=True, verbose_name='区/县所在省份')
+    district_municipality = models.CharField(max_length=12, null=True, blank=True, verbose_name='区/县所在市')
+
+    class Meta:
+        verbose_name = '区/县管理'
+        managed = True
+        db_table = 'district'
+
+
+class Township(models.Model):
+    township_id = models.CharField(max_length=12, primary_key=True)
+    township_name = models.CharField(max_length=50, verbose_name='乡/镇')
+    township_province = models.CharField(max_length=12, null=True, blank=True, verbose_name='乡/镇所在省份')
+    township_municipality = models.CharField(max_length=12, null=True, blank=True, verbose_name='乡/镇所在市')
+    township_area = models.CharField(max_length=12, null=True, blank=True, verbose_name='乡/镇所在区/县')
+
+    class Meta:
+        verbose_name = '乡/镇管理'
+        managed = True
+        db_table = 'township'
+
+
+class Village(models.Model):
+    village_id = models.CharField(max_length=12, primary_key=True)
+    village_name = models.CharField(max_length=50, verbose_name='村')
+    village_province = models.CharField(max_length=12, null=True, blank=True, verbose_name='村所在省份')
+    village_municipality = models.CharField(max_length=12, null=True, blank=True, verbose_name='村所在市')
+    village_area = models.CharField(max_length=12, null=True, blank=True, verbose_name='村所在区/县')
+    village_township = models.CharField(max_length=12, null=True, blank=True, verbose_name='村所在区/乡/镇')
+
+    class Meta:
+        verbose_name = '村管理'
+        managed = True
+        db_table = 'village'
 
 
 # -------------------------------学校管理--------------------------
@@ -30,7 +69,7 @@ class School(models.Model):
     school_name = models.CharField(max_length=50, verbose_name='学校名称')
     school_describe = models.TextField(null=True, blank=True, verbose_name='学校描述')
     school_department = models.CharField(max_length=20, null=True, blank=True, verbose_name='主管部门')
-    school_municipality = models.IntegerField(null=True, blank=True, verbose_name='学校所在城市')
+    school_municipality = models.CharField(max_length=12, null=True, blank=True, verbose_name='学校所在城市')
     school_rank = models.CharField(max_length=20, blank=True, null=True, verbose_name='办学层次')
     school_remark = models.CharField(max_length=100, null=True, blank=True, verbose_name='学校备注')
 
@@ -58,7 +97,6 @@ class Class(models.Model):
         (1, '团队类型'),
         (2, '课程班级'),
         (3, '默认班级'),
-        (4, '临时团队')
     ]
 
     class_id = models.AutoField(primary_key=True)
@@ -66,9 +104,13 @@ class Class(models.Model):
     class_creator = models.CharField(max_length=48, verbose_name='创建者')
     create_time = models.DateTimeField(auto_now=True, verbose_name='创建时间')
     class_introduce = models.CharField(max_length=256, null=True, blank=True, verbose_name='班级介绍')
+    class_note = models.TextField(null=True, blank=True, verbose_name='班级备注')
     class_type = models.SmallIntegerField(null=True, blank=True, choices=CLASS_TYPE, verbose_name='班级类型')
+    course_id = models.IntegerField(null=True, blank=True, verbose_name='课程编号')
+    class_school = models.CharField(max_length=20, null=True, blank=True, verbose_name='班级所在学校')
     class_college = models.CharField(max_length=20, null=True, blank=True, verbose_name='班级所在学院')
     class_invitation = models.CharField(max_length=10, null=True, blank=True, verbose_name='班级邀请码')
+    code_time = models.DateTimeField(null=True, blank=True, verbose_name='邀请码有效期')
 
     class Meta:
         verbose_name = '班级管理'
@@ -100,6 +142,35 @@ class ClassUser(models.Model):
         verbose_name = '班级用户'
         managed = True
         db_table = 'class_user'
+
+
+class Team(models.Model):
+    team_id = models.AutoField(primary_key=True)
+    team_nick = models.CharField(max_length=30, verbose_name='团队名字')
+    team_introduce = models.TextField(null=True, blank=True, verbose_name='团队介绍')
+    team_creator = models.CharField(max_length=48, verbose_name='创建者')
+    team_teacher = models.CharField(max_length=48, null=True, blank=True, verbose_name='指导老师')
+    team_school = models.CharField(max_length=100, null=True, blank=True, verbose_name='团队学校')
+    school_name = models.CharField(max_length=48, null=True, blank=True, verbose_name='学校名称')
+    registration_time = models.DateTimeField(verbose_name='注册时间')
+    invitation_code = models.CharField(max_length=8, null=True, blank=True, verbose_name='邀请码')
+    code_time = models.IntegerField(null=True, blank=True, verbose_name='邀请码有效期')
+
+    class Meta:
+        verbose_name = '团队'
+        managed = True
+        db_table = 'team'
+
+
+class TeamUser(models.Model):
+    team_id = models.IntegerField(verbose_name='团队编号')
+    team_user = models.CharField(max_length=48, verbose_name='团队成员')
+    join_time = models.DateTimeField(verbose_name='加入时间')
+
+    class Meta:
+        verbose_name = '团队成员'
+        managed = True
+        db_table = 'team_user'
 
 
 # ---------------------------用户管理------------------------------
@@ -147,10 +218,8 @@ class User(models.Model):
     user_telephone = models.CharField(max_length=20, blank=True, null=True, verbose_name='用户电话')
     user_email = models.EmailField(blank=True, null=True, verbose_name='用户邮箱')
     user_birthday = models.DateTimeField(null=True, blank=True, verbose_name='用户生日')
-    user_school = models.CharField(max_length=20, null=True, blank=True, verbose_name='用户所在学校')
-    user_class = models.IntegerField(null=True, blank=True, verbose_name='用户所在班级')
-    user_team = models.IntegerField(null=True, blank=True, verbose_name='用户所在团队')
-    user_address = models.IntegerField(null=True, blank=True, verbose_name='用户所在地址')
+    user_school = models.CharField(max_length=100, null=True, blank=True, verbose_name='用户所在学校')
+    user_address = models.CharField(max_length=100, null=True, blank=True, verbose_name='用户所在地址')
     user_status = models.BooleanField(default='1', verbose_name='用户状态')
 
     class Meta:
@@ -221,6 +290,8 @@ class Problem(models.Model):
     memory_limit = models.IntegerField(default='128', verbose_name='空间限制')
     problem_tag = models.CharField(max_length=256, blank=True, null=True, verbose_name='题目标签')
     problem_difficult = models.SmallIntegerField(default='0', verbose_name='题目难度')
+    problem_solved = models.IntegerField(default='0', verbose_name='问题解决量')
+    problem_submit = models.IntegerField(default='0', verbose_name='问题提交量')
     problem_creator = models.CharField(max_length=48, null=True, blank=True, verbose_name='题目创建者')
     problem_status = models.BooleanField(default='1', verbose_name='题目状态')
 
@@ -605,7 +676,7 @@ class Course(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=48, verbose_name='课程名称')
     course_introduce = models.TextField(null=True, blank=True, verbose_name='课程介绍')
-    course_cover = models.ImageField(upload_to=course_cover_path, null=True, blank=True, verbose_name='封面')
+    course_cover = models.TextField(null=True, blank=True, verbose_name='课程封面')
     create_time = models.DateTimeField(auto_now=True, verbose_name='课程创建时间')
     course_cost = models.IntegerField(default='0', verbose_name='课程价格')
     course_creator = models.CharField(max_length=48, verbose_name='课程创建者')

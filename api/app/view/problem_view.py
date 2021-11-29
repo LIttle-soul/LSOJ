@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.core.cache import cache
 from datetime import datetime
 from app.config import config
+from django.db.models import Q
 import os
 
 publicMethod = PublicMethod()
@@ -23,96 +24,64 @@ class GetProblemList(View):
     """
 
     def get(self, request):
-        token = request.COOKIES.get('token')
+        token = request.COOKIES.get("token")
         user_id = cache.get(token)
-        problem_id = request.GET.get('problem_id')
-        problem_list = []
-
-        if problem_id:
-            problem = Problem.objects.filter(problem_id=problem_id).first()
-            if not problem:
-                message = {'status': False, 'message': '没有这个问题'}
+        page = request.GET.get("page")
+        total = request.GET.get("total")
+        key = request.GET.get("key")
+        text = request.GET.get("text")
+        problems = Problem.objects.all()
+        solution = Solution.objects.all()
+        print(page, total, key, text, user_id)
+        if key:
+            if key == 'search':
+                problems = problems.filter(Q(problem_id__contains=text) | Q(problem_title__contains=text) | Q(
+                    problem_tag__contains=text) | Q(problem_course__contains=text))
+            elif key == 'id':
+                problems = problems.filter(problem_id=text)
+            elif key == 'difficult':
+                problems = problems.filter(problem_difficult=text)
             else:
-                if user_id:
-                    problem_ture = Solution.objects.filter(
-                        problem_id=problem.problem_id, user_id=user_id, run_result=4).first()
-                    problem_false = Solution.objects.filter(
-                        problem_id=problem.problem_id, user_id=user_id).first()
-                    if problem_ture:
-                        result = '1'
-                    elif problem_false:
-                        result = '-1'
-                    else:
-                        result = '0'
-                else:
-                    result = '0'
-                if problem.problem_creator:
-                    user = User.objects.filter(
-                        user_id=problem.problem_creator).first()
-                    if user:
-                        creator_name = user.user_name
-                    else:
-                        creator_name = ''
-                problem_list.append({
-                    'problem_id': problem.problem_id,
-                    'problem_title': problem.problem_title,
-                    'problem_description': problem.problem_description,
-                    'problem_spj': problem.problem_spj,
-                    'problem_course': problem.problem_course.split(','),
-                    'creation_time': problem.creation_time,
-                    'time_limit': problem.time_limit,
-                    'memory_limit': problem.memory_limit,
-                    'problem_tag': problem.problem_tag,
-                    'problem_difficult': problem.problem_difficult,
-                    'problem_creator': problem.problem_creator,
-                    'creator_name': creator_name.split(','),
-                    'problem_status': problem.problem_status,
-                    'problem_submit': Solution.objects.filter(problem_id=problem.problem_id).count(),
-                    'problem_accepted': Solution.objects.filter(problem_id=problem.problem_id, run_result=4).count(),
-                    'pass_status': result
-                })
+                return JsonResponse({'status': False, 'message': 'key值出错'})
+        problem_num = problems.count()
+        if total == '0':
+            problems = problems[int(page) - 1:]
         else:
-            problems = Problem.objects.all()
-            for data in problems:
-                if user_id:
-                    problem_ture = Solution.objects.filter(
-                        problem_id=data.problem_id, user_id=user_id, run_result=4).first()
-                    problem_false = Solution.objects.filter(
-                        problem_id=data.problem_id, user_id=user_id).first()
-                    if problem_ture:
-                        result = '1'
-                    elif problem_false:
-                        result = '-1'
-                    else:
-                        result = '0'
+            problems = problems[(int(page) - 1) * int(total): int(page) * int(total)]
+        problem_list = []
+        for problem in problems:
+            if user_id:
+                problem_ture = solution.filter(contest_id='-1', problem_id=problem.problem_id,
+                                                       user_id=user_id, run_result=4).first()
+                problem_false = solution.filter(contest_id='-1', problem_id=problem.problem_id,
+                                                        user_id=user_id).first()
+                if problem_ture:
+                    result = 1
+                elif problem_false:
+                    result = -1
                 else:
-                    result = '0'
-                creator_name = ''
-                if data.problem_creator:
-                    user = User.objects.filter(
-                        user_id=data.problem_creator).first()
-                    if user:
-                        creator_name = user.user_name
-                problem_list.append({
-                    'problem_id': data.problem_id,
-                    'problem_title': data.problem_title,
-                    'problem_description': data.problem_description,
-                    'problem_spj': data.problem_spj,
-                    'problem_course': data.problem_course.split(',') if data.problem_course else '',
-                    'creation_time': data.creation_time,
-                    'time_limit': data.time_limit,
-                    'memory_limit': data.memory_limit,
-                    'problem_tag': data.problem_tag.split(',') if data.problem_tag else '',
-                    'problem_difficult': data.problem_difficult,
-                    'problem_creator': data.problem_creator,
-                    'creator_name': creator_name,
-                    'problem_status': data.problem_status,
-                    'problem_submit': Solution.objects.filter(problem_id=data.problem_id).count(),
-                    'problem_accepted': Solution.objects.filter(problem_id=data.problem_id, run_result=4).count(),
-                    'pass_status': result
-                })
-            message = {'status': True, 'message': problem_list}
-        return JsonResponse(message)
+                    result = 0
+            else:
+                result = 0
+            problem_list.append({
+                'problem_id': problem.problem_id,
+                'problem_title': problem.problem_title,
+                'problem_description': problem.problem_description,
+                'problem_spj': problem.problem_spj,
+                'problem_course': problem.problem_course,
+                'creation_time': problem.creation_time,
+                'time_limit': problem.time_limit,
+                'memory_limit': problem.memory_limit,
+                'problem_tag': problem.problem_tag,
+                'problem_difficult': problem.problem_difficult,
+                'problem_solved': problem.problem_solved,
+                'problem_submit': problem.problem_submit,
+                'problem_creator': problem.problem_creator,
+                'problem_status': problem.problem_status,
+                'pass_status': result,
+            })
+
+        return JsonResponse({'status': True, 'message': problem_list, 'total': problem_num})
 
 
 # class GetProblemInfo(View):
@@ -158,16 +127,21 @@ class GetProblemList(View):
 
 class GetProblemTag(View):
     def get(self, request):
-        tags = Problem.objects.all().values_list('problem_tag').distinct()
-        courses = Problem.objects.all().values_list('problem_course').distinct()
+        problems = Problem.objects.all()
+        tags = problems.values_list('problem_tag').distinct()
+        courses = problems.values_list('problem_course').distinct()
         tags_list = []
         courses_list = []
         for tag in tags:
+            if not tag[0]:
+                continue
             item = tag[0].split(',')
             for it in item:
                 if it != '':
                     tags_list.append(it)
         for course in courses:
+            if not course[0]:
+                continue
             item = course[0].split(',')
             for it in item:
                 if it != '':
@@ -249,35 +223,35 @@ class AddProblem(View):
         problem_id = request.GET.get('problem_id')
         problem = Problem.objects.filter(problem_id=problem_id).first()
         problem_title = request.GET.get('problem_title')
-        if problem_title is not None:
+        if problem_title:
             problem.problem_title = problem_title
         problem_description = request.GET.get('problem_description')
-        if problem_description is not None:
+        if problem_description:
             problem.problem_description = problem_description
         problem_spj = request.GET.get('problem_spj')
-        if problem_spj is not None:
+        if problem_spj:
             if problem_spj in ['false', 'FALSE']:
                 problem_spj = False
             elif problem_spj in ['true', 'TRUE']:
                 problem_spj = True
             problem.problem_spj = problem_spj
         problem_course = request.GET.get('problem_course')
-        if problem_course is not None:
+        if problem_course:
             problem.problem_course = problem_course
         time_limit = request.GET.get('time_limit')
-        if time_limit is not None:
+        if time_limit:
             problem.time_limit = time_limit
         memory_limit = request.GET.get('memory_limit')
-        if memory_limit is not None:
+        if memory_limit:
             problem.memory_limit = memory_limit
         problem_tag = request.GET.get('problem_tag')
-        if problem_tag is not None:
+        if problem_tag:
             problem.problem_tag = problem_tag
         problem_difficult = request.GET.get('problem_difficult')
-        if problem_difficult is not None:
+        if problem_difficult:
             problem.problem_difficult = problem_difficult
         problem_status = request.GET.get('problem_status')
-        if problem_status is not None:
+        if problem_status:
             if problem_status in ['false', 'FALSE']:
                 problem_status = False
             elif problem_status in ['true', 'TRUE']:
@@ -526,6 +500,7 @@ class ImageList(View):
 class ProblemSample(View):
     def get(self, request):
         problem_id = request.GET.get('problem_id')
+        print(problem_id)
         target_path = config.PROBLEM_DATA
         target_path = os.path.join(target_path, problem_id)
         if not os.path.exists(target_path):
@@ -549,6 +524,7 @@ class ProblemSample(View):
     def post(self, request):
         files = request.FILES.get('files')
         problem_id = request.POST.get('problem_id')
+        print(problem_id)
         target_path = config.PROBLEM_DATA
         target_path = os.path.join(target_path, problem_id)
         if not os.path.exists(target_path):

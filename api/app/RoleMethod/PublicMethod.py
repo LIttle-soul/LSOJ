@@ -6,7 +6,6 @@ import datetime
 import time
 import random
 import jwt
-from django_redis import get_redis_connection
 from django.core.mail import send_mail
 from django.db import connection
 from django.core.cache import cache
@@ -15,7 +14,6 @@ from django.core.cache import cache
 class PublicMethod:
     def __init__(self):
         super(PublicMethod, self).__init__()
-        self.redis = get_redis_connection()
         self.JWT_SALT = 'iv%x6xo7l7_u9bf_u!9#g#m*)*=ej@bek5)(@u3kh*72+unjv='
         self.password = b'jhcoj_mxs'
         self.code_str = string.ascii_letters + string.digits
@@ -71,14 +69,14 @@ class PublicMethod:
         code = self.get_code(length=4)  # 取5个长度为4的随机序
         # 将验证码存储在redis中
         ip = self.get_ip(requester)
-        self.redis.setex(ip, 60, code)
+        cache.set(ip, 60, code)
         code = {"capture": code}
         return code
 
     # 验证后台验证码是否正确
     def check_capture(self, requester, code):
         ip = self.get_ip(requester)
-        get_code = self.redis.get(ip)
+        get_code = cache.get(ip)
         if not get_code:
             return False
         if str(code).upper() == str(get_code.decode("utf-8", "ignore")).upper():
@@ -89,15 +87,15 @@ class PublicMethod:
     # 生成邮箱验证码
     def email_code(self, email):
         code = self.get_code(length=6)
-        self.redis.setex(email, 3000, code)
+        cache.set(email, code, 3000)
         return code
 
     # 验证邮箱验证码是否正确
     def check_email_code(self, email, code):
-        get_code = self.redis.get(email)
+        get_code = cache.get(email)
         if not get_code:
             return False
-        if str(code).upper() == str(get_code.decode("utf-8", "ignore")).upper():
+        if str(code).upper() == str(get_code).upper():
             return True
         else:
             return False
@@ -194,7 +192,7 @@ class PublicMethod:
     # 查询用户做题排名情况，传参为起始时间
     def get_rank_list_by_time(self, timer):
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT USER.user_id, USER.user_name, USER.user_nick, t.submit, s.solved, v.school_name, USER.user_sex, w.success success FROM USER INNER JOIN ( SELECT COUNT( DISTINCT problem_id ) solved, user_id FROM solution WHERE solution_time > '{timer}' AND run_result = 4 GROUP BY user_id ORDER BY solved DESC ) s ON USER.user_id = s.user_id INNER JOIN ( SELECT count( solution_id ) success, user_id FROM solution WHERE solution_time > '{timer}' AND run_result = 4 GROUP BY user_id ORDER BY success DESC ) w ON USER.user_id = w.user_id INNER JOIN ( SELECT COUNT( problem_id ) submit, user_id FROM solution WHERE solution_time > '{timer}' GROUP BY user_id ORDER BY submit DESC ) t ON USER.user_id = t.user_id JOIN ( SELECT school_id, school_name FROM school ) v ON USER.user_school = v.school_id ORDER BY s.solved DESC, t.submit;")
+            cursor.execute(f"SELECT USER.user_id, USER.user_name, USER.user_nick, t.submit, s.solved, USER.user_sex, w.success success FROM USER INNER JOIN ( SELECT COUNT( DISTINCT problem_id ) solved, user_id FROM solution WHERE solution_time > '{timer}' AND run_result = 4 GROUP BY user_id ORDER BY solved DESC ) s ON USER.user_id = s.user_id INNER JOIN ( SELECT count( solution_id ) success, user_id FROM solution WHERE solution_time > '{timer}' AND run_result = 4 GROUP BY user_id ORDER BY success DESC ) w ON USER.user_id = w.user_id INNER JOIN ( SELECT COUNT( problem_id ) submit, user_id FROM solution WHERE solution_time > '{timer}' GROUP BY user_id ORDER BY submit DESC ) t ON USER.user_id = t.user_id ORDER BY s.solved DESC, t.submit;")
             solution_data = cursor.fetchall()
         return_data = list(solution_data)
         return return_data
@@ -202,6 +200,6 @@ class PublicMethod:
     # 查询用户做题排名情况，全部的排名
     def get_all_rank_list(self):
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT USER.user_id user_id, USER.user_name user_name, USER.user_nick user_nick, t.submit submit, s.solved solved, v.school_name school_name, USER.user_sex user_sex, w.success success	FROM USER INNER JOIN ( SELECT count( DISTINCT problem_id ) solved, user_id FROM solution WHERE run_result = 4 GROUP BY user_id ORDER BY solved DESC ) s ON USER.user_id = s.user_id INNER JOIN ( SELECT count( solution_id ) success, user_id FROM solution WHERE run_result = 4 GROUP BY user_id ORDER BY success DESC ) w ON USER.user_id = w.user_id INNER JOIN ( SELECT COUNT( problem_id ) submit, user_id FROM solution GROUP BY user_id ORDER BY submit DESC ) t ON USER.user_id = t.user_id JOIN ( SELECT school_id, school_name FROM school ) v ON USER.user_school = v.school_id ORDER BY s.solved DESC, t.submit;")
+            cursor.execute(f"SELECT USER.user_id user_id, USER.user_name user_name, USER.user_nick user_nick, t.submit submit, s.solved solved, USER.user_sex user_sex, w.success success FROM USER INNER JOIN ( SELECT count( DISTINCT problem_id ) solved, user_id FROM solution WHERE run_result = 4 GROUP BY user_id ORDER BY solved DESC ) s ON USER.user_id = s.user_id INNER JOIN ( SELECT count( solution_id ) success, user_id FROM solution WHERE run_result = 4 GROUP BY user_id ORDER BY success DESC ) w ON USER.user_id = w.user_id INNER JOIN ( SELECT COUNT( problem_id ) submit, user_id FROM solution GROUP BY user_id ORDER BY submit DESC ) t ON USER.user_id = t.user_id ORDER BY s.solved DESC,t.submit;")
             date = cursor.fetchall()
         return list(date)
