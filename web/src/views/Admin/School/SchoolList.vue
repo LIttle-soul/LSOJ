@@ -66,26 +66,7 @@ watch(temp_search_data, (new_val: string) => {
   console.log(new_val);
 });
 let search_text = ref("");
-let Data = ref([
-  {
-    school_id: "4265051060",
-    school_name: "新疆工业职业技术学院",
-    school_describe: null,
-    school_department: "",
-    school_rank: "专科",
-    school_remark: "",
-    school_municipality: "新疆维吾尔自治区",
-  },
-  {
-    school_id: "4262051378",
-    school_name: "甘肃财贸职业学院",
-    school_describe: null,
-    school_department: "",
-    school_rank: "专科",
-    school_remark: "",
-    school_municipality: "甘肃省",
-  },
-]);
+let Data = ref([]);
 let page = ref({
   page: 1,
   page_size: 50,

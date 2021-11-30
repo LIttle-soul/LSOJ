@@ -159,46 +159,46 @@ export default [
       title: "学校管理",
     },
   },
-  // {
-  //   path: "/admin/addschool",
-  //   name: "AdminAddSchool",
-  //   component: () => import("@/views/Admin/School/SchoolAdd.vue"),
-  //   meta: {
-  //     title: "添加学校",
-  //   },
-  // },
-  // {
-  //   path: "/admin/collegelist",
-  //   name: "AdminCollegeList",
-  //   component: () => import("@/views/Admin/School/CollegeList.vue"),
-  //   meta: {
-  //     title: "学院管理",
-  //   },
-  // },
-  // {
-  //   path: "/admin/addCollege",
-  //   name: "AdminAddCollege",
-  //   component: () => import("@/views/Admin/School/CollegeAdd.vue"),
-  //   meta: {
-  //     title: "添加学院",
-  //   },
-  // },
-  // {
-  //   path: "/admin/classlist",
-  //   name: "AdminClassList",
-  //   component: () => import("@/views/Admin/School/ClassList.vue"),
-  //   meta: {
-  //     title: "班级管理",
-  //   },
-  // },
-  // {
-  //   path: "/admin/addclass",
-  //   name: "AdminddClass",
-  //   component: () => import("@/views/Admin/School/ClassAdd.vue"),
-  //   meta: {
-  //     title: "添加班级",
-  //   },
-  // },
+  {
+    path: "/admin/addschool",
+    name: "AdminAddSchool",
+    component: () => import("@/views/Admin/School/SchoolAdd.vue"),
+    meta: {
+      title: "添加学校",
+    },
+  },
+  {
+    path: "/admin/collegelist",
+    name: "AdminCollegeList",
+    component: () => import("@/views/Admin/School/CollegeList.vue"),
+    meta: {
+      title: "学院管理",
+    },
+  },
+  {
+    path: "/admin/addCollege",
+    name: "AdminAddCollege",
+    component: () => import("@/views/Admin/School/CollegeAdd.vue"),
+    meta: {
+      title: "添加学院",
+    },
+  },
+  {
+    path: "/admin/classlist",
+    name: "AdminClassList",
+    component: () => import("@/views/Admin/School/ClassList.vue"),
+    meta: {
+      title: "班级管理",
+    },
+  },
+  {
+    path: "/admin/addclass",
+    name: "AdminddClass",
+    component: () => import("@/views/Admin/School/ClassAdd.vue"),
+    meta: {
+      title: "添加班级",
+    },
+  },
   // {
   //   path: "/admin/judgerlist",
   //   name: "AdminJudgerList",
@@ -215,5 +215,12 @@ export default [
   //     title: "添加判题机",
   //   },
   // },
-  // ...adminCourse
+  {
+    path: "/admin/afreshjudger",
+    name: "AdminAfreshJudger",
+    component: () => import("@/views/Admin/Judger/JudgerAfresh.vue"),
+    meta: {
+      title: "重判题目",
+    },
+  },
 ];

@@ -1,36 +1,29 @@
 <template>
   <div class="college-list-child">
-    <el-table
-      :data="
-        Data.slice((page.cur - 1) * page.page_size, page.cur * page.page_size)
-      "
-      size="mini"
-      :stripe="true"
-      :fit="true"
-      style="width: 100%"
-    >
+    <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
       <el-table-column prop="college_id" label="学院编号"> </el-table-column>
       <el-table-column prop="college_name" label="学院名称"> </el-table-column>
-      <el-table-column prop="college_school" label="学院所在学校">
-      </el-table-column>
-      <el-table-column fixed="right" width="125px" label="操作">
+      <el-table-column prop="college_school" label="学院所在学校"> </el-table-column>
+      <el-table-column fixed="right" width="80px" label="操作">
         <template #default="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            circle
-            icon="el-icon-edit"
-            @click="handleEditClick(scope.row)"
-          >
-          </el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            circle
-            icon="el-icon-delete"
-            @click="handleDeleteClick(scope.row)"
-          >
-          </el-button>
+          <div class="button-box">
+            <el-button
+              size="mini"
+              type="primary"
+              circle
+              @click="handleEditClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-pencil-square"></i></el-icon>
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              circle
+              @click="handleDeleteClick(scope.row)"
+            >
+              <el-icon :size="16"><i class="bi bi-trash"></i></el-icon>
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -38,11 +31,11 @@
       class="pagination-1"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="page.cur"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
       :page-size="page.page_size"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -50,11 +43,11 @@
       class="pagination-2"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="page.cur"
+      :current-page="page.page"
       :page-sizes="[20, 50, 100, 200]"
       :page-size="page.page_size"
       layout="prev, pager, next"
-      :total="Data.length"
+      :total="page.total"
       :hide-on-single-page="true"
     >
     </el-pagination>
@@ -73,18 +66,29 @@ let props = defineProps({
     type: undefined,
     default: [],
   },
+  page: {
+    type: undefined,
+    default: {
+      page: 1,
+      page_size: 50,
+      total: 0,
+    },
+  },
 });
-let page = ref({
-  cur: 1,
-  page_size: 50,
-});
+
+// 向父组件传送事件
+let emit = defineEmits(["handleSizeChange", "handlePageChange", "reload"]);
+
+// 页面跳转
 let handleSizeChange = (val: number) => {
-  page.value.page_size = val;
+  emit("handleSizeChange", val);
 };
 
 let handleCurrentChange = (val: number) => {
-  page.value.cur = val;
+  emit("handlePageChange", val);
 };
+
+// 事件相关操作函数
 let handleEditClick = (val: any) => {
   console.log(val);
 };
@@ -94,89 +98,17 @@ let handleCheckClick = (val: any) => {
 let handleDeleteClick = (val: any) => {
   console.log(val);
 };
-
-// export default {
-//   name: "collegeListChild",
-//   data() {
-//     return {
-//       current_page: 1,
-//       page_sizes: 50,
-//       edit: true,
-//     };
-//   },
-//   methods: {
-//     handleEditClick() {
-//       this.$router.push({
-//         name: "AdminAddCollege",
-//       });
-//     },
-//     handleCheckClick() {
-//       console.log(this.Data);
-//     },
-//     handleDeleteClick(val) {
-//       console.log(val);
-//     },
-//     handleSizeChange(val) {
-//       this.page_sizes = val;
-//     },
-//     handleCurrentChange(val) {
-//       this.current_page = val;
-//     },
-//     search_all_data() {
-//       this.Data = this.$store.getters
-//         .filtercollegeData(this.search_data)
-//         .map((item) => ({
-//           college_id: item.college_id,
-//           user_nick: item.user_nick,
-//           user_name: item.user_name,
-//           user_college: item.user_college
-//             ? item.user_college.college_name
-//             : null,
-//           college_municipality: item.college_municipality,
-//           user_status: true,
-//           registration_time: this.$dayJS(item.registration_time).format(
-//             "YYYY-MM-DD HH:mm:ss"
-//           ),
-//           centerDialogVisible: false,
-//         }));
-//     },
-//   },
-// };
 </script>
 
 <style scope lang="scss">
-.college-list-child .table-header {
-  font: 1.2em "楷体";
-  letter-spacing: 3px;
-  height: 30px;
-  width: 50%;
-  min-width: 210px;
-  float: left;
-}
-.college-list-child .el-card__header {
-  height: 60px;
-}
-.college-list-child .input-with-select {
-  width: 205px;
-  float: right;
-  margin-right: 10px;
-  transform: translateY(-1px);
-}
-.college-list-child .current-time {
-  font-size: 10px;
-  color: darkturquoise;
-  letter-spacing: 1px;
+.button-box {
+  display: flex;
+  justify-content: space-around;
 }
 .college-list-child .pagination-2 {
   display: none;
 }
-.edit {
-  margin-bottom: 2%;
-}
 @media screen and (max-width: 600px) {
-  .college-list-child .input-with-select {
-    display: none;
-  }
   .college-list-child .pagination-2 {
     display: block;
   }

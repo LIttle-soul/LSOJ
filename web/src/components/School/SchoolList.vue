@@ -112,9 +112,6 @@ let handleDeleteClick = (val: any) => {
 .school-list-child .pagination-2 {
   display: none;
 }
-.edit {
-  margin-bottom: 2%;
-}
 @media screen and (max-width: 600px) {
   .school-list-child .pagination-2 {
     display: block;

@@ -75,3 +75,26 @@ export const submitCode = (data: submitCodeData) => {
     return res.data;
   });
 };
+
+/**
+ * Afresh judge solution
+ * @param {Number} solution_id - which solution will afresh judger
+ * @param {Number} problem_id - which problem will afresh judger
+ * @param {Number} contest_id - which contest will afresh judger
+ * @param {String} user_id - which user will afresh judger
+ */
+interface afreshJudgerData {
+  solution_id: number;
+  problem_id: number;
+  contest_id: number;
+  user_id: string;
+}
+export const afreshJudgerSolution = (data: afreshJudgerData) => {
+  return http({
+    url: "/api/solution/rejudgesolution/",
+    method: "post",
+    data: data,
+  }).then((res: any) => {
+    return res.data;
+  });
+};

@@ -202,6 +202,11 @@ export const nav_menu = [
         index: "AddJudger",
         src: "/admin/addjudger",
       },
+      {
+        title: "判题机重判",
+        index: "AfreshJudger",
+        src: "/admin/afreshjudger",
+      },
     ],
   },
 ];
