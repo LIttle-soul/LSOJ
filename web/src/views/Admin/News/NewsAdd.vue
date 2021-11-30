@@ -62,7 +62,7 @@ import { submitNewsData, changeNewsData, getNewsList } from "@/api/news";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import news_mode from "@/assets/markdown/新闻模板.md?raw";
+import news_mode from "@/assets/markdown/NewsTemplet.md?raw";
 
 let route = useRoute();
 let router = useRouter();

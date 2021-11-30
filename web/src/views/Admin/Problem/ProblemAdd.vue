@@ -94,13 +94,12 @@
 
 <script lang="ts" setup>
 import ProblemChild from "@/components/Editor/MarkdownEditor.vue";
-import { submitProblemData, changeProblemData } from "@/api/problem";
+import { submitProblemData, changeProblemData, getProblemDataList } from "@/api/problem";
 import { useStore, mapState } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { ElLoading, ElMessage } from "element-plus";
-import problem_mode from "@/assets/markdown/问题模板.md?raw";
-import { getProblemDataList } from "../../../api/problem";
+import problem_mode from "@/assets/markdown/ProblemTemplet.md?raw";
 
 let store = useStore();
 let route = useRoute();

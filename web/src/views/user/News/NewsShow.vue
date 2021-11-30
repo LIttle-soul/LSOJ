@@ -19,7 +19,7 @@ import dayJS from "dayjs";
 import { ElLoading, ElMessage } from "element-plus";
 import { getNewsList } from "@/api/news";
 import NewsChild from "@/components/Editor/MarkdownEditor.vue";
-import temp_news from "@/assets/markdown/新闻模板.md?raw";
+import temp_news from "@/assets/markdown/NewsTemplet.md?raw";
 
 let route = useRoute();
 

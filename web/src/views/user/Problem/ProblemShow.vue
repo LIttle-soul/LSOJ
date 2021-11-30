@@ -86,7 +86,7 @@ import CodeEditor from "@/components/Editor/CodeEditor.vue";
 import CodeHeader from "@/components/Editor/CodeHeader.vue";
 import SolutionHeader from "@/components/Solution/SolutionHeader.vue";
 import SolutionContent from "@/components/Solution/SolutionContent.vue";
-import TempProblem from "@/assets/markdown/问题模板.md?raw";
+import TempProblem from "@/assets/markdown/ProblemTemplet.md?raw";
 
 let route = useRoute();
 

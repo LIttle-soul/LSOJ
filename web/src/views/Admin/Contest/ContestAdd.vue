@@ -132,7 +132,7 @@ import { useStore, mapState } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import contest_mode from "@/assets/markdown/新闻模板.md?raw";
+import contest_mode from "@/assets/markdown/NewsTemplet.md?raw";
 import dayJS from "dayjs";
 import { getProblemDataList } from "@/api/problem";
 

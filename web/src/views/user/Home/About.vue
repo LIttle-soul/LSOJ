@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts" setup>
-import HelpCenter from "@/assets/markdown/帮助中心.md?raw";
-import ContactUs from "@/assets/markdown/联系我们.md?raw";
-import UserAgreement from "@/assets/markdown/用户协议.md?raw";
-import About52AC from "@/assets/markdown/关于52AC.md?raw";
+import HelpCenter from "@/assets/markdown/HelpCenter.md?raw";
+import ContactUs from "@/assets/markdown/ContactUs.md?raw";
+import UserAgreement from "@/assets/markdown/UserProtocol.md?raw";
+import About52AC from "@/assets/markdown/AboutMe.md?raw";
 import { getCurrentInstance } from "vue";
 import { ref, watch } from "vue";
 import markdownEditor from "@/components/Editor/MarkdownEditor.vue";
