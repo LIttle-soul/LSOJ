@@ -2,97 +2,53 @@
   <div class="course-show">
     <el-container>
       <el-header>
-        <el-image></el-image>
-        <el-descriptions title="课程标题" :column="2">
-          <el-descriptions-item label="开课时间" width="22.5%">2021/08/01 至 2022/01/31</el-descriptions-item>
-          <el-descriptions-item label="开课状态" width="22.5%">正在开课</el-descriptions-item>
-          <el-descriptions-item label="开课院校" width="22.5%">金华职业技术学院</el-descriptions-item>
-          <el-descriptions-item label="授课老师" width="22.5%">梅旭时</el-descriptions-item>
-          <el-descriptions-item label="课程学分" width="22.5%">2分</el-descriptions-item>
-          <el-descriptions-item label="学习人数" width="22.5%">0/41人</el-descriptions-item>
+        <el-image :src="course_data.course_img"></el-image>
+        <el-descriptions :title="course_data.course_title" :column="2">
+          <el-descriptions-item label="开课时间" width="22.5%"
+            >{{ course_data.course_begin_time }} 至
+            {{ course_data.course_end_time }}</el-descriptions-item
+          >
+          <el-descriptions-item label="开课状态" width="22.5%">{{
+            course_data.course_status
+          }}</el-descriptions-item>
+          <el-descriptions-item label="开课院校" width="22.5%">{{
+            course_data.course_school
+          }}</el-descriptions-item>
+          <el-descriptions-item label="授课老师" width="22.5%">{{
+            course_data.course_teacher.user_name
+          }}</el-descriptions-item>
+          <el-descriptions-item label="课程学分" width="22.5%"
+            >{{ course_data.course_score }}分</el-descriptions-item
+          >
+          <el-descriptions-item label="学习人数" width="22.5%"
+            >{{ course_data.course_student }}人</el-descriptions-item
+          >
         </el-descriptions>
-        <el-button type="warning" plain size="medium" class="course-join">立即参加</el-button>
+        <el-button type="warning" plain size="medium" class="course-join"
+          >立即参加</el-button
+        >
       </el-header>
       <el-main>
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="课程详情" name="first">
-            <div>
-              <div class="title">课程简介</div>
-              <div class="content-text">
-                <div style="text-indent: 2em; line-height: 28px;">
-                  企业法律风险防范课程讲授企业法律风险管理体系、企业法律风险分类、宪法法律风险、行政法律风险、民商法律
-                  风险、刑事法律风险、经济法律风险、社会法律风险、国际法律风险、诉讼法律风险、企业法律风险防范对策。
-                </div>
-              </div>
-              <div class="title">课程概述</div>
-              <div class="content-text">
-                <div style="text-indent: 2em;">
-                  <p>
-                    一、本课程共有105个教学微视频，共八章节，视频总时长达1200分钟。
-                    <br>
-                    二、本课程共32个学时，2学分。
-                    <br>
-                    三、教学计划如下:
-                    <br>
-                    第一章 法律风险管理&nbsp;&nbsp; 2个学时
-                    <br>
-                    第二章 法律风险分类&nbsp;&nbsp; 2个学时
-                    <br>
-                    第三章 宪法法律风险&nbsp;&nbsp; 3个学时
-                    <br>
-                    第四章 行政法律风险&nbsp;&nbsp; 3个学时
-                    <br>
-                    第五章 民商法律风险&nbsp;&nbsp; 3个学时
-                    <br>
-                    第六章 经济法律风险&nbsp;&nbsp; 4个学时
-                    <br>
-                    第七章 刑事法律风险&nbsp;&nbsp; 3个学时
-                    <br>
-                    第八章 社会法律风险&nbsp;&nbsp; 4个学时
-                    <br>
-                    第九章 国际法律风险&nbsp;&nbsp; 2个学时
-                    <br>
-                    第十章 诉讼法律风险&nbsp;&nbsp; 3个学时
-                    <br>
-                    第十一章 企业法律风险防范对策&nbsp;&nbsp; 3个学时
-                    <br>
-                    四、授课方式介绍
-                    <br>
-                    每次课前发布任务，网上观看微课，然后做作业、测验和考试，讨论区互动答疑，线下课堂案例分析和解答问题。
-                    <br>
-                    五、成绩评价:线上和线下融合、过程性评价与终结性评价相结合的多元化课程评价体系;
-                    <br>
-                    线上成绩是以“视频观看时长、完成测试、考试、作业情况及论坛发帖”之成绩为计算依据，各项目占比如下:
-                    <br>
-                    (1)视频观看占20%（最终以任课教师系统设置为准）;
-                    <br>
-                    (2)作业成绩占10%（最终以任课教师系统设置为准）;
-                    <br>
-                    (3)测验成绩占50%（最终以任课教师系统设置为准）;
-                    <br>
-                    (4)考试成绩占10%（最终以任课教师系统设置为准）;
-                    <br>
-                    (5)发帖讨论成绩占5%,普通帖子0.5分一个,精华帖子1分一个（最终以任课教师系统设置为准）;
-                    <br>
-                    (6)笔记成绩占5%,普通笔记0.5分一个,精华笔记1分一个（最终以任课教师系统设置为准）;
-                    <br>
-                    本课程最终成绩 = 线上成绩70%权重值+线下成绩30%权重值（最终以任课教师系统设置为准）。
-                  </p>
-                </div>
+            <div class="title">课程简介</div>
+            <div class="content-text">
+              <div style="text-indent: 2em; line-height: 28px">
+                <CourseInfo
+                  mode="preview"
+                  height="100%"
+                  :content="course_data.course_summary"
+                />
               </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="课程目录" name="second">
-            <div class="course-outline" style="position: relative;">
-              <div v-for="item in 5" :key="item">
-                <h5 class="item">
-                  第一章  企业法概述
-                </h5>
+            <div class="course-outline" style="position: relative">
+              <div v-for="(item, index) in course_data.course_catalog" :key="index">
+                <h5 class="item">{{ item.title }}</h5>
                 <ul>
-                  <li class="outline" v-for="item in 5" :key="item">
-                    <span class="sb-border" >
-                      第一节  企业法概述
-                    </span>
+                  <li class="outline" v-for="(item2, index2) in item.child" :key="index2">
+                    <span class="sb-border"> {{ item2.title }} </span>
                   </li>
                 </ul>
               </div>
@@ -104,120 +60,266 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    console.log(this)
-    return {
-      activeName: 'first',
-    }
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { Lock, Unlock } from "@element-plus/icons";
+import dayJS from "dayjs";
+import CourseInfo from "@/components/Editor/MarkdownEditor.vue";
+import { ElLoading } from "element-plus";
+import { getCourseDetails, getCourseChapter } from "@/api/course";
+import { format } from "echarts";
+
+let route = useRoute();
+
+let activeName = ref("first");
+let task = ref(true);
+let radio = ref(3);
+
+// 单课程相关数据
+let course_data = ref({
+  course_id: 1,
+  course_title: "数据结构",
+  course_img: "",
+  course_begin_time: "2021-01-01 08:00:00",
+  course_end_time: "2021-08-01 16:00:00",
+  course_status: "正在开课",
+  course_score: 2,
+  course_teacher: {
+    user_id: "admin",
+    user_name: "梅旭时",
   },
-  methods: {
-    handleClick(tab, event) {
-      console.log(tab, event)
+  course_school: "金华职业技术学院",
+  course_student: 0,
+  join_status: true,
+  course_summary: `# Hello`,
+  course_catalog: [
+    {
+      title: "第一章 零零零零",
+      child: [
+        {
+          title: "第一节 树与图",
+        },
+        {
+          title: "第二节 二叉树",
+        },
+      ],
     },
+    {
+      title: "第一章 零零零零",
+      child: [
+        {
+          title: "第一节 树与图",
+        },
+        {
+          title: "第二节 二叉树",
+        },
+      ],
+    },
+  ],
+});
+
+// 设置课程状态
+let setCourseStatua = (begin_time: string, end_time: string) => {
+  if (dayJS(begin_time).isAfter(dayJS())) {
+    return "未开始";
+  } else if (dayJS(end_time).isAfter(dayJS())) {
+    return "正在开课";
+  } else {
+    return "已结束";
   }
-}
+};
+
+let formatdata = (val: any) => {
+  return {
+    course_id: val.course_id,
+    course_title: val.course_title,
+    course_img: val.course_cover,
+    course_begin_time: dayJS(val.start_time).format("YYYY-MM-DD HH:mm:ss"),
+    course_end_time: dayJS(val.end_time).format("YYYY-MM-DD HH:mm:ss"),
+    course_status: getCourseStatus(val.start_time, val.end_time),
+    course_score: val.course_credits,
+    course_teacher: {
+      user_id: val.course_creator,
+      user_name: val.creator_name,
+    },
+    course_school: val.course_school.school_name,
+    course_student: val.course_peoples,
+    join_status: val.is_join,
+  };
+};
+
+let getCourseContent = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中....",
+    background: "rgba(0,0,0,7)",
+  });
+  let back_data = await getCourseDetails({
+    course_id: route.query.id,
+  });
+  console.log(back_data);
+  if (back_data.status) {
+    course_data.value = <any>formatdata(back_data.message);
+    loading.close();
+  } else {
+    loading.close();
+  }
+};
+
+let getCourseStatus = (start_time: any, end_time: any) => {
+  if (dayJS().isBefore(dayJS(start_time))) {
+    return "未开课";
+  } else if (dayJS().isAfter(dayJS(end_time))) {
+    return "已结课";
+  } else {
+    return "正在开课";
+  }
+};
+
+let getCourseChapterlist = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中....",
+    background: "rgba(0,0,0,7)",
+  });
+  let back_data = await getCourseChapter({
+    course_id: route.query.id,
+  });
+  console.log(back_data);
+  if (back_data.status) {
+    // course_data.value = formatchapterdata(back_data.message);
+    loading.close();
+  } else {
+    loading.close();
+  }
+};
+
+let handleClick = (tab: any, event: any) => {
+  console.log(tab, event);
+};
+let all_task = () => {
+  console.log(123);
+};
+let all_finish = () => {
+  console.log(456);
+};
+let all_unfinish = () => {
+  console.log(789);
+};
+let course_play = () => {
+  console.log("课程播放");
+};
+
+onMounted(() => {
+  getCourseContent();
+  getCourseChapterlist();
+});
 </script>
 
-<style scoped>
-.el-header {
-  height: 200px;
-}
-.el-image{
-  width: 40%;
-  height: 200px;
-  float: left;
-}
-.el-descriptions {
-  width: 54%;
-  float:left;
-  margin-left: 2%;
-}
-.el-button{
-  margin-left: 2%;
-  float: left;
-}
-.el-main {
-  max-width: 1200px;
-  width: 1200px;
-  margin: 0 auto;
-}
-.title {
-  border: 0;
-  display: block;
-  width: 100%;
-  background: #e2efff;
-  height: 42px;
-  line-height: 42px;
-  font-size: 16px;
-  font-weight: 550;
-  color: #1d7ffd;
-  letter-spacing: 5px;
-  text-align: center;
-}
-.content-text {
-    padding: 20px 24px;
-    color: #666;
-    font-size: 14px;
-    line-height: 28px;
-    max-width: 800px;
-}
-.course-outline ul.outline {
-    padding-left: 20px;
-    padding-right: 20px;
-}
-li {
-    display: flex;
-    font-family: 'Arial', 'Microsoft Yahei' !important;
-    font-size: 14px;
-    color: #666666;
-    letter-spacing: 0.88px;
-    height: 35px;
-    line-height: 35px;
-}
-.course-outline .item {
-    padding-left: 20px;
-    padding-right: 20px;
-    border: none;
-    display: block;
-    width: 100%;
-    background: #f1faff;
-    height: 42px;
-    line-height: 42px;
-    font-size: 16px;
-    font-weight: 550;
-    color: #418fbe;
-    letter-spacing: 3px;
-}
-h5 {
-  padding: 0;
-  margin: 0;
-  display: block;
-  font-size: 0.83em;
-  margin-block-start: 1.67em;
-  margin-block-end: 1.67em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
-}
-ul, li {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-ul {
-    display: block;
-    list-style-type: disc;
-    margin-block-start: 1em;
-    margin-block-end: 1em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 40px;
-}
-.course-show{
+<style scoped lang="scss">
+.course-show {
   max-width: 1200px;
   width: 1200px;
   margin: 50px auto;
+  .el-header {
+    height: 200px;
+    .el-image {
+      width: 40%;
+      height: 200px;
+      float: left;
+    }
+    .el-descriptions {
+      width: 54%;
+      float: left;
+      margin-left: 2%;
+    }
+    .el-button {
+      margin-left: 2%;
+      float: left;
+    }
+  }
+  .el-main {
+    max-width: 1200px;
+    width: 1200px;
+    margin: 0 auto;
+    .title {
+      border: 0;
+      display: block;
+      width: 100%;
+      background: #e2efff;
+      height: 42px;
+      line-height: 42px;
+      font-size: 16px;
+      font-weight: 550;
+      color: #1d7ffd;
+      letter-spacing: 5px;
+      text-align: center;
+    }
+    .content-text {
+      padding: 20px 24px;
+      color: #666;
+      font-size: 14px;
+      line-height: 28px;
+      max-width: 800px;
+    }
+    .course-outline {
+      ul {
+        .outline {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        li {
+          display: flex;
+          font-family: "Arial", "Microsoft Yahei" !important;
+          font-size: 14px;
+          color: #666666;
+          letter-spacing: 0.88px;
+          height: 35px;
+          line-height: 35px;
+        }
+      }
+      .item {
+        padding-left: 20px;
+        padding-right: 20px;
+        border: none;
+        display: block;
+        width: 100%;
+        background: #f1faff;
+        height: 42px;
+        line-height: 42px;
+        font-size: 16px;
+        font-weight: 550;
+        color: #418fbe;
+        letter-spacing: 3px;
+      }
+      h5 {
+        padding: 0;
+        margin: 0;
+        display: block;
+        font-size: 0.83em;
+        margin-block-start: 1.67em;
+        margin-block-end: 1.67em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        font-weight: bold;
+      }
+      ul,
+      li {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      ul {
+        display: block;
+        list-style-type: disc;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        padding-inline-start: 40px;
+      }
+    }
+  }
 }
 </style>

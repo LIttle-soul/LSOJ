@@ -26,7 +26,7 @@ export default defineConfig({
     // open: '/index.html',
     proxy: {
       "/api": {
-        target: "http://10.46.23.128:8085/",
+        target: "http://10.46.62.138:8085/",
         ws: true,
         secure: false,
         changeOrigin: true,

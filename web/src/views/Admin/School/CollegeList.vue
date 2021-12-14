@@ -6,6 +6,23 @@
           <div class="header-left">
             <el-icon :size="25" class="icon"><i class="bi bi-building"></i></el-icon>
             学院管理
+            <el-select
+              v-model="page.school"
+              :multiple="false"
+              :filterable="true"
+              :remote="true"
+              :reserve-keyword="true"
+              placeholder="请输入你的学校"
+              :remote-method="remoteSchool"
+              @change="getData"
+            >
+              <el-option
+                v-for="item in school_list.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </div>
           <el-input
             placeholder="请输入内容"
@@ -56,7 +73,8 @@ import CollegeList from "@/components/School/CollegeList.vue";
 import { useStore, mapState } from "vuex";
 import { ref, computed, watch, onMounted } from "vue";
 import { ElLoading, ElMessage } from "element-plus";
-import { getCollegeList } from "@/api/school";
+import { getCollegeList, getSchoolList } from "@/api/school";
+import { getAddressList } from "@/api/address";
 
 let store = useStore();
 let temp_search_data = computed(
@@ -83,7 +101,36 @@ let page = ref({
   page_size: 50,
   total: 0,
   text: "",
+  school: [],
 });
+
+// 懒加载数据请求
+let school_list = ref({
+  options: <any>[],
+  loading: false,
+});
+let remoteSchool = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getSchoolList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      municipality_id: "",
+      school_id: "",
+    });
+    if (back_data.status) {
+      school_list.value.options = back_data.message.map((item: any) => ({
+        label: item.school_name,
+        value: item.school_id,
+      }));
+    } else {
+      school_list.value.options = [];
+    }
+  } else {
+    school_list.value.options = [];
+  }
+};
 
 // 事件处理函数
 let search_all_data = (val: string) => {
@@ -106,7 +153,7 @@ let formatData = (val: any) => {
   return val.map((item: any) => ({
     college_id: item.college_id,
     college_name: item.college_name,
-    college_school: item.college_school,
+    college_school: item.college_school?.school_name || "",
   }));
 };
 
@@ -120,10 +167,11 @@ let getData = async () => {
   let back_data = await getCollegeList({
     page: page.value.page,
     total: page.value.page_size,
-    text: page.value.text,
-    municipality_id: "",
+    text: page.value.text || "",
+    school_id: page.value.school || "",
+    college_id: "",
   });
-  // console.log(back_data);
+  console.log(back_data);
   if (back_data.status) {
     Data.value = formatData(back_data.message);
     page.value.total = back_data.total;
@@ -136,11 +184,6 @@ let getData = async () => {
     });
   }
 };
-
-// 自动加载数据
-onMounted(() => {
-  // getData();
-});
 </script>
 
 <style lang="scss">

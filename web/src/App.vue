@@ -15,8 +15,10 @@ store.dispatch("user/checkUserStatus");
 <style lang="scss">
 @import url("./assets/css/reset.css");
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css");
+
 .app {
   position: relative;
   height: 100%;
+  min-width: 800px;
 }
 </style>

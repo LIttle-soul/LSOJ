@@ -1,95 +1,124 @@
 <template>
-  <div class="course-card" @click="show_course(Data)">
-    <div class="card-header">
-      <!-- <img
-        ref="bannerHeight"
-        src="//edu-image.nosdn.127.net/F05ADA2CD454710CFF6D216D35512FBF.JPG?imageView&amp;quality=100&amp;thumbnail=230y130&amp;type=webp"
-        alt="课程封面"
-      /> -->
-      <el-image :src="'data:image/png;base64'+Data.course_cover" class="images"></el-image>
+  <div class="course-child">
+    <div class="course-card" v-for="(item, index) in Data" :key="index">
+      <div class="course-item" @click="linkTo(item.course_id)">
+        <div class="glass"></div>
+        <div class="card-header">
+          <el-image class="card-image" :src="item.src" fit="fill"></el-image>
+        </div>
+        <div class="card-content">
+          <h4 class="title">{{ item.title }}</h4>
+          <p class="auther">{{ item.auther }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="status">
+            {{ item.status }}
+          </div>
+          <div class="join">{{ item.join }}人参加</div>
+        </div>
+      </div>
     </div>
-    <div class="card-content">
-      <p class="title">{{Data.course_name}}</p>
-      <p class="school">金华职业技术学院</p>
-      <p class="teacher">{{Data.course_creator}}</p>
-    </div>
-  
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    Data: {
-      type: undefined,
-      default: [],
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+let router = useRouter();
+
+let props = defineProps({
+  Data: {
+    type: undefined,
+    default: [
+      {
+        course_id: 1,
+        src: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+        title: "法语入门",
+        auther: "LiSoul",
+        join: 100,
+        status: "已结束",
+      },
+    ],
+  },
+});
+
+let linkTo = (val: number) => {
+  router.push({
+    path: "/courseshow",
+    query: {
+      id: val,
     },
-  },
-  mounted() {
-  },
-  methods: {
-    show_course(row) {
-      console.log(row);
-      if (!this.admin) {
-       this.$router.push({
-          path: "/showcourse",
-          query: {
-            course_title: escape(row.course_name),
-          },
-        }); 
-      } 
-    }
-  },
+  });
 };
 </script>
 
-<style scoped>
-.course-card {
-  width: 226px;
-  height: 200px;
-  padding: 0;
-  border-radius: 8px;
-}
-.course-card .card-header {
+<style lang="scss" scoped>
+.course-child {
   width: 100%;
-  height: 65%;
-  border-radius: 8px 8px 0 0;
-}
-.course-card .card-header img {
-  width: 100%;
-  height: 100%;
-  border-radius: 8px 8px 0 0;
-}
-.course-card .card-content {
-  height: 35%;
-  width: 100%;
-  border-radius: 0 0 8px 8px;
-  /* border-bottom: 1px solid black;  */
-  background-color: #f1f1ef;
-}
-.images{
-  height: 100%;
-  width: 100%;
-}
-.course .title {
-  font-size: 18px;
-  margin-top: 1%;
-  font-weight: bold;
-}
-.course .school {
-  height: 12px;
-  line-height: 12px;
-  font-size: 13px;
-  margin-top: 6px; 
-  margin-top: 3.5%;
-  color: #666;
-  overflow: hidden;
-}
-.course .teacher {
-  line-height: 17px;
-  margin: 8px 0 0 0;
-  font-size: 13px;
-  color: #999;
-  overflow: hidden;
+  margin: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-gap: 20px;
+  .course-card {
+    .course-item {
+      width: 180px;
+      height: 200px;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px hsla(0, 0%, 100%, 0.3) inset, 0 0.5em 1em rgba(0, 0, 0, 0.6);
+      text-shadow: 0 1px 1px hsla(0, 0%, 100%, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
+      background-color: rgba(210, 210, 210, 0.4);
+      position: relative;
+      .glass {
+        position: absolute;
+        background: #e9ebfe;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        -webkit-filter: blur(10px);
+        filter: blur(10px);
+      }
+      .card-header {
+        width: 100%;
+        height: 60%;
+        .card-image {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .card-content {
+        width: 100%;
+        height: calc(40% - 40px);
+        padding: 10px;
+        .title {
+          font-family: "STKaiti";
+          font-weight: bold;
+          font-size: 20px;
+        }
+        .auther {
+          font-size: 14px;
+        }
+      }
+      .card-footer {
+        width: 100%;
+        height: 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        line-height: 20px;
+        .status {
+          margin: 0 10px;
+        }
+        .join {
+          margin: 0 10px;
+        }
+      }
+    }
+  }
 }
 </style>

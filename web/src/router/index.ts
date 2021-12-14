@@ -7,13 +7,14 @@ import {
 import user from "./modules/user";
 import admin from "./modules/admin";
 import others from "./modules/others";
+import course_user from "./modules/course_user";
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: () => import("@/layout/User.vue"),
-    children: user,
+    children: [...user, ...course_user],
   },
   {
     path: "/admin",

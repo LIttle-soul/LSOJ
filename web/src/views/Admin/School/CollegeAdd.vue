@@ -4,7 +4,7 @@
       <el-form
         label-position="left"
         label-width="80px"
-        v-model="college_form"
+        :model="college_form"
         ref="form_ref"
         :rules="form_rule"
       >
@@ -12,13 +12,22 @@
           <el-input v-model="college_form.college_name"></el-input>
         </el-form-item>
         <el-form-item label="所属学校" prop="college_school">
-          <el-cascader
-            placeholder="请选择学校"
+          <el-select
             v-model="college_form.college_school"
-            :props="school_list"
-            :clearable="true"
+            :multiple="false"
+            :filterable="true"
+            :remote="true"
+            :reserve-keyword="true"
+            placeholder="请输入你的学校"
+            :remote-method="remoteSchool"
           >
-          </el-cascader>
+            <el-option
+              v-for="item in school_list.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="学院描述">
           <el-input
@@ -67,74 +76,33 @@ let form_rule = ref({
 
 // 懒加载数据请求
 let school_list = ref({
-  lazy: true,
-  lazyLoad(node: any, resolve: any) {
-    const { level, value } = node;
-    switch (level) {
-      case 0:
-        getAddress("", 0, "province", resolve);
-        break;
-      case 1:
-        getAddress("province", value, "municipality", resolve);
-        break;
-      case 2:
-        getSchool(value, resolve);
-        break;
-      default:
-        resolve([]);
-    }
-  },
+  options: <any>[],
+  loading: false,
 });
-
-// 相关数据获取
-let getAddress = async (
-  father: string,
-  father_id: number,
-  child: string,
-  resolve: any
-) => {
-  let back_data = await getAddressList(<any>{
-    father: father,
-    father_id: father_id,
-    child: child,
-    page: 1,
-    total: 100,
-  });
-  // console.log(back_data);
-  if (back_data.status) {
-    resolve(formatAddress(back_data.message));
+let remoteSchool = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getSchoolList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      municipality_id: "",
+      school_id: "",
+    });
+    if (back_data.status) {
+      school_list.value.options = back_data.message.map((item: any) => ({
+        label: item.school_name,
+        value: item.school_id,
+      }));
+    } else {
+      school_list.value.options = [];
+    }
+  } else {
+    school_list.value.options = [];
   }
 };
 
-let getSchool = async (municipality_id: number, resolve: any) => {
-  let back_data = await getSchoolList(<any>{
-    page: 1,
-    total: 500,
-    text: "",
-    municipality_id: municipality_id,
-  });
-  // console.log(back_data);
-  if (back_data.status) {
-    resolve(formatSchool(back_data.message));
-  }
-};
-
-// 相关数格式化
-let formatAddress = (val: any) => {
-  return val.map((item: any) => ({
-    value: item.id,
-    label: item.name,
-    leaf: item.deep >= 3,
-  }));
-};
-let formatSchool = (val: any) => {
-  return val.map((item: any) => ({
-    value: item.school_id,
-    label: item.school_name,
-    leaf: true,
-  }));
-};
-
+// 数据提交
 let submit = async () => {
   let form_temp = unref(form_ref);
   form_temp.validate(async (valid: any) => {
@@ -142,9 +110,9 @@ let submit = async () => {
       let back_data = await addCollegeData({
         college_id: college_form.value.college_id,
         college_name: college_form.value.college_name,
-        college_school: college_form.value.college_school,
-        college_description: college_form.value.college_description,
-        college_remarks: college_form.value.college_remarks,
+        school_id: college_form.value.college_school,
+        college_describe: college_form.value.college_description,
+        college_remark: college_form.value.college_remarks,
       });
       console.log(back_data);
       if (back_data.status) {

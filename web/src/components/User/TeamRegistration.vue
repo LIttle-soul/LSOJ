@@ -12,21 +12,40 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="指导老师" prop="team_teacher">
-        <el-input
+        <el-select
           v-model="teamData.team_teacher"
-          placeholder="请输入老师账号"
-          input-style="width: 208px"
+          :multiple="true"
+          :filterable="true"
+          :remote="true"
+          :reserve-keyword="true"
+          placeholder="请输入你的指导老师"
+          :remote-method="remotePeople"
         >
-        </el-input>
+          <el-option
+            v-for="item in people_list.options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="学校" prop="team_school">
-        <el-cascader
-          placeholder="请选择团队所在学校"
+        <el-select
           v-model="teamData.team_school"
-          :props="school_list"
-          :clearable="true"
+          :multiple="false"
+          :filterable="true"
+          :remote="true"
+          :reserve-keyword="true"
+          placeholder="请输入你的学校"
+          :remote-method="remoteSchool"
         >
-        </el-cascader>
+          <el-option
+            v-for="item in school_list.options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="submitTeamData">提交</el-button>
@@ -82,73 +101,57 @@ let team_data_rules = reactive({
   team_teacher: [{ validator: check_teacher, trigger: "blur" }],
 });
 
-// vuex数据获取懒加载
+// 数据获取懒加载
 let school_list = ref({
-  lazy: true,
-  lazyLoad(node: any, resolve: any) {
-    const { level, value } = node;
-    switch (level) {
-      case 0:
-        getAddress("", 0, "province", resolve);
-        break;
-      case 1:
-        getAddress("province", value, "municipality", resolve);
-        break;
-      case 2:
-        getSchool(value, resolve);
-        break;
-      default:
-        resolve([]);
-    }
-  },
+  options: <any>[],
+  loading: false,
 });
-
-// 相关数据获取
-let getAddress = async (
-  father: string,
-  father_id: number,
-  child: string,
-  resolve: any
-) => {
-  let back_data = await getAddressList(<any>{
-    father: father,
-    father_id: father_id,
-    child: child,
-    page: 1,
-    total: 100,
-  });
-  // console.log(back_data);
-  if (back_data.status) {
-    resolve(formatAddress(back_data.message));
+let people_list = ref({
+  options: <any>[],
+  loading: false,
+});
+let remoteSchool = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getSchoolList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      municipality_id: "",
+      school_id: "",
+    });
+    if (back_data.status) {
+      school_list.value.options = back_data.message.map((item: any) => ({
+        label: item.school_name,
+        value: item.school_id,
+      }));
+    } else {
+      school_list.value.options = [];
+    }
+  } else {
+    school_list.value.options = [];
   }
 };
-let getSchool = async (municipality_id: number, resolve: any) => {
-  let back_data = await getSchoolList(<any>{
-    page: 1,
-    total: 500,
-    text: "",
-    municipality_id: municipality_id,
-  });
-  // console.log(back_data);
-  if (back_data.status) {
-    resolve(formatSchool(back_data.message));
+let remotePeople = async (val: string) => {
+  if (val !== "") {
+    people_list.value.loading = true;
+    let back_data = await getUserList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      user_id: "",
+    });
+    if (back_data.status) {
+      people_list.value.options = back_data.message.map((item: any) => ({
+        label: item.user_name || item.user_nick || item.user_id,
+        value: item.user_id,
+      }));
+    } else {
+      people_list.value.options = [];
+    }
+  } else {
+    people_list.value.options = [];
   }
-};
-
-// 相关数格式化
-let formatAddress = (val: any) => {
-  return val.map((item: any) => ({
-    value: item.id,
-    label: item.name,
-    leaf: item.deep >= 3,
-  }));
-};
-let formatSchool = (val: any) => {
-  return val.map((item: any) => ({
-    value: item.school_id,
-    label: item.school_name,
-    leaf: true,
-  }));
 };
 
 let emits = defineEmits(["reloadTeamData"]);

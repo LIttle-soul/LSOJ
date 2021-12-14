@@ -115,6 +115,7 @@ let getData = async () => {
     total: page.value.page_size,
     text: page.value.text,
     municipality_id: "",
+    school_id: "",
   });
   // console.log(back_data);
   if (back_data.status) {

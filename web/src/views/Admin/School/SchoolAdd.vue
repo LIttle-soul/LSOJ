@@ -4,7 +4,7 @@
       <el-form
         label-position="left"
         label-width="80px"
-        v-model="school_form"
+        :model="school_form"
         ref="form_ref"
         :rules="form_rule"
       >
@@ -18,12 +18,12 @@
           <el-input v-model="school_form.school_department"></el-input>
         </el-form-item>
         <el-form-item label="办学层次">
-          <el-input v-model="school_form.school_remarks"></el-input>
+          <el-input v-model="school_form.school_rank"></el-input>
         </el-form-item>
-        <el-form-item label="学校所在城市" prop="school_city">
+        <el-form-item label="所在城市" prop="school_municipality">
           <el-cascader
             placeholder="请选择城市"
-            v-model="school_form.school_city"
+            v-model="school_form.school_municipality"
             :props="address_list"
             :clearable="true"
           >
@@ -31,7 +31,7 @@
         </el-form-item>
         <el-form-item label="学校描述">
           <el-input
-            v-model="school_form.school_description"
+            v-model="school_form.school_describe"
             :autosize="{ minRows: 6, maxRows: 10 }"
             type="textarea"
             class="description"
@@ -39,7 +39,7 @@
         </el-form-item>
         <el-form-item label="学校备注">
           <el-input
-            v-model="school_form.school_remarks"
+            v-model="school_form.school_remark"
             :autosize="{ minRows: 4, maxRows: 10 }"
             type="textarea"
             class="description"
@@ -55,25 +55,28 @@ import { ref, reactive, unref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getAddressList } from "@/api/address";
-import { getSchoolList, addCollegeData } from "@/api/school";
+import { getSchoolList, addSchoolData } from "@/api/school";
 
 let router = useRouter();
 
 let school_form = ref({
   school_id: "",
   school_name: "",
+  school_describe: "",
   school_department: "",
-  school_description: "",
-  school_remarks: "",
-  school_city: [],
+  school_rank: "",
+  school_remark: "",
+  school_municipality: "",
 });
 
 // 数据验证
 let form_ref = ref();
 let form_rule = ref({
-  school_id: [{ required: true, message: "学院编号不可为空", trigger: "blur" }],
-  school_name: [{ required: true, message: "学院名称不可为空", trigger: "blur" }],
-  school_city: [{ required: true, message: "学校所在地不可为空", trigger: "blur" }],
+  school_id: [{ required: true, message: "学校编号不可为空", trigger: "blur" }],
+  school_name: [{ required: true, message: "学校名称不可为空", trigger: "blur" }],
+  school_municipality: [
+    { required: true, message: "学校所在地不可为空", trigger: "blur" },
+  ],
 });
 
 // 懒加载数据请求
@@ -138,12 +141,14 @@ let submit = async () => {
   let form_temp = unref(form_ref);
   form_temp.validate(async (valid: any) => {
     if (valid) {
-      let back_data = await addCollegeData({
+      let back_data = await addSchoolData({
         school_id: school_form.value.school_id,
         school_name: school_form.value.school_name,
+        school_describe: school_form.value.school_describe,
+        school_municipality: school_form.value.school_municipality,
         school_department: school_form.value.school_department,
-        school_description: school_form.value.school_description,
-        school_remarks: school_form.value.school_remarks,
+        school_rank: school_form.value.school_rank,
+        school_remark: school_form.value.school_remark,
       });
       console.log(back_data);
       if (back_data.status) {

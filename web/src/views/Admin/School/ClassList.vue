@@ -6,6 +6,40 @@
           <div class="header-left">
             <el-icon :size="25" class="icon"><i class="bi bi-building"></i></el-icon>
             班级管理
+            <el-select
+              v-model="page.school"
+              :multiple="false"
+              :filterable="true"
+              :remote="true"
+              :reserve-keyword="true"
+              placeholder="请输入你的学校"
+              :remote-method="remoteSchool"
+            >
+              <el-option
+                v-for="item in school_list.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="page.college"
+              :multiple="false"
+              :filterable="true"
+              :remote="true"
+              :reserve-keyword="true"
+              placeholder="请输入你的学院"
+              :remote-method="remoteCollege"
+              :disabled="page.school === '' || page.school === null"
+              @change="getData"
+            >
+              <el-option
+                v-for="item in college_list.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </div>
           <el-input
             placeholder="请输入内容"
@@ -56,7 +90,8 @@ import ClassList from "@/components/School/ClassList.vue";
 import { useStore, mapState } from "vuex";
 import { ref, computed, watch, onMounted } from "vue";
 import { ElLoading, ElMessage } from "element-plus";
-import { getClassList } from "@/api/school";
+import { getClassList, getCollegeList, getSchoolList } from "@/api/school";
+import { getAddressList } from "@/api/address";
 
 let store = useStore();
 let temp_search_data = computed(
@@ -72,7 +107,63 @@ let page = ref({
   page_size: 50,
   total: 0,
   text: "",
+  school: "",
+  college: "",
 });
+
+// 懒加载数据请求
+let school_list = ref({
+  options: <any>[],
+  loading: false,
+});
+let college_list = ref({
+  options: <any>[],
+  loading: false,
+});
+let remoteSchool = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getSchoolList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      municipality_id: "",
+      school_id: "",
+    });
+    if (back_data.status) {
+      school_list.value.options = back_data.message.map((item: any) => ({
+        label: item.school_name,
+        value: item.school_id,
+      }));
+    } else {
+      school_list.value.options = [];
+    }
+  } else {
+    school_list.value.options = [];
+  }
+};
+let remoteCollege = async (val: string) => {
+  if (val !== "") {
+    college_list.value.loading = true;
+    let back_data = await getCollegeList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      college_id: "",
+      school_id: page.value.school,
+    });
+    if (back_data.status) {
+      college_list.value.options = back_data.message.map((item: any) => ({
+        label: item.college_name,
+        value: item.college_id,
+      }));
+    } else {
+      college_list.value.options = [];
+    }
+  } else {
+    college_list.value.options = [];
+  }
+};
 
 // 事件处理函数
 let search_all_data = (val: string) => {
@@ -93,12 +184,12 @@ let handlePageChange = (val: number) => {
 // 数据格式化
 let formatData = (val: any) => {
   return val.map((item: any) => ({
-    class_id: item.school_id,
-    class_name: item.school_name,
-    class_introduce: item.school_describe,
-    class_type: item.school_department,
-    class_creator: item.school_rank,
-    class_college: item.school_remark,
+    class_id: item.class_id,
+    class_name: item.class_name,
+    class_introduce: item.class_introduce,
+    class_type: item.class_type,
+    class_creator: item.class_creator,
+    class_college: item.class_college.college_name,
   }));
 };
 
@@ -112,10 +203,13 @@ let getData = async () => {
   let back_data = await getClassList({
     page: page.value.page,
     total: page.value.page_size,
-    text: page.value.text,
-    municipality_id: "",
+    text: page.value.text || "",
+    college_id: page.value.college || "",
+    school_id: page.value.school || "",
+    class_id: "",
+    course_id: "",
   });
-  // console.log(back_data);
+  console.log(back_data);
   if (back_data.status) {
     Data.value = formatData(back_data.message);
     page.value.total = back_data.total;
@@ -128,11 +222,6 @@ let getData = async () => {
     });
   }
 };
-
-// 自动加载数据
-onMounted(() => {
-  // getData();
-});
 </script>
 <style lang="scss">
 .class-list {

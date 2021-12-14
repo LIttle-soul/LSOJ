@@ -167,10 +167,10 @@ if (token !== undefined && token !== null) {
   background-color: rgba(100, 100, 100);
   height: 60px;
   line-height: 60px;
-  position: fixed;
+  position: relative;
   top: 0;
   width: 100%;
-  min-width: 360px;
+  min-width: 800px;
   z-index: 100;
   box-shadow: 0px 3px 5px #aaa;
   border-radius: 0 0 25px 25px;

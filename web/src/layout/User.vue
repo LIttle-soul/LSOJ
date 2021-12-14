@@ -22,12 +22,13 @@ import Footer from "@/components/Footer/Footer.vue";
 <style scoped lang="scss">
 .page {
   min-height: 100%;
-  position: relative;
   .header {
     width: 100%;
     min-width: 360px;
     height: 60px;
     z-index: 100;
+    position: sticky;
+    top: 0;
   }
   .main {
     width: 100%;

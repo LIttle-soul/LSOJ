@@ -3,7 +3,20 @@
     <el-table :data="Data" size="mini" :stripe="true" :fit="true" style="width: 100%">
       <el-table-column prop="school_id" label="学校编号"> </el-table-column>
       <el-table-column prop="school_name" label="学校名称"> </el-table-column>
-      <el-table-column prop="school_describe" label="学校描述"> </el-table-column>
+      <el-table-column prop="school_describe" label="学校描述">
+        <template #default="scope">
+          <el-popover
+            :content="scope.row.school_describe"
+            placement="bottom"
+            trigger="hover"
+            :width="400"
+          >
+            <template #reference>
+              <el-button type="text">查看更多</el-button>
+            </template>
+          </el-popover>
+        </template>
+      </el-table-column>
       <el-table-column prop="school_department" label="主管部门"> </el-table-column>
       <el-table-column prop="school_rank" label="办学层次"> </el-table-column>
       <el-table-column prop="school_remark" label="学校备注"> </el-table-column>

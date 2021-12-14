@@ -6,12 +6,14 @@ import http from "@/utils/http";
  * @param {Number} total - Current page total
  * @param {String} text - The search text
  * @param {String} municipality_id - Get list from this municipality
+ * @param {String} school_id - Get a school data
  */
 interface schoolListData {
   page: number;
   total: number;
   text: string;
   municipality_id: string;
+  school_id: string;
 }
 
 export const getSchoolList = (data: schoolListData) => {
@@ -30,19 +32,20 @@ export const getSchoolList = (data: schoolListData) => {
  * @param {Number} total - Current page size
  * @param {String} text - The search text
  * @param {String} school_id - Get list from this school
+ * @param {Number} college_id - Get a college data by college ID
  */
 
 interface collegeListData {
   page: number;
   total: number;
   text: string;
-  college_id: number;
+  college_id: string;
   school_id: string;
 }
 
 export const getCollegeList = (data: collegeListData) => {
   return http({
-    url: "/api/school/getcollege/",
+    url: "/api/school/managecollege/",
     method: "get",
     params: data,
   }).then((res: any) => {
@@ -69,7 +72,7 @@ interface classListData {
 
 export const getClassList = (data: classListData) => {
   return http({
-    url: "/api/school/getclass/",
+    url: "/api/class/createclass/",
     method: "get",
     params: data,
   }).then((res: any) => {
@@ -89,7 +92,7 @@ interface schoolData {
 
 export const addSchoolData = (data: schoolData) => {
   return http({
-    url: "/api/school/",
+    url: "/api/school/getschool/",
     method: "post",
     data: data,
   }).then((res: any) => {
@@ -100,11 +103,13 @@ export const addSchoolData = (data: schoolData) => {
 interface collegeData {
   school_id: string;
   college_name: string;
+  college_describe: string;
+  college_remark: string;
 }
 
 export const addCollegeData = (data: collegeData) => {
   return http({
-    url: "/api/school/",
+    url: "/api/school/managecollege/",
     method: "post",
     data: data,
   }).then((res: any) => {
@@ -114,18 +119,49 @@ export const addCollegeData = (data: collegeData) => {
 
 interface classData {
   class_name: string;
-  class_creator: string;
+  class_introduce: string;
   class_note: string;
-  class_type: number;
   course_id: number;
   class_school: string;
   class_college: string;
+  class_teacher: string[];
+  class_student: string[];
 }
 
-export const addClassData = (data: any) => {
+export const addClassData = (data: classData) => {
+  return http({
+    url: "/api/class/createclass/",
+    method: "post",
+    data: data,
+  }).then((res: any) => {
+    return res.data;
+  });
+};
+
+export const deleteSchoolData = (data: any) => {
   return http({
     url: "/api/school/",
-    method: "post",
+    method: "delete",
+    data: data,
+  }).then((res: any) => {
+    return res.data;
+  });
+};
+
+export const deleteCollegeData = (data: any) => {
+  return http({
+    url: "/api/school/",
+    method: "delete",
+    data: data,
+  }).then((res: any) => {
+    return res.data;
+  });
+};
+
+export const deleteClassData = (data: any) => {
+  return http({
+    url: "/api/school/",
+    method: "delete",
     data: data,
   }).then((res: any) => {
     return res.data;

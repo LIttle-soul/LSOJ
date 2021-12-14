@@ -58,7 +58,7 @@
         </el-form-item>
         <el-form-item label="我的地址">
           <el-cascader
-            placeholder="别怕，这是你学校的地址"
+            placeholder="请输入你的地址"
             v-model="user_form.user_address"
             :props="address_list"
             :clearable="true"
@@ -66,23 +66,41 @@
           </el-cascader>
         </el-form-item>
         <el-form-item label="我的学校">
-          <el-cascader
-            placeholder="想知道你的校友有谁吗？"
+          <el-select
             v-model="user_form.user_school"
-            :props="school_list"
-            :clearable="true"
+            :multiple="false"
+            :filterable="true"
+            :remote="true"
+            :reserve-keyword="true"
+            placeholder="请输入你的学校"
+            :remote-method="remoteSchool"
           >
-          </el-cascader>
+            <el-option
+              v-for="item in school_list.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="我的班级">
-          <el-cascader
-            placeholder="想知道和你同班的有谁吗？"
+          <el-select
             v-model="user_form.user_class"
-            :disabled="user_form.user_school == ''"
-            :props="class_list"
-            :clearable="true"
+            :multiple="false"
+            :filterable="true"
+            :remote="true"
+            :reserve-keyword="true"
+            placeholder="请输入你的班级"
+            :remote-method="remoteClass"
+            :disabled="user_form.user_school === null || user_form.user_school === ''"
           >
-          </el-cascader>
+            <el-option
+              v-for="item in class_list.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item size="large">
           <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -101,7 +119,7 @@ import { Setting } from "@element-plus/icons";
 import { submitUserInfoForm } from "@/api/user";
 import dayJS from "dayjs";
 import { getAddressList } from "@/api/address";
-import { getSchoolList } from "@/api/school";
+import { getSchoolList, getClassList } from "@/api/school";
 
 let store = useStore();
 let router = useRouter();
@@ -180,40 +198,59 @@ let address_list = ref({
   },
 });
 let school_list = ref({
-  lazy: true,
-  lazyLoad(node: any, resolve: any) {
-    const { level, value } = node;
-    switch (level) {
-      case 0:
-        getAddress("", 0, "province", resolve);
-        break;
-      case 1:
-        getAddress("province", value, "municipality", resolve);
-        break;
-      case 2:
-        getSchool(value, resolve);
-        break;
-      default:
-        resolve([]);
-    }
-  },
+  options: <any>[],
+  loading: false,
 });
 let class_list = ref({
-  lazy: true,
-  lazyLoad(node: any, resolve: any) {
-    const { level } = node;
-    setTimeout(() => {
-      const nodes = Array.from({ length: level + 1 }).map((item, index) => ({
-        value: index,
-        label: `Option - ${index}`,
-        leaf: level >= 2,
-      }));
-      // Invoke `resolve` callback to return the child nodes data and indicate the loading is finished.
-      resolve(nodes);
-    }, 1000);
-  },
+  options: <any>[],
+  loading: false,
 });
-
+let remoteSchool = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getSchoolList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      municipality_id: "",
+      school_id: "",
+    });
+    if (back_data.status) {
+      school_list.value.options = back_data.message.map((item: any) => ({
+        label: item.school_name,
+        value: item.school_id,
+      }));
+    } else {
+      school_list.value.options = [];
+    }
+  } else {
+    school_list.value.options = [];
+  }
+};
+let remoteClass = async (val: string) => {
+  if (val !== "") {
+    school_list.value.loading = true;
+    let back_data = await getClassList({
+      page: 1,
+      total: 10,
+      text: val || "",
+      school_id: user_form.value.user_school,
+      college_id: "",
+      class_id: "",
+      course_id: "",
+    });
+    if (back_data.status) {
+      class_list.value.options = back_data.message.map((item: any) => ({
+        label: item.class_name,
+        value: item.class_id,
+      }));
+    } else {
+      class_list.value.options = [];
+    }
+  } else {
+    class_list.value.options = [];
+  }
+};
 // 相关数据获取
 let getAddress = async (
   father: string,
@@ -234,32 +271,12 @@ let getAddress = async (
   }
 };
 
-let getSchool = async (municipality_id: number, resolve: any) => {
-  let back_data = await getSchoolList(<any>{
-    page: 1,
-    total: 500,
-    text: "",
-    municipality_id: municipality_id,
-  });
-  // console.log(back_data);
-  if (back_data.status) {
-    resolve(formatSchool(back_data.message));
-  }
-};
-
 // 相关数格式化
 let formatAddress = (val: any) => {
   return val.map((item: any) => ({
     value: item.id,
     label: item.name,
     leaf: item.deep >= 3,
-  }));
-};
-let formatSchool = (val: any) => {
-  return val.map((item: any) => ({
-    value: item.school_id,
-    label: item.school_name,
-    leaf: true,
   }));
 };
 

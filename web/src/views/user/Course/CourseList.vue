@@ -1,233 +1,266 @@
 <template>
   <div class="course">
-      <h2>课程推荐</h2>
-       <el-input
-        placeholder="请输入内容"
-        size="mini"
-        v-model="search_data"
-        class="input-with-select"
-      >
-        <template #append>
-          <el-button
-            icon="el-icon-search"
-            @click="search_all_data(search_data)"
-          ></el-button>
-        </template>
-      </el-input>
     <div class="header">
-      <!-- 
-        datas: 无缝滚动列表数据，组件内部使用列表长度。
-        v-model: 通过v-model控制动画滚动与停止，默认开始滚动
-        direction: 控制滚动方向，可选值up，down，left，right
-        isWatch: 开启数据更新监听
-        hover: 是否开启鼠标悬停
-        limitScrollNum: 开启滚动的数据量，只有列表长度大于等于该值才会滚动
-        step: 步进速度
-       -->
-      <js-seamless-scroll
-        :datas="Data"
-        :v-model="true"
-        direction="right"
-        :isWatch="true"
-        :hover="true"
-        :limitScrollNum="4"
-        :step="scroll_step"
-        class="scroll"
-      >
-        <div style="display: flex;">
-          <div v-for="item in Data" :key="item" class="scroll-item">
-            <CourseCard :Data="item"></CourseCard>
-          </div>
+      <div class="nav">
+        <div class="left">推荐课程</div>
+        <div class="right">
+          <el-button
+            type="info"
+            size="mini"
+            @click="
+              () => {
+                page.type = 'recommend';
+                getData('recommend');
+              }
+            "
+            >热门</el-button
+          >
+          <el-button
+            type="info"
+            size="mini"
+            @click="
+              () => {
+                page.type = 'time';
+                getData('recommend');
+              }
+            "
+            >最新</el-button
+          >
+          <el-button
+            type="info"
+            size="mini"
+            @click="
+              () => {
+                page.type = 'like';
+                getData('recommend');
+              }
+            "
+            >好评</el-button
+          >
         </div>
-      </js-seamless-scroll>
-      <el-button
-        class="left"
-        type="text"
-        @click="scroll_step = scroll_step - 0.5"
-        @dblclick="scroll_step = -Math.abs(scroll_step)"
-      >
-        <el-icon :size="33">
-          <d-arrow-left />
-        </el-icon>
-      </el-button>
-      <el-button
-        class="right"
-        type="text"
-        @click="scroll_step = scroll_step + 0.5"
-        @dblclick="scroll_step = Math.abs(scroll_step)"
-      >
-        <el-icon :size="33">
-          <d-arrow-right />
-        </el-icon>
-      </el-button>
+      </div>
+      <div class="main">
+        <CourseCard :Data="Data" />
+      </div>
     </div>
-    <h2>课程列表</h2>
-    <ul class="content">
-      <li v-for="item in Data" :key="item" class="content-item">
-        <CourseCard :Data="item"></CourseCard>
-      </li>
-    </ul>
+    <div class="content">
+      <div class="nav">
+        <div class="left">
+          全部课程
+          <el-select
+            size="mini"
+            v-model="page.subject"
+            class="select"
+            @change="getData('all')"
+          >
+            <el-option
+              v-for="(item, index) in page.subject_options"
+              :key="index"
+              :value="item"
+              :label="item"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="right">
+          <el-input
+            v-model="page.value"
+            size="mini"
+            placeholder="在此输入搜索内容"
+            input-style="width: 130px;"
+            class="right-input"
+            @keydown.enter="getData('all')"
+          >
+            <template #prepend>
+              <el-select v-model="page.status">
+                <el-option
+                  v-for="(item, index) in page.status_options"
+                  :key="index"
+                  :value="item.value"
+                  :label="item.label"
+                ></el-option>
+              </el-select>
+            </template>
+          </el-input>
+        </div>
+      </div>
+      <div class="main">
+        <CourseCard :Data="allData" />
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="page.total"
+          :page-size="page.page_size"
+          :current-page="page.page"
+          @current-change="handlePageChange"
+        >
+        </el-pagination>
+      </div>
+    </div>
   </div>
-</template> 
-<script>
+</template>
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
 import CourseCard from "@/components/Course/CourseCard.vue";
-import { DArrowLeft, DArrowRight } from "@element-plus/icons";
-import { mapGetters, mapState } from "vuex";
-export default {
-  components: {
-    CourseCard: CourseCard,
-    DArrowLeft,
-    DArrowRight,
-  },
-  computed: {
-    ...mapState({
-      temp_search_data: (state) => state.search_data,
-    }),
-    ...mapState("course", {
-      temp_data: (state) => state.course_list,
-    }),
-    ...mapGetters("course", {
-      filterCourseList: "filterCourseList",
-    })
-  },
-  watch: {
-    temp_search_data() {
-      this.search_data = this.temp_search_data;
-      this.search_all_data(this.search_data);
-    },
-    temp_data() {
-      this.Data = this.formatData(this.temp_data);
-    },
-  },
+import { ElLoading } from "element-plus";
+import { getCourseList, getCourseTag } from "../../../api/course";
 
-  created() {
-    this.$store.dispatch('course/getCourseList');
-    this.Data = this.formatData(this.temp_data);
+let Data = ref([
+  {
+    course_id: 1,
+    src: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+    title: "法语入门",
+    auther: "LiSoul",
+    join: 100,
+    status: "已结束",
   },
-  data() {
-    return {
-      search_data: "",
-      scroll_step: 0.6,
-      Data: [
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第1条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第2条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第3条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第4条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第5条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第5条",
-          date: Date.now(),
-        },
-        {
-          title: "Vue3.0 无缝滚动组件展示数据第5条",
-          date: Date.now(),
-        },
-      ],
-    };
+  {
+    course_id: 1,
+    src: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+    title: "法语入门",
+    auther: "LiSoul",
+    join: 100,
+    status: "已结束",
   },
-  methods: {
-    search_all_data(val) {
-      this.Data = this.formatData(this.filterCourseList(this.temp_data, val));
-    },
-    formatData(val) {
-      return val.map((item) => ({
-        course_id: item.course_id,
-        course_name: item.course_name,
-        course_creator: item.course_creator,
-        course_cover: item.course_cover,
-      }));
-    },
+]);
+let allData = ref([]);
+
+let page = ref({
+  page: 1,
+  page_size: 50,
+  total: 0,
+  value: "",
+  type: "",
+  subject: "",
+  status: "all",
+  subject_options: [],
+  status_options: [
+    { value: "all", label: "全部" },
+    { value: "not_started", label: "即将开始" },
+    { value: "started", label: "正在进行" },
+    { value: "end", label: "已结束" },
+  ],
+});
+let handlePageChange = (val: number) => {
+  page.value.page = val;
+  getData("all");
+};
+let course_status = ["未激活", "公开", "私有", "收费", "结课"];
+let formatData = (val: any) => {
+  return val.map((item: any) => ({
+    course_id: item.course_id,
+    title: item.course_name,
+    src: item.course_cover,
+    auther: item.course_creator,
+    join: item.course_peoples,
+    status: course_status[item.course_status],
+  }));
+};
+
+let getData = async (val: string) => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中....",
+    background: "rgba(0,0,0,0.7)",
+  });
+  let back_data = await getCourseList({
+    page: page.value.page,
+    total: val === "recommend" ? 12 : page.value.page_size,
+    sort_by: val === "recommend" ? page.value.type : "",
+    key: page.value.status,
+    text: page.value.value || "",
+    subject: page.value.subject || "",
+  });
+  // console.log(back_data);
+  if (back_data.status) {
+    if (val === "all") {
+      allData.value = formatData(back_data.message);
+      page.value.total = back_data.total;
+    } else if (val === "recommend") {
+      Data.value = formatData(back_data.message);
+    }
+    loading.close();
+  } else {
+    loading.close();
   }
 };
+let getDataTag = async () => {
+  let loading = ElLoading.service({
+    lock: true,
+    text: "加载中....",
+    background: "rgba(0,0,0,7)",
+  });
+  let back_data = await getCourseTag();
+  console.log(back_data);
+  if (back_data.status) {
+    page.value.subject_options = back_data.tag;
+    loading.close();
+  } else {
+    loading.close();
+  }
+};
+onMounted(() => {
+  getData("all");
+  getData("recommend");
+  getDataTag();
+});
 </script>
-<style  lang="css">
-.input-with-select {
-  width: 230px;
-  float: right;
-  margin-top: -5%;
-  transform: translateY(-1px);
-}
-</style>
 
-<style scoped>
-
-/* .course-list {
-  width: 85%;
-  max-width: 1400px;
-  margin: 70px auto;
-  position: relative;
-  float: right;
-} */
-
+<style lang="scss">
 .course {
   width: 80%;
-  min-width: 800px;
-  margin: 0 auto;
-}
-.course h2 {
-  font-size: 1.8em;
-  font-weight: bolder;
-  font-family: "楷体";
-  margin: 40px 60px;
-}
-.course .header {
-  width: 100%;
-  height: 210px;
-  overflow: hidden;
-  border-radius: 20px;
-  box-shadow: 3px 3px 0.4em rgb(155, 163, 38), -3px 0 0.4em olive;
-  padding: 50px 0;
-  position: relative;
-}
-.left {
-  width: 40px;
-  height: 40px;
-  /* background-color: black; */
-  color: rgb(63, 15, 151);
-  position: absolute;
-  bottom: 10px;
-  left: 30%;
-}
-.right {
-  width: 40px;
-  height: 40px;
-  /* background-color: black; */
-  color: rgb(63, 15, 151);
-  position: absolute;
-  bottom: 10px;
-  right: 30%;
-}
-.course .header .scroll {
-  height: 100%;
-  width: 10000px;
-}
-.course .header .scroll .scroll-item {
-  margin: 0 20px;
-}
-.course .content {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  /* overflow: auto; */
-  justify-content: center;
-}
-.course .content-item {
-  margin: 20px 20px;
+  margin: 20px auto;
+  .header {
+    width: 100%;
+    min-height: 200px;
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      height: 40px;
+      .left {
+        text-align: left;
+        font-size: 30px;
+        font-family: "STKaiti";
+        height: 40px;
+        line-height: 40px;
+        font-weight: bolder;
+      }
+      .right {
+        height: 40px;
+        padding: 6px 10px;
+      }
+    }
+  }
+  .content {
+    width: 100%;
+    min-height: 600px;
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      height: 40px;
+      .left {
+        text-align: left;
+        font-size: 30px;
+        font-family: "STKaiti";
+        display: flex;
+        height: 40px;
+        line-height: 28px;
+        padding: 6px 10px;
+        font-weight: bolder;
+        .select {
+          width: 100px;
+          margin-left: 10px;
+        }
+      }
+      .right {
+        height: 40px;
+        padding: 6px 10px;
+        .right-input {
+          .el-input__inner {
+            width: 80px;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

@@ -1,13 +1,13 @@
 {
     "db_host": "124.71.143.224",
     "db_port": 3306,
-    "db_user": "jhcoj",
-    "db_password": "12345678",
-    "db_database": "jhcoj",
+    "db_user": "LSOJ",
+    "db_password": "renchenghui",
+    "db_database": "lsoj",
     
-    "server_host": "10.46.24.178",
-    "server_port": 8805,
-    "file_server_port": 8806,
+    "server_host": "124.71.143.224",
+    "server_port": 25001,
+    "file_server_port": 25002,
 
     "client_name": "LSOJ",
     "client_host": "localhost",
