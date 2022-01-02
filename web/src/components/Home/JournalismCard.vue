@@ -41,6 +41,7 @@ let props = defineProps({
   width: 99%;
   min-height: 200px;
   margin-bottom: 40px;
+  border-radius: 20px;
   .header {
     height: 40px;
     line-height: 40px;

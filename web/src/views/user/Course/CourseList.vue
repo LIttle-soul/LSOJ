@@ -102,7 +102,7 @@
 import { onMounted, ref } from "vue";
 import CourseCard from "@/components/Course/CourseCard.vue";
 import { ElLoading } from "element-plus";
-import { getCourseList, getCourseTag } from "../../../api/course";
+import { getCourseList, getCourseTag } from "@/api/course";
 
 let Data = ref([
   {
@@ -126,7 +126,7 @@ let allData = ref([]);
 
 let page = ref({
   page: 1,
-  page_size: 50,
+  page_size: 20,
   total: 0,
   value: "",
   type: "",
@@ -169,6 +169,7 @@ let getData = async (val: string) => {
     key: page.value.status,
     text: page.value.value || "",
     subject: page.value.subject || "",
+    me: "",
   });
   // console.log(back_data);
   if (back_data.status) {
@@ -190,7 +191,7 @@ let getDataTag = async () => {
     background: "rgba(0,0,0,7)",
   });
   let back_data = await getCourseTag();
-  console.log(back_data);
+  // console.log(back_data);
   if (back_data.status) {
     page.value.subject_options = back_data.tag;
     loading.close();

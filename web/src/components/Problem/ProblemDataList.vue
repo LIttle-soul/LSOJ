@@ -61,6 +61,7 @@
         :show-file-list="false"
         :drag="true"
         :multiple="true"
+        accept=".in,.out"
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将上传文件拖到此处或点击上传</div>
@@ -114,7 +115,8 @@ let handleEditClick = (val: any) => {
       let back_data = await changeProblemTestName({
         problem_id: props.problem_id,
         files_name: val.data_title,
-        new_name: value.split(".").length > 1 ? value : value + "." + val.data_type,
+        new_name:
+          value.split(".").length > 1 ? value : value + "." + val.data_type,
       });
       if (back_data.status) {
         ElMessage({

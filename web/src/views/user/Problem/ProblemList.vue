@@ -54,14 +54,14 @@
     <div class="problem-right">
       <ProblemNav
         title="问题标签"
-        :card_data="tag_list"
-        @filterData="search_all_data"
+        :card_data="page_info.tag_list"
+        @filterData="search_all_data('search', $event)"
         class="problem_nav"
       />
       <ProblemNav
         title="问题来源"
-        :card_data="course_list"
-        @filterData="search_all_data"
+        :card_data="page_info.course_list"
+        @filterData="search_all_data('search', $event)"
         class="problem_nav"
       />
     </div>
@@ -90,18 +90,9 @@ let page_info = ref({
   page_size: 50,
   key: "",
   text: "",
+  tag_list: [],
+  course_list: [],
 });
-
-let tag_list = computed(
-  mapState("problem", ["problem_tag_list"]).problem_tag_list.bind({
-    $store: store,
-  })
-);
-let course_list = computed(
-  mapState("problem", ["problem_course_list"]).problem_course_list.bind({
-    $store: store,
-  })
-);
 let temp_search_data = computed(
   mapState(["search_data"]).search_data.bind({
     $store: store,
@@ -109,6 +100,7 @@ let temp_search_data = computed(
 );
 
 let search_all_data = (key: string, text: string) => {
+  console.log(key, text);
   page_info.value.key = key || "";
   page_info.value.text = text || "";
   getData();
@@ -131,6 +123,7 @@ watch(temp_search_data, (val) => {
   search_all_data("search", val);
 });
 
+// 数据格式化
 let formatData = (val: any) => {
   return val.map((item: any) => ({
     problem_id: item.problem_id,
@@ -150,6 +143,7 @@ let formatData = (val: any) => {
   }));
 };
 
+// 获取问题数据
 let getData = async () => {
   let loading = ElLoading.service({
     lock: true,
@@ -172,9 +166,18 @@ let getData = async () => {
   }
 };
 
+// 获取问题标签数据
+let getTagData = async () => {
+  let back_data = await getProblemTagAndCourse();
+  if (back_data.status) {
+    page_info.value.tag_list = back_data.tag;
+    page_info.value.course_list = back_data.course;
+  }
+};
+
 onMounted(() => {
   getData();
-  store.dispatch("problem/getProblemTagList");
+  getTagData();
 });
 </script>
 

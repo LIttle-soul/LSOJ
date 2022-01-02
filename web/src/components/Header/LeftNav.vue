@@ -27,9 +27,7 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { useStore, mapState } from "vuex";
-
-let store = useStore();
+import { nav_menu } from "@/config/adminNav";
 
 let props = defineProps({
   isCollapse: {
@@ -39,8 +37,6 @@ let props = defineProps({
 });
 
 let emit = defineEmits(["hasSelect"]);
-
-let nav_menu = computed(mapState("admin", ["nav_menu"]).nav_menu.bind({ $store: store }));
 
 let hasSelect = (index: number, path: string) => {
   emit("hasSelect", path);

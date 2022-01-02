@@ -31,22 +31,30 @@ export default [
       title: "添加问题",
     },
   },
-  // {
-  //   path: "/admin/courselist",
-  //   name: "AdminCourseList",
-  //   component: () => import("@/views/Admin/Course/CourseList.vue"),
-  //   meta: {
-  //     title: "课程管理",
-  //   },
-  // },
-  // {
-  //   path: "/admin/addCourse",
-  //   name: "AdminAddCourse",
-  //   component: () => import("@/views/Admin/Course/CourseAdd.vue"),
-  //   meta: {
-  //     title: "添加课程",
-  //   },
-  // },
+  {
+    path: "/admin/courselist",
+    name: "AdminCourseList",
+    component: () => import("@/views/Admin/Course/CourseList.vue"),
+    meta: {
+      title: "课程管理",
+    },
+  },
+  {
+    path: "/admin/addCourse/:course_id*",
+    name: "AdminAddCourse",
+    component: () => import("@/views/Admin/Course/CourseAdd.vue"),
+    meta: {
+      title: "添加课程",
+    },
+  },
+  {
+    path: "/user/courseShow",
+    name: "userCourseShow",
+    component: () => import("@/views/user/Course/CourseShow.vue"),
+    meta: {
+      title: "课程详情",
+    },
+  },
   {
     path: "/admin/newslist",
     name: "AdminNewsList",
@@ -63,22 +71,22 @@ export default [
       title: "添加新闻",
     },
   },
-  // {
-  //   path: "/admin/forumlist",
-  //   name: "AdminForumList",
-  //   component: () => import("@/views/Admin/Forum/ForumList.vue"),
-  //   meta: {
-  //     title: "论坛管理",
-  //   },
-  // },
-  // {
-  //   path: "/admin/sensitiveword",
-  //   name: "AdminSensitiveWord",
-  //   component: () => import("@/views/Admin/Forum/SensitiveWord.vue"),
-  //   meta: {
-  //     title: "敏感词管理",
-  //   },
-  // },
+  {
+    path: "/admin/forumlist",
+    name: "AdminForumList",
+    component: () => import("@/views/Admin/Forum/ForumList.vue"),
+    meta: {
+      title: "论坛管理",
+    },
+  },
+  {
+    path: "/admin/sensitiveword",
+    name: "AdminSensitiveWord",
+    component: () => import("@/views/Admin/Forum/SensitiveWord.vue"),
+    meta: {
+      title: "敏感词管理",
+    },
+  },
   {
     path: "/admin/contestlist",
     name: "AdminContestList",
@@ -111,22 +119,54 @@ export default [
       title: "竞赛问题",
     },
   },
+  {
+    path: "/admin/levellist",
+    name: "AdminLevelList",
+    component: () => import("@/views/Admin/Level/LevelList.vue"),
+    meta: {
+      title: "关卡管理",
+    },
+  },
+  {
+    path: "/admin/LevelAdd",
+    name: "AdminLevelAdd",
+    component: () => import("@/views/Admin/Level/LevelAdd.vue"),
+    meta: {
+      title: "添加关卡",
+    },
+  },
   // {
-  //   path: "/admin/levellist",
-  //   name: "AdminLevelList",
-  //   component: () => import("@/views/Admin/Level/LevelList.vue"),
+  //   path: "/admin/BigLevelAdd",
+  //   name: "AdminBigLevelAdd",
+  //   component: () => import("@/views/Admin/Level/BigLevelAdd.vue"),
   //   meta: {
-  //     title: "关卡管理",
+  //     title: "增加大关卡",
   //   },
   // },
-  // {
-  //   path: "/admin/addlevel",
-  //   name: "AdminAddLevel",
-  //   component: () => import("@/views/Admin/Level/LevelAdd.vue"),
-  //   meta: {
-  //     title: "添加关卡",
-  //   },
-  // },
+  {
+    path: "/admin/BigLevelEdit",
+    name: "AdminBigLevelEdit",
+    component: () => import("@/views/Admin/Level/BigLevelEdit.vue"),
+    meta: {
+      title: "修改大关卡",
+    },
+  },
+  {
+    path: "/admin/SmallLevelAdd",
+    name: "AdminSmallLevelAdd",
+    component: () => import("@/views/Admin/Level/SmallLevelAdd.vue"),
+    meta: {
+      title: "增加小关卡",
+    },
+  },
+  {
+    path: "/admin/SmallLevelEdit",
+    name: "AdminSmallLevelEdit",
+    component: () => import("@/views/Admin/Level/SmallLevelEdit.vue"),
+    meta: {
+      title: "修改小关卡",
+    },
+  },
   {
     path: "/admin/addresslist",
     name: "AdminAddress",

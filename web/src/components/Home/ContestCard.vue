@@ -79,8 +79,13 @@ let more = () => {
     path: "contestlist",
   });
 };
-let linkTo = (val: String) => {
-  router.push("/contestshow/" + val);
+let linkTo = (val: string) => {
+  router.push({
+    path: "/contestshow/",
+    query: {
+      contest_id: val,
+    },
+  });
 };
 
 let filter_status_data: any = [
@@ -110,6 +115,7 @@ let filter_status_data: any = [
     min-height: 400px;
     margin: 20px 0;
     position: relative;
+    border-radius: 20px;
     .header {
       height: 50px;
       line-height: 50px;

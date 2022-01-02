@@ -24,12 +24,18 @@
             >{{ course_data.course_student }}人</el-descriptions-item
           >
         </el-descriptions>
-        <el-button type="warning" plain size="medium" class="course-join"
-          >立即参加</el-button
+        <el-button
+          type="primary"
+          plain
+          size="medium"
+          class="course-join"
+          @click="open(course_data.join_status, Number(course_data.course_id))"
+        >
+          {{ course_data.join_status ? "进入学习" : "立即参加" }}</el-button
         >
       </el-header>
       <el-main>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tabs v-model="activeName">
           <el-tab-pane label="课程详情" name="first">
             <div class="title">课程简介</div>
             <div class="content-text">
@@ -44,10 +50,17 @@
           </el-tab-pane>
           <el-tab-pane label="课程目录" name="second">
             <div class="course-outline" style="position: relative">
-              <div v-for="(item, index) in course_data.course_catalog" :key="index">
+              <div
+                v-for="(item, index) in course_data.course_catalog"
+                :key="index"
+              >
                 <h5 class="item">{{ item.title }}</h5>
                 <ul>
-                  <li class="outline" v-for="(item2, index2) in item.child" :key="index2">
+                  <li
+                    class="outline"
+                    v-for="(item2, index2) in item.child"
+                    :key="index2"
+                  >
                     <span class="sb-border"> {{ item2.title }} </span>
                   </li>
                 </ul>
@@ -62,15 +75,16 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { Lock, Unlock } from "@element-plus/icons";
 import dayJS from "dayjs";
 import CourseInfo from "@/components/Editor/MarkdownEditor.vue";
-import { ElLoading } from "element-plus";
-import { getCourseDetails, getCourseChapter } from "@/api/course";
+import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
+import { getCourseDetails, getCourseChapter, joinCourse } from "@/api/course";
 import { format } from "echarts";
 
 let route = useRoute();
+let router = useRouter();
 
 let activeName = ref("first");
 let task = ref(true);
@@ -78,7 +92,7 @@ let radio = ref(3);
 
 // 单课程相关数据
 let course_data = ref({
-  course_id: 1,
+  course_id: route.params.course_id,
   course_title: "数据结构",
   course_img: "",
   course_begin_time: "2021-01-01 08:00:00",
@@ -134,21 +148,23 @@ let formatdata = (val: any) => {
   return {
     course_id: val.course_id,
     course_title: val.course_title,
+    course_summary: val.course_introduce,
     course_img: val.course_cover,
-    course_begin_time: dayJS(val.start_time).format("YYYY-MM-DD HH:mm:ss"),
-    course_end_time: dayJS(val.end_time).format("YYYY-MM-DD HH:mm:ss"),
+    course_begin_time: dayJS(val.start_time).format("YYYY-MM-DD"),
+    course_end_time: dayJS(val.end_time).format("YYYY-MM-DD"),
     course_status: getCourseStatus(val.start_time, val.end_time),
     course_score: val.course_credits,
     course_teacher: {
       user_id: val.course_creator,
       user_name: val.creator_name,
     },
-    course_school: val.course_school.school_name,
+    course_school: val.course_school.school_name || val.course_school.school_id,
     course_student: val.course_peoples,
     join_status: val.is_join,
   };
 };
 
+// 获取课程内容
 let getCourseContent = async () => {
   let loading = ElLoading.service({
     lock: true,
@@ -156,7 +172,7 @@ let getCourseContent = async () => {
     background: "rgba(0,0,0,7)",
   });
   let back_data = await getCourseDetails({
-    course_id: route.query.id,
+    course_id: course_data.value.course_id,
   });
   console.log(back_data);
   if (back_data.status) {
@@ -177,6 +193,7 @@ let getCourseStatus = (start_time: any, end_time: any) => {
   }
 };
 
+// 获取章节列表
 let getCourseChapterlist = async () => {
   let loading = ElLoading.service({
     lock: true,
@@ -184,32 +201,82 @@ let getCourseChapterlist = async () => {
     background: "rgba(0,0,0,7)",
   });
   let back_data = await getCourseChapter({
-    course_id: route.query.id,
+    course_id: course_data.value.course_id,
   });
-  console.log(back_data);
+  // console.log(back_data);
   if (back_data.status) {
-    // course_data.value = formatchapterdata(back_data.message);
+    course_data.value.course_catalog = <any>(
+      formatChapterData(back_data.message)
+    );
     loading.close();
   } else {
     loading.close();
   }
 };
+// 格式化章节列表
+let formatChapterData = (val: any) => {
+  return val.map((res: any) => ({
+    title: res.chapter_title,
+    child:
+      res.section_list?.map((res2: any) => ({
+        title: res2.chapter_title,
+      })) || [],
+  }));
+};
 
-let handleClick = (tab: any, event: any) => {
-  console.log(tab, event);
+let open = (val: boolean, res: number) => {
+  if (!val) {
+    ElMessageBox.confirm("确定要加入这个课程吗？", "确认消息", {
+      cancelButtonText: "取消",
+      confirmButtonText: "确认",
+      type: "warning",
+    })
+      .then(async () => {
+        let back_data = await joinCourse({
+          course_id: course_data.value.course_id,
+        });
+        // console.log(back_data);
+        if (back_data.status) {
+          getCourseContent();
+          ElMessage({
+            type: "success",
+            message: back_data.message,
+          });
+        } else {
+          ElMessage({
+            type: "success",
+            message: back_data.message,
+          });
+        }
+      })
+      .catch(() => {
+        ElMessage({
+          type: "info",
+          message: "取消报名",
+        });
+      });
+  } else {
+    router.push({
+      path: `/coursedetails/${res}/chapter`,
+    });
+  }
 };
-let all_task = () => {
-  console.log(123);
-};
-let all_finish = () => {
-  console.log(456);
-};
-let all_unfinish = () => {
-  console.log(789);
-};
-let course_play = () => {
-  console.log("课程播放");
-};
+
+// let handleClick = (tab: any, event: any) => {
+//   console.log(tab, event);
+// };
+// let all_task = () => {
+//   console.log(123);
+// };
+// let all_finish = () => {
+//   console.log(456);
+// };
+// let all_unfinish = () => {
+//   console.log(789);
+// };
+// let course_play = () => {
+//   console.log("课程播放");
+// };
 
 onMounted(() => {
   getCourseContent();

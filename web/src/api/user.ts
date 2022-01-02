@@ -1,9 +1,10 @@
 import http from "@/utils/http";
+import { AxiosResponseTransformer } from "axios";
 
 /**
  * Check user login status
+ * @author LiSoul
  */
-
 export const checkUserLoginStatus = () => {
   return http({
     url: "/api/user/extendtokentime/",
@@ -15,22 +16,21 @@ export const checkUserLoginStatus = () => {
 
 /**
  * Login
- * @param {string} user_id - User ID
- * @param {string} password - User Password
- * @return {JSON} - Action status and token
- *
+ * @author LiSoul
  * @example
- * console.log(submitLoginForm({
+ * ```typescript
+ * const back_data = submitLoginForm({
  *  user_id: xxxx,
- * password: *******
- * }))
+ *  password: *******
+ * });
+ * ```
  */
-interface loginData {
+export const submitLoginForm = (data: {
+  /** User Id */
   user_id: string;
+  /** User Password */
   password: string;
-}
-
-export const submitLoginForm = (data: loginData) => {
+}): AxiosResponseTransformer => {
   return http({
     url: "/api/user/login/",
     method: "post",
@@ -42,17 +42,16 @@ export const submitLoginForm = (data: loginData) => {
 
 /**
  * Register
- * @param {string} user_id - User ID
- * @param {string} password - User Password
- * @param {string} check_password - User Password second
+ * @author LiSoul
+ * @param {{string}} user_id - User ID
+ * @param {{string}} password - User Password
+ * @param {{string}} check_password - User Password second
  */
-interface registerData {
+export const submitRegisterForm = (data: {
   user_id: string;
   password: string;
   check_password: string;
-}
-
-export const submitRegisterForm = (data: registerData) => {
+}) => {
   return http({
     url: "/api/user/register/",
     method: "post",
@@ -62,22 +61,21 @@ export const submitRegisterForm = (data: registerData) => {
   });
 };
 
-/**
- * Submit Forget Password Form
- * when user forget password, we can use this founction to change it
- * @param {string} user_id - the user id value
- * @param {string} new_password - the new password
- * @param {string} check_password - the check password
- * @param {string} email_code - the callback email code
- */
-
 interface forgetpasswordData {
   user_id: string;
   new_password: string;
   check_password: string;
   email_code: string;
 }
-
+/**
+ * Submit Forget Password Form
+ * @author LiSoul
+ * when user forget password, we can use this founction to change it
+ * @param {{string}} user_id - the user id value
+ * @param {{string}} new_password - the new password
+ * @param {{string}} check_password - the check password
+ * @param {{string}} email_code - the callback email code
+ */
 export const submitForgetPasswordForm = (data: forgetpasswordData) => {
   return http({
     url: "/api/user/forgetpassword/",
@@ -88,16 +86,16 @@ export const submitForgetPasswordForm = (data: forgetpasswordData) => {
   });
 };
 
-/**
- * Send email code
- * @param {string} user_id - when user forget password, user need this keyword to find it;
- * @param {email} email - when user bind email need it;
- */
 interface sendEmailData {
   user_id: String;
   email: String;
 }
-
+/**
+ * Send email code
+ * @author LiSoul
+ * @param {{string}} user_id - when user forget password, user need this keyword to find it;
+ * @param {{email}} email - when user bind email need it;
+ */
 export const sendEmailCode = (data: sendEmailData) => {
   return http({
     url: "/api/user/sendemail/",
@@ -117,6 +115,7 @@ export const sendEmailCode = (data: sendEmailData) => {
 
 /***
  * Get has login userinfo
+ * @author LiSoul
  */
 
 export const getUserInfo = () => {
@@ -128,10 +127,15 @@ export const getUserInfo = () => {
   });
 };
 
+interface bindEmailData {
+  email: string;
+  code: string;
+}
 /***
  * Bind user email
- * @param {email} email - user will bind email
- * @param {string} code - the callback email code
+ * @author LiSoul
+ * @param {{email}} email - user will bind email
+ * @param {{string}} code - the callback email code
  * @returns {JSON} - Action status
  *
  * @example
@@ -140,11 +144,6 @@ export const getUserInfo = () => {
  *  code: "123456"
  * }))
  */
-interface bindEmailData {
-  email: string;
-  code: string;
-}
-
 export const bindUserEmail = (data: bindEmailData) => {
   return http({
     url: "/api/user/sendemail/",
@@ -155,19 +154,6 @@ export const bindUserEmail = (data: bindEmailData) => {
   });
 };
 
-/**
- * Submit User Info
- * @param {string} user_name - User Name
- * @param {string} user_nick - User Nick
- * @param {string} user_introduce - User Introduce
- * @param {string} user_telephone - User Telephone Number
- * @param {Date}   user_birthday - User Birthday
- * @param {string, number} user_school - User School ID
- * @param {string, number} user_class - User Class ID
- * @param {string, number} user_address - User Address ID
- * @param {number} user_sex - 0:man 1:woman
- * @returns
- */
 interface userInfoData {
   user_name: string;
   user_nick: string;
@@ -179,7 +165,20 @@ interface userInfoData {
   user_address: [number, string];
   user_sex: number;
 }
-
+/**
+ * Submit User Info
+ * @author LiSoul
+ * @param {{string}} user_name - User Name
+ * @param {{string}} user_nick - User Nick
+ * @param {{string}} user_introduce - User Introduce
+ * @param {{string}} user_telephone - User Telephone Number
+ * @param {{Date}}   user_birthday - User Birthday
+ * @param {{string, number}} user_school - User School ID
+ * @param {{string, number}} user_class - User Class ID
+ * @param {{string, number}} user_address - User Address ID
+ * @param {{number}} user_sex - 0:man 1:woman
+ * @returns
+ */
 export const submitUserInfoForm = (data: userInfoData) => {
   // console.log(data);
   return http({
@@ -192,14 +191,15 @@ export const submitUserInfoForm = (data: userInfoData) => {
   });
 };
 
-/**
- * Get User Status
- * @param {string} user_id - If has user_id, it will search the user's info, else it search self info.
- * @returns
- */
 interface userStatusData {
   user_id: string;
 }
+/**
+ * Get User Status
+ * @author LiSoul
+ * @param {{string}} user_id - If has user_id, it will search the user's info, else it search self info.
+ * @returns
+ */
 export const getUserStatus = (data: userStatusData) => {
   return http({
     url: "/api/user/userstatus/",
@@ -210,19 +210,20 @@ export const getUserStatus = (data: userStatusData) => {
   });
 };
 
-/**
- * Get user list
- * @param {Number} page - Current page
- * @param {Number} total - Current page size
- * @param {String} text - The search text
- * @param {String} user_id - Get a user's userinfo
- */
 interface userListData {
   page: number;
   total: number;
   text: string;
   user_id: string;
 }
+/**
+ * Get user list
+ * @author LiSoul
+ * @param {{Number}} page - Current page
+ * @param {{Number}} total - Current page size
+ * @param {{String}} text - The search text
+ * @param {{String}} user_id - Get a user's userinfo
+ */
 export const getUserList = (data: userListData) => {
   return http({
     url: "/api/user/getuserlist/",
@@ -233,19 +234,20 @@ export const getUserList = (data: userListData) => {
   });
 };
 
-/**
- * The admin change userinfo
- * @param {String} user_id -  The user's ID will change
- * @param {String} user_power - The user's power
- * @param {Boolean} user_status - The user's status
- * @param {String} user_password - The user's password
- */
 interface changeUserInfoData {
   user_id: string;
   user_power: string;
   user_status: boolean;
   user_password: string;
 }
+/**
+ * The admin change userinfo
+ * @author LiSoul
+ * @param {{String}} user_id -  The user's ID will change
+ * @param {{String}} user_power - The user's power
+ * @param {{Boolean}} user_status - The user's status
+ * @param {{String}} user_password - The user's password
+ */
 export const changeUserInfo = (data: any) => {
   return http({
     url: "/api/user/getuserlist/",
@@ -256,14 +258,14 @@ export const changeUserInfo = (data: any) => {
   });
 };
 
-/**
- * The admin delete other user
- * @param {String} user_id - The will delete user
- */
 interface deleteUserInfoData {
   user_id: string;
 }
-
+/**
+ * The admin delete other user
+ * @author LiSoul
+ * @param {{String}} user_id - The will delete user
+ */
 export const deleteUserInfo = (data: deleteUserInfoData) => {
   return http({
     url: "/api/user/getuserlist/",
@@ -274,19 +276,20 @@ export const deleteUserInfo = (data: deleteUserInfoData) => {
   });
 };
 
-/**
- * Get team list
- * @param {Number} page - Current page
- * @param {Number} total - Current page size
- * @param {String} text - The search text
- * @param {String} mode - ['', join, create] Return all team, my join team and my creator team
- */
 interface teamListData {
   page: number;
   total: number;
   text: string;
   mode: string;
 }
+/**
+ * Get team list
+ * @author LiSoul
+ * @param {{Number}} page - Current page
+ * @param {{Number}} total - Current page size
+ * @param {{String}} text - The search text
+ * @param {{String}} mode - ['', join, create] Return all team, my join team and my creator team
+ */
 export const getTeamList = (data: teamListData) => {
   return http({
     url: "/api/team/getteamlist/",
@@ -299,6 +302,7 @@ export const getTeamList = (data: teamListData) => {
 
 /**
  * Delete Team List
+ * @author LiSoul
  * @param {Number} team_id - The team's ID will delete
  */
 export const deleteTeamData = (data: { team_id: number }) => {
@@ -311,15 +315,16 @@ export const deleteTeamData = (data: { team_id: number }) => {
   });
 };
 
-/**
- * Delete team user
- * @param {Number} team_id - which team
- * @param {String} user_id - which user
- */
 interface teamUserData {
   team_id: number;
   user_id: string;
 }
+/**
+ * Delete team user
+ * @author LiSoul
+ * @param {{Number}} team_id - which team
+ * @param {{String}} user_id - which user
+ */
 export const deleteTeamUser = (data: teamUserData) => {
   return http({
     url: "/api/team/jointeam/",
@@ -330,19 +335,20 @@ export const deleteTeamUser = (data: teamUserData) => {
   });
 };
 
-/**
- * Team registration
- * @param {String} team_nick - The team's name
- * @param {String} team_introduce - The team's introduce
- * @param {String} team_school - Which school that this team brlong to
- * @param {String} team_teacher - The tutor about this team
- */
 interface teamRegistrationData {
   team_nick: string;
   team_introduce: string;
   team_school: string;
   team_teacher: string;
 }
+/**
+ * Team registration
+ * @author LiSoul
+ * @param {{String}} team_nick - The team's name
+ * @param {{String}} team_introduce - The team's introduce
+ * @param {{String}} team_school - Which school that this team brlong to
+ * @param {{String}} team_teacher - The tutor about this team
+ */
 export const teamRegistration = (data: any) => {
   // console.log(data);
   return http({
@@ -357,6 +363,7 @@ export const teamRegistration = (data: any) => {
 
 /**
  * Get team invitation code
+ * @author LiSoul
  * @param {Number} team_id - The team's ID
  */
 export const getInvitationCode = (data: { team_id: number }) => {
@@ -371,6 +378,7 @@ export const getInvitationCode = (data: { team_id: number }) => {
 
 /**
  * Join team by invitation code
+ * @author LiSoul
  * @param {String} code - The invitation code
  */
 

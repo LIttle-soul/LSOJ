@@ -100,7 +100,7 @@ export default [
     },
   },
   {
-    path: "/contestshow/:contest_id",
+    path: "/contestshow",
     name: "ContestShow",
     component: () => import("@/views/User/Contest/ContestShow.vue"),
     meta: {
@@ -108,12 +108,53 @@ export default [
     },
   },
   {
-    path: "/contestdata/:contest_id",
+    path: "/contestdata/",
     name: "ContestData",
     component: () => import("@/views/User/Contest/ContestData.vue"),
-    meta: {
-      title: "竞赛查看",
-    },
+    children: [
+      {
+        path: "problem",
+        name: "ContestProblem",
+        component: () => import("@/views/User/Contest/ContestData/Problem.vue"),
+        meta: {
+          title: "竞赛问题",
+        },
+      },
+      {
+        path: "status",
+        name: "ContestStatus",
+        component: () =>
+          import("@/views/User/Contest/ContestData/Solution.vue"),
+        meta: {
+          title: "竞赛状态",
+        },
+      },
+      {
+        path: "rank",
+        name: "ContestRank",
+        component: () => import("@/views/User/Contest/ContestData/Rank.vue"),
+        meta: {
+          title: "竞赛排名",
+        },
+      },
+      {
+        path: "count",
+        name: "ContestCount",
+        component: () => import("@/views/User/Contest/ContestData/Count.vue"),
+        meta: {
+          title: "竞赛统计",
+        },
+      },
+      {
+        path: "print",
+        name: "ContestPrint",
+        component: () =>
+          import("@/views/User/Contest/ContestData/PutContest.vue"),
+        meta: {
+          title: "竞赛打印",
+        },
+      },
+    ],
   },
   {
     path: "/newslist",
@@ -129,6 +170,38 @@ export default [
     component: () => import("@/views/User/News/NewsShow.vue"),
     meta: {
       title: "新闻内容",
+    },
+  },
+  {
+    path: "/forum",
+    name: "Forum",
+    component: () => import("@/views/User/Forum/ForumList.vue"),
+    meta: {
+      title: "论坛",
+    },
+  },
+  {
+    path: "/showforum",
+    name: "ShowForum",
+    component: () => import("@/views/User/Forum/ForumShow.vue"),
+    meta: {
+      title: "帖子内容",
+    },
+  },
+  {
+    path: "/createforum",
+    name: "CreateForum",
+    component: () => import("@/views/User/Forum/ForumCreate.vue"),
+    meta: {
+      title: "创建帖子",
+    },
+  },
+  {
+    path: "/levelshow",
+    name: "LevelShow",
+    component: () => import("@/views/User/Level/LevelShow.vue"),
+    meta: {
+      title: "闯关",
     },
   },
 ];

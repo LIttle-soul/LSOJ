@@ -45,10 +45,7 @@ let props = defineProps({
 
 let linkTo = (val: number) => {
   router.push({
-    path: "/courseshow",
-    query: {
-      id: val,
-    },
+    path: `/courseshow/${val}`,
   });
 };
 </script>
@@ -66,7 +63,8 @@ let linkTo = (val: number) => {
       height: 200px;
       margin: 0 auto;
       overflow: hidden;
-      box-shadow: 0 0 0 1px hsla(0, 0%, 100%, 0.3) inset, 0 0.5em 1em rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 0 1px hsla(0, 0%, 100%, 0.3) inset,
+        0 0.5em 1em rgba(0, 0, 0, 0.6);
       text-shadow: 0 1px 1px hsla(0, 0%, 100%, 0.3);
       border-radius: 15px;
       overflow: hidden;

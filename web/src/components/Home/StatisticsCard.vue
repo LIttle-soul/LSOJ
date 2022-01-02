@@ -35,6 +35,7 @@ let moreNews = () => {
   min-height: 200px;
   position: relative;
   margin-bottom: 40px;
+  border-radius: 20px;
   .header {
     font-size: 16px;
     height: 40px;

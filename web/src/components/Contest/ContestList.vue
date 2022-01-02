@@ -188,7 +188,10 @@ let handleDeleteClick = async (row: any) => {
 };
 let show_contest = (row: any) => {
   if (!prop.admin) {
-    router.push("/contestshow/" + row.contest_id);
+    router.push({
+      path: "/contestshow",
+      query: { contest_id: row.contest_id },
+    });
   }
 };
 </script>

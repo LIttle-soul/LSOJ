@@ -49,7 +49,7 @@
       <el-dialog v-model="contest_join" title="竞赛报名" width="500px">
         <ContestJoin
           :contest_id="contest_form.contest_id"
-          @reload="setContestData(Number(route.params.contest_id))"
+          @reload="setContestData(Number(route.query.contest_id))"
         />
       </el-dialog>
     </div>
@@ -114,7 +114,10 @@ let contest_form = ref({
   contest_creator: "LiSoul",
 });
 let showContestData = (contest_id: any) => {
-  router.push("/contestdata/" + contest_id);
+  router.push({
+    path: "/contestdata/problem",
+    query: { contest_id: contest_id },
+  });
 };
 let joinContest = () => {
   contest_join.value = true;
@@ -202,7 +205,7 @@ let timeEnd = () => {
 };
 
 onMounted(() => {
-  setContestData(Number(route.params.contest_id));
+  setContestData(Number(route.query.contest_id));
 });
 </script>
 

@@ -123,8 +123,8 @@ export const nav_menu = [
       },
       {
         title: "关卡添加",
-        index: "AddLevel",
-        src: "/admin/addlevel",
+        index: "LevelAdd",
+        src: "/admin/LevelAdd",
       },
     ],
   },

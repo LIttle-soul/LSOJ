@@ -25,6 +25,13 @@ export default defineConfig({
     https: false,
     // open: '/index.html',
     proxy: {
+      // "/api": {
+      //   target: "http://127.0.0.1:8085/",
+      //   ws: true,
+      //   secure: false,
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/api/, ""),
+      // },
       "/api": {
         target: "http://10.46.62.138:8085/",
         ws: true,
@@ -32,6 +39,13 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
+      // "/api": {
+      //   target: "http://10.46.52.70:8080/",
+      //   ws: true,
+      //   secure: false,
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/api/, ""),
+      // },
     },
   },
 });

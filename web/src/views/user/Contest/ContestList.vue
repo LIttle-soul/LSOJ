@@ -69,10 +69,6 @@ let temp_search_data = computed(
   mapState(["search_data"]).search_data.bind({ $store: store })
 );
 
-let temp_data = computed(
-  mapState("contest", ["contest_list"]).contest_list.bind({ $store: store })
-);
-
 let Data = ref([
   {
     contest_id: 1,
@@ -168,7 +164,6 @@ let getContestData = async () => {
 };
 
 onMounted(() => {
-  // console.log(route.params);
   getContestData();
 });
 </script>

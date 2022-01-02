@@ -3,7 +3,12 @@
     <el-button class="nav-button" circle @click="drawer = !drawer">
       <el-icon><Menu /></el-icon>
     </el-button>
-    <el-drawer :title="web_icon" v-model="drawer" :with-header="true" direction="ltr">
+    <el-drawer
+      :title="web_icon"
+      v-model="drawer"
+      :with-header="true"
+      direction="ltr"
+    >
       <el-menu
         class="nav-menu"
         text-color="#1af"
@@ -11,9 +16,12 @@
         :default-active="$route.path"
         router
       >
-        <el-menu-item v-for="item in headerNav" :key="item.index" :index="item.index">{{
-          item.title
-        }}</el-menu-item>
+        <el-menu-item
+          v-for="item in headerNav"
+          :key="item.index"
+          :index="item.index"
+          >{{ item.title }}</el-menu-item
+        >
       </el-menu>
     </el-drawer>
     <h3 class="icon">{{ web_icon }}</h3>
@@ -26,9 +34,12 @@
       router
       style="border: none"
     >
-      <el-menu-item v-for="item in headerNav" :key="item.index" :index="item.index">{{
-        item.title
-      }}</el-menu-item>
+      <el-menu-item
+        v-for="item in headerNav"
+        :key="item.index"
+        :index="item.index"
+        >{{ item.title }}</el-menu-item
+      >
     </el-menu>
     <el-dropdown class="header-head" type="primary" trigger="hover">
       <el-avatar :src="circleUrl"></el-avatar>
@@ -52,7 +63,10 @@
         placeholder="Enter搜索"
       >
         <template #prefix>
-          <el-icon color="#AAAAAA" style="font-size: 1.1rem; transform: translateY(4px)">
+          <el-icon
+            color="#AAAAAA"
+            style="font-size: 1.1rem; transform: translateY(4px)"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1024 1024"
@@ -143,6 +157,11 @@ let linkTo = async (val: any) => {
     } else {
       router.push({ name: val.name, params: { contest_list: [] } });
     }
+  } else if (val.name === "MyCourseList") {
+    // console.log(val)
+    router.push({
+      name: "WeCourseHomeMyCourseList",
+    });
   } else {
     router.push({ name: val.name });
   }

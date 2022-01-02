@@ -11,6 +11,7 @@
         action="/api/user/getusericon/"
         name="file"
         :on-success="changeUserIcon"
+        accept="image/*"
       >
         <el-button size="mini" type="primary">更换头像</el-button>
       </el-upload>

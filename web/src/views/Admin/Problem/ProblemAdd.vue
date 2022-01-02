@@ -63,7 +63,10 @@
           ></el-switch>
         </el-form-item>
       </el-form>
-      <el-button type="primary" style="float: right; margin-bottom: 15px" @click="submit"
+      <el-button
+        type="primary"
+        style="float: right; margin-bottom: 15px"
+        @click="submit"
         >提交</el-button
       >
     </el-card>
@@ -71,7 +74,10 @@
       <template #header>
         <div class="card-header">
           <span class="title">题目内容</span>
-          <el-button class="button" type="text" @click="changeProblem = !changeProblem"
+          <el-button
+            class="button"
+            type="text"
+            @click="changeProblem = !changeProblem"
             >修改内容</el-button
           >
         </div>
@@ -82,7 +88,13 @@
         :key="new Date().getTime()"
       />
     </el-card>
-    <el-dialog title="内容编辑" v-model="changeProblem" width="90%" top="60px" center>
+    <el-dialog
+      title="内容编辑"
+      v-model="changeProblem"
+      width="90%"
+      top="60px"
+      center
+    >
       <ProblemChild
         height="800px"
         :content="problem_form.problem_content"
@@ -94,22 +106,29 @@
 
 <script lang="ts" setup>
 import ProblemChild from "@/components/Editor/MarkdownEditor.vue";
-import { submitProblemData, changeProblemData, getProblemDataList } from "@/api/problem";
-import { useStore, mapState } from "vuex";
+import {
+  submitProblemData,
+  changeProblemData,
+  getProblemDataList,
+  getProblemTagAndCourse,
+} from "@/api/problem";
 import { useRoute, useRouter } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { ElLoading, ElMessage } from "element-plus";
 import problem_mode from "@/assets/markdown/ProblemTemplet.md?raw";
 
-let store = useStore();
 let route = useRoute();
 let router = useRouter();
 
-let problem_tag_list = computed(
-  mapState("problem", ["problem_tag_list"]).problem_tag_list.bind({
-    $store: store,
-  })
-);
+let problem_tag_list = ref([]);
+
+// 获取问题标签数据
+let getTagData = async () => {
+  let back_data = await getProblemTagAndCourse();
+  if (back_data.status) {
+    problem_tag_list.value = back_data.tag;
+  }
+};
 
 let changeProblem = ref(false);
 let change_problem_id = ref(false);
@@ -209,6 +228,7 @@ onMounted(() => {
     change_problem_id.value = true;
     getProblemData(<string>route.params.problem_id[0]);
   }
+  getTagData();
 });
 </script>
 

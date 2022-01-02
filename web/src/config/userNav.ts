@@ -4,7 +4,7 @@ export const user_nav = [
   { index: "/ranklist", name: "RankList", title: "排名" },
   { index: "/solutionlist", name: "SolutionList", title: "状态" },
   { index: "/contestlist", name: "ContestList", title: "竞赛" },
-  { index: "/levellist", name: "LevelList", title: "闯关" },
+  { index: "/levelshow", name: "LevelShow", title: "闯关" },
   { index: "/courselist", name: "CourseList", title: "课程" },
   { index: "/forum", name: "Forum", title: "讨论" },
 ];
@@ -19,6 +19,11 @@ export const user_login = [
   { index: "/showuserinfo", name: "ShowUserInfo", title: "我的信息" },
   { index: "/userstatus", name: "UserStatus", title: "我的状态" },
   { index: "/contestlist", name: "ContestList", title: "我的比赛" },
+  {
+    index: "/wecoursehome/mycourselist",
+    name: "MyCourseList",
+    title: "我的课程",
+  },
   { index: "/solutionlist", name: "SolutionList", title: "我的提交" },
   { index: "/home", name: "Logout", title: "用户注销" },
 ];

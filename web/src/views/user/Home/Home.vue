@@ -13,6 +13,7 @@
           <p class="medium">{{ item.title }}</p>
         </el-carousel-item>
       </el-carousel>
+      <!-- <VideoPlay /> -->
     </div>
     <el-container>
       <el-aside class="aside">
@@ -41,6 +42,7 @@ import JournalismCard from "@/components/Home/JournalismCard.vue";
 import StatisticsCard from "@/components/Home/StatisticsCard.vue";
 import ContestCard from "@/components/Home/ContestCard.vue";
 import { onMounted } from "@vue/runtime-core";
+// import VideoPlay from "@/components/Other/VideoPlay.vue";
 
 let image_list = [
   {
